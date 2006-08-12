@@ -51,6 +51,8 @@ import javax.swing.JComponent;
  * @author davidg
  */
 public class Fred extends JComponent {
+    private static final double MAX_SPEED = 10.0;
+    private static final double MAX_MOVE_TIME_SECS = 3.0;
     private final static Point2D.Double ORIGIN = new Point2D.Double(0.0, 0.0);
     
     private List<Fred2> rootIdeas;
@@ -62,7 +64,7 @@ public class Fred extends JComponent {
     
     private void buildModel() {
         rootIdeas = new ArrayList<Fred2>();
-        final int lines = 24;
+        final int lines = 35;
         (new Thread(){public void run() {
             for (int i = 0; i < lines; i++) {
                 Fred2 fred2 = new Fred2();
@@ -80,7 +82,7 @@ public class Fred extends JComponent {
             List<Fred2> subs = rootIdeas.get(0).getSubIdeas();
             
             Fred2 subIdea0 = null;
-            for (int i = 0; i < 9; i++) {
+            for (int i = 0; i < 4; i++) {
                 subIdea0 = new Fred2();
                 subIdea0.setLength(100);
                 subIdea0.setAngle(Math.PI / 4);
@@ -88,7 +90,7 @@ public class Fred extends JComponent {
                     subs.add(subIdea0);
                     timeAdded = System.currentTimeMillis();
                 }
-                try { Thread.sleep(100);} catch(Exception e){}
+                try { Thread.sleep(1000);} catch(Exception e){}
             }
             
             List<Fred2> subs2 = subIdea0.getSubIdeas();
@@ -143,10 +145,10 @@ public class Fred extends JComponent {
         points = new ArrayList<Point2D>();
         createPoints(rootIdeas, ORIGIN, 0.0);
         List<Fred2> ideas = rootIdeas;
-        tweakIdeas(ideas, ORIGIN, 0.0);
+        tweakIdeas(ideas, ORIGIN, 0.0, false);
     }
     
-    private Point2D tweakIdeas(final List<Fred2> ideas, final Point2D c, final double initAngle) {
+    private Point2D tweakIdeas(final List<Fred2> ideas, final Point2D c, final double initAngle, final boolean hasParent) {
         if (ideas.size() == 0) {
             return new Point2D.Double(0.0, 0.0);
         }
@@ -157,14 +159,10 @@ public class Fred extends JComponent {
             timeAdded = System.currentTimeMillis();
         }
         long now = System.currentTimeMillis();
-        double maxMaxSpeed = 10.0;
-        double maxMoveTimeSecs = 5.0;
         double maxSpeed = 0.0;
-        if ((now - timeAdded) < (maxMoveTimeSecs * 1000.0)) {
-//            System.out.println("!!!!!!!!!");
-            maxSpeed = maxMaxSpeed - ((now - timeAdded) * maxMaxSpeed / 1000.0 / maxMoveTimeSecs);
+        if ((now - timeAdded) < (MAX_MOVE_TIME_SECS * 1000.0)) {
+            maxSpeed = MAX_SPEED - ((now - timeAdded) * MAX_SPEED / 1000.0 / MAX_MOVE_TIME_SECS);
         }
-//        System.out.println("maxSpeed = " + maxSpeed);
         synchronized(ideas) {
             double minDiffAngle = Math.PI / 2 / ideas.size();
             for (int i = 0; i < ideas.size(); i++) {
@@ -177,7 +175,6 @@ public class Fred extends JComponent {
                 if (i < ideas.size() - 1) {
                     nextIdea = ideas.get(i + 1);
                 }
-//            for(Fred2 idea: ideas) {
                 Point2D point = getPoint(idea, c, initAngle);
                 double forceX = 0.0;
                 double forceY = 0.0;
@@ -204,7 +201,7 @@ public class Fred extends JComponent {
                     }
                 }
                 Point2D p2 = getPoint(idea, ORIGIN, initAngle);
-                Point2D tf = tweakIdeas(idea.getSubIdeas(), point, idea.getAngle());
+                Point2D tf = tweakIdeas(idea.getSubIdeas(), point, idea.getAngle(), true);
                 forceX += tf.getX();
                 forceY += tf.getY();
                 double sideForce = (p2.getY() * forceX) + (-p2.getX() * forceY);
@@ -240,6 +237,9 @@ public class Fred extends JComponent {
                     }
                 } else {
                     double previousAngle = -Math.PI;
+                    if (!hasParent) {
+                        previousAngle = ideas.get(ideas.size() - 1).getAngle() - 2 * Math.PI;
+                    }
                     if (previousAngle > newAngle - minDiffAngle) {
                         newAngle = previousAngle + minDiffAngle;
                         double previousV = 0.0;
@@ -258,7 +258,6 @@ public class Fred extends JComponent {
                         nextIdea.setAngle(newAngle + minDiffAngle);
                         newAngle = nextAngle - minDiffAngle;
                         double nextV = nextIdea.getV();
-//                        double diffV = v - nextV;
                         double diffV = 0.0;
                         if (diffV > 0) {
                             idea.setV(-diffV);
@@ -271,10 +270,12 @@ public class Fred extends JComponent {
                     }
                 } else {
                     double nextAngle = Math.PI;
+                    if (!hasParent) {
+                        nextAngle = ideas.get(0).getAngle() +  2 * Math.PI;
+                    }
                     if (nextAngle < newAngle + minDiffAngle) {
                         newAngle = nextAngle - minDiffAngle;
                         double nextV = 0.0;
-                        //double diffV = v - nextV;
                         double diffV = 0.0;
                         if (diffV > 0) {
                             idea.setV(-diffV);
@@ -283,13 +284,6 @@ public class Fred extends JComponent {
                         }
                         v = idea.getV();
                     }
-                }
-//                idea.setAngle(idea.getAngle() + (idea.getV() / idea.getLength()));
-                if (previousIdea != null) {
-                    assert(previousIdea.getAngle() < idea.getAngle());
-                }
-                if (nextIdea != null) {
-                    assert(nextIdea.getAngle() > idea.getAngle());
                 }
                 idea.setAngle(newAngle);
             }
