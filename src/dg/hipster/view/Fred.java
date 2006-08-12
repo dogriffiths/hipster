@@ -37,10 +37,12 @@ package dg.hipster.view;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.RenderingHints;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
@@ -64,7 +66,7 @@ public class Fred extends JComponent {
     
     private void buildModel() {
         rootIdeas = new ArrayList<Fred2>();
-        final int lines = 35;
+        final int lines = 15;
         (new Thread(){public void run() {
             for (int i = 0; i < lines; i++) {
                 Fred2 fred2 = new Fred2();
@@ -128,11 +130,44 @@ public class Fred extends JComponent {
                 Point2D p = new Point2D.Double(Math.sin(a) * len, Math.cos(a) * len);
                 Point s = getView(c, p);
                 g.drawLine(c.x, c.y, s.x, s.y);
+                Point midp = new Point((c.x + s.x) / 2, (c.y + s.y) / 2);
+                drawString((Graphics2D)g, "hipster", midp, 4, Math.PI / 2.0 - a);
                 displayIdeas(g, idea.getAngle(), s, idea.getSubIdeas());
             }
         }
     }
     
+    public void transform(Graphics2D graphics2d, double orientation, int x, int y) {
+        graphics2d.transform(
+                AffineTransform.getRotateInstance(
+                -orientation, x, y
+                )
+                );
+    }
+    public void drawString(Graphics2D graphics2d, String string, Point p, int alignment,
+            double orientation) {
+        
+        int xc = p.x;
+        int yc = p.y;
+        
+        AffineTransform transform = graphics2d.getTransform();
+        
+        transform(graphics2d, orientation, xc, yc);
+        
+        FontMetrics fm = graphics2d.getFontMetrics();
+        double realTextWidth = fm.stringWidth(string);
+        double realTextHeight = fm.getHeight();
+        
+        int offsetX = (int) (realTextWidth * (double) (alignment % 3) / 2.0);
+        int offsetY = (int) (-realTextHeight * (double) (alignment / 3) / 2.0);
+        
+        if ((graphics2d != null) && (string != null)) {
+            graphics2d.drawString(string, xc - offsetX, yc - offsetY);
+        }
+        
+        graphics2d.setTransform(transform);
+    }
+
     private Point getView(final Point c, final Point2D p) {
         int sx = c.x + (int)p.getX();
         int sy = c.y - (int)p.getY();
