@@ -33,7 +33,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-package dg.hip.model;
+package dg.hipster.model;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;

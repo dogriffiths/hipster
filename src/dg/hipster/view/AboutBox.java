@@ -33,7 +33,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-package dg.hip.view;
+package dg.hipster.view;
 
 import java.awt.BorderLayout;
 import java.awt.Font;
@@ -59,7 +59,7 @@ public class AboutBox extends JFrame implements ActionListener {
     protected static int aboutLeft = 350;
     protected Font titleFont, bodyFont;
     protected static ResourceBundle resBundle = ResourceBundle.getBundle(
-            "dg/hip/resource/strings");
+            "dg/hipster/resource/strings");
     
     public AboutBox() {
         super("");

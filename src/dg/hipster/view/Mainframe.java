@@ -33,9 +33,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-package dg.hip.view;
+package dg.hipster.view;
 
-import dg.hip.model.Settings;
+import dg.hipster.model.Settings;
 import java.awt.BorderLayout;
 import java.util.ResourceBundle;
 import javax.swing.JFrame;
@@ -50,7 +50,7 @@ public class Mainframe extends JFrame {
      * Internationalization strings.
      */
     protected static ResourceBundle resBundle = ResourceBundle.getBundle(
-            "dg/hip/resource/strings");
+            "dg/hipster/resource/strings");
     
     private Fred hip;
     

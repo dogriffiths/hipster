@@ -33,12 +33,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-package dg.hip.controller;
+package dg.hipster.controller;
 
 import com.apple.eawt.Application;
 import com.apple.eawt.ApplicationEvent;
 import com.apple.eawt.ApplicationListener;
-import dg.hip.Main;
+import dg.hipster.Main;
 import java.io.File;
 
 /**

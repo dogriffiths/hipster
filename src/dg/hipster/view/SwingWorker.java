@@ -1,4 +1,4 @@
-package dg.hip.view;
+package dg.hipster.view;
 
 import javax.swing.SwingUtilities;
 

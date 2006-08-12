@@ -33,7 +33,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-package dg.hip.view;
+package dg.hipster.view;
 
 import java.awt.Color;
 import java.awt.Dimension;

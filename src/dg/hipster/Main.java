@@ -33,11 +33,11 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-package dg.hip;
+package dg.hipster;
 
-import dg.hip.model.Settings;
-import dg.hip.view.AboutBox;
-import dg.hip.view.Mainframe;
+import dg.hipster.model.Settings;
+import dg.hipster.view.AboutBox;
+import dg.hipster.view.Mainframe;
 import java.awt.Rectangle;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -54,7 +54,7 @@ public class Main {
      * Internationalization strings.
      */
     protected static ResourceBundle resBundle = ResourceBundle.getBundle(
-            "dg/hip/resource/strings");
+            "dg/hipster/resource/strings");
     
     /** Creates a new instance of Main */
     public Main() {
@@ -66,7 +66,7 @@ public class Main {
     public static void main(String[] args) {
         if (isMac()) {
             try {
-                Class.forName("dg.hip.controller.MacAppListener");
+                Class.forName("dg.hipster.controller.MacAppListener");
             } catch(ClassNotFoundException cnfe) {
                 cnfe.printStackTrace();
             }
