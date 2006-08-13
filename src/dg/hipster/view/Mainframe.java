@@ -52,6 +52,9 @@ public class Mainframe extends JFrame {
     protected static ResourceBundle resBundle = ResourceBundle.getBundle(
             "dg/hipster/resource/strings");
     
+    /**
+     * Main idea processor component.
+     */
     private Fred hip;
     
     /** Creates a new instance of Mainframe */
@@ -64,6 +67,9 @@ public class Mainframe extends JFrame {
         buildView();
     }
 
+    /**
+     * Lay the window out.
+     */
     private void buildView() {
         hip = new Fred();
         this.getContentPane().add(hip, BorderLayout.CENTER);
