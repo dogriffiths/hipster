@@ -131,7 +131,11 @@ public class Fred extends JComponent {
                 Point s = getView(c, p);
                 g.drawLine(c.x, c.y, s.x, s.y);
                 Point midp = new Point((c.x + s.x) / 2, (c.y + s.y) / 2);
-                drawString((Graphics2D)g, "hipster", midp, 4, Math.PI / 2.0 - a);
+                double textAngle = (Math.PI / 2.0) - a;
+                if ((a < 0) || (a > Math.PI)) {
+                    textAngle += Math.PI;
+                }
+                drawString((Graphics2D)g, idea.getText(), midp, 4, textAngle);
                 displayIdeas(g, idea.getAngle(), s, idea.getSubIdeas());
             }
         }
@@ -349,6 +353,7 @@ public class Fred extends JComponent {
         private double length;
         private double angle;
         private double v;
+        private String text = "hipster";
         private List<Fred2> subIdeas = new ArrayList<Fred2>();
         
         public Fred2() {
@@ -381,6 +386,14 @@ public class Fred extends JComponent {
         
         public void setV(double v) {
             this.v = v;
+        }
+
+        public String getText() {
+            return text;
+        }
+
+        public void setText(String text) {
+            this.text = text;
         }
     }
     
