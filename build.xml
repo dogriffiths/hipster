@@ -66,4 +66,25 @@
     nbproject/build-impl.xml file. 
 
     -->
+    <!--                    -->
+    <!-- CHECK CODING STYLE -->
+    <!--                    -->
+    <target name="checkstyle"
+        description="Generates a report of code convention violations. Any errors about creating a checker means an old checkstyle library is somewhere">
+
+        <path id="pmd.classpath">
+            <fileset dir="lib">
+                <include name="*.jar"/>
+            </fileset>
+        </path>
+        <taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask"
+        classpathref="pmd.classpath"/>
+        <pmd shortFilenames="true">
+            <ruleset>basic</ruleset>
+            <formatter type="xml" toFile="dist/pmd_report.xml"/>
+            <fileset dir="src">
+                <include name="**/F*.java"/>
+            </fileset>
+        </pmd>
+    </target>
 </project>
