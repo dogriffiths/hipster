@@ -83,7 +83,7 @@
             <ruleset>basic</ruleset>
             <formatter type="xml" toFile="dist/pmd_report.xml"/>
             <fileset dir="src">
-                <include name="**/F*.java"/>
+                <include name="**/*.java"/>
             </fileset>
         </pmd>
     </target>
