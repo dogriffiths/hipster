@@ -10,10 +10,10 @@
  * modification, are permitted provided that the following conditions are met:
  *
  * * Redistributions of source code must retain the above copyright notice,
- *   this list of conditions and the following disclaimer.
+ *   this Vector of conditions and the following disclaimer.
  *
  * * Redistributions in binary form must reproduce the above copyright notice,
- *   this list of conditions and the following disclaimer in the documentation
+ *   this Vector of conditions and the following disclaimer in the documentation
  *   and/or other materials provided with the distribution.
  *
  * * Neither the name of the David Griffiths nor the names of his contributors
@@ -44,8 +44,7 @@ import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Vector;
 import javax.swing.JComponent;
 
 /**
@@ -57,7 +56,8 @@ public class Fred extends JComponent {
     private static final double MAX_MOVE_TIME_SECS = 3.0;
     private final static Point2D.Double ORIGIN = new Point2D.Double(0.0, 0.0);
     
-    private List<Fred2> rootIdeas;
+    private Fred2 root;
+    private Fred2View rootView;
     
     /** Creates a new instance of Fred */
     public Fred() {
@@ -65,45 +65,34 @@ public class Fred extends JComponent {
     }
     
     private void buildModel() {
-        rootIdeas = new ArrayList<Fred2>();
+        root = new Fred2();
+        rootView = new Fred2View(root);
         final int lines = 15;
         (new Thread(){public void run() {
             for (int i = 0; i < lines; i++) {
                 Fred2 fred2 = new Fred2();
-            fred2.setLength(100 + 100 * i / lines);
-//            fred2.setLength(100 + 100 * i / lines + ((int)Math.random() * 100));
-//                fred2.setLength(100 + (int)(Math.random() * 200));
-//            fred2.setLength(200);
-                fred2.setAngle(i * Math.PI / lines);
-                synchronized(rootIdeas) {
-                    rootIdeas.add(fred2);
+                synchronized(root) {
+                    root.add(fred2);
                     timeAdded = System.currentTimeMillis();
                 }
                 //try { Thread.sleep(100);} catch(Exception e){}
             }
-            List<Fred2> subs = rootIdeas.get(0).getSubIdeas();
+            
+            Fred2 sub = root.getSubIdeas().get(0);
             
             Fred2 subIdea0 = null;
             for (int i = 0; i < 4; i++) {
                 subIdea0 = new Fred2();
-                subIdea0.setLength(100);
-                subIdea0.setAngle(Math.PI / 4);
-                synchronized(subs) {
-                    subs.add(subIdea0);
-                    timeAdded = System.currentTimeMillis();
-                }
+                sub.add(subIdea0);
+                timeAdded = System.currentTimeMillis();
                 try { Thread.sleep(1000);} catch(Exception e){}
             }
             
-            List<Fred2> subs2 = subIdea0.getSubIdeas();
+            Fred2 s2 = subIdea0;
             for (int i = 0; i < 6; i++) {
                 Fred2 subIdea2 = new Fred2();
-                subIdea2.setLength(100);
-                subIdea2.setAngle(Math.PI / 4);
-                synchronized(subs2) {
-                    subs2.add(subIdea2);
-                    timeAdded = System.currentTimeMillis();
-                }
+                s2.add(subIdea2);
+                timeAdded = System.currentTimeMillis();
                 try { Thread.sleep(1000);} catch(Exception e){}
             }
         }}).start();
@@ -113,20 +102,19 @@ public class Fred extends JComponent {
         ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g.setColor(Color.BLACK);
         Dimension size = getSize();
-        List<Fred2> views = rootIdeas;
+        Vector<Fred2View> views = rootView.getSubViews();
         Point c = new Point(size.width / 2, size.height / 2);
         displayIdeas(g, 0.0, c, views);
         adjustModel();
-//               try { Thread.sleep(100);} catch(Exception e){}
         repaint(100);
     }
     
     
-    private void displayIdeas(final Graphics g, final double initAngle, final Point c, final List<Fred2> ideas) {
-        synchronized(ideas) {
-            for (Fred2 idea: ideas) {
-                double a = idea.getAngle() + initAngle;
-                double len = idea.getLength();
+    private void displayIdeas(final Graphics g, final double initAngle, final Point c, final Vector<Fred2View> views) {
+        synchronized(views) {
+            for (Fred2View view: views) {
+                double a = view.getAngle() + initAngle;
+                double len = view.getLength();
                 Point2D p = new Point2D.Double(Math.sin(a) * len, Math.cos(a) * len);
                 Point s = getView(c, p);
                 g.drawLine(c.x, c.y, s.x, s.y);
@@ -135,8 +123,8 @@ public class Fred extends JComponent {
                 if ((a < 0) || (a > Math.PI)) {
                     textAngle += Math.PI;
                 }
-                drawString((Graphics2D)g, idea.getText(), midp, 4, textAngle);
-                displayIdeas(g, idea.getAngle(), s, idea.getSubIdeas());
+                drawString((Graphics2D)g, view.getIdea().getText(), midp, 4, textAngle);
+                displayIdeas(g, view.getAngle(), s, view.getSubViews());
             }
         }
     }
@@ -171,7 +159,7 @@ public class Fred extends JComponent {
         
         graphics2d.setTransform(transform);
     }
-
+    
     private Point getView(final Point c, final Point2D p) {
         int sx = c.x + (int)p.getX();
         int sy = c.y - (int)p.getY();
@@ -179,16 +167,16 @@ public class Fred extends JComponent {
     }
     long timeAdded = 0;
     
-    List<Point2D> points;
+    Vector<Point2D> points;
     private void adjustModel() {
-        points = new ArrayList<Point2D>();
-        createPoints(rootIdeas, ORIGIN, 0.0);
-        List<Fred2> ideas = rootIdeas;
-        tweakIdeas(ideas, ORIGIN, 0.0, false);
+        points = new Vector<Point2D>();
+        Vector<Fred2View> views = rootView.getSubViews();
+        createPoints(views, ORIGIN, 0.0);
+        tweakIdeas(views, ORIGIN, 0.0, false);
     }
     
-    private Point2D tweakIdeas(final List<Fred2> ideas, final Point2D c, final double initAngle, final boolean hasParent) {
-        if (ideas.size() == 0) {
+    private Point2D tweakIdeas(final Vector<Fred2View> views, final Point2D c, final double initAngle, final boolean hasParent) {
+        if (views.size() == 0) {
             return new Point2D.Double(0.0, 0.0);
         }
         double mass = 2000.0 / (points.size() * Math.sqrt((double)points.size()));
@@ -202,19 +190,19 @@ public class Fred extends JComponent {
         if ((now - timeAdded) < (MAX_MOVE_TIME_SECS * 1000.0)) {
             maxSpeed = MAX_SPEED - ((now - timeAdded) * MAX_SPEED / 1000.0 / MAX_MOVE_TIME_SECS);
         }
-        synchronized(ideas) {
-            double minDiffAngle = Math.PI / 2 / ideas.size();
-            for (int i = 0; i < ideas.size(); i++) {
-                Fred2 previousIdea = null;
-                Fred2 nextIdea = null;
-                Fred2 idea = ideas.get(i);
+        synchronized(views) {
+            double minDiffAngle = Math.PI / 2 / views.size();
+            for (int i = 0; i < views.size(); i++) {
+                Fred2View previousView = null;
+                Fred2View nextView = null;
+                Fred2View view = views.get(i);
                 if (i > 0) {
-                    previousIdea = ideas.get(i - 1);
+                    previousView = views.get(i - 1);
                 }
-                if (i < ideas.size() - 1) {
-                    nextIdea = ideas.get(i + 1);
+                if (i < views.size() - 1) {
+                    nextView = views.get(i + 1);
                 }
-                Point2D point = getPoint(idea, c, initAngle);
+                Point2D point = getPoint(view, c, initAngle);
                 double forceX = 0.0;
                 double forceY = 0.0;
                 for(Point2D other: points) {
@@ -239,14 +227,14 @@ public class Fred extends JComponent {
                         }
                     }
                 }
-                Point2D p2 = getPoint(idea, ORIGIN, initAngle);
-                Point2D tf = tweakIdeas(idea.getSubIdeas(), point, idea.getAngle(), true);
+                Point2D p2 = getPoint(view, ORIGIN, initAngle);
+                Point2D tf = tweakIdeas(view.getSubViews(), point, view.getAngle(), true);
                 forceX += tf.getX();
                 forceY += tf.getY();
                 double sideForce = (p2.getY() * forceX) + (-p2.getX() * forceY);
                 totForceX += forceX;
                 totForceY += forceY;
-                double v = idea.getV();
+                double v = view.getV();
                 v += sideForce / mass;
                 v *= 0.90;
                 if (v > maxSpeed) {
@@ -255,109 +243,160 @@ public class Fred extends JComponent {
                 if (v < -maxSpeed) {
                     v = -maxSpeed;
                 }
-                idea.setV(v);
-                double oldAngle = idea.getAngle();
-                double newAngle = oldAngle  + (idea.getV() / idea.getLength());
-                if (previousIdea != null) {
-                    double previousAngle = previousIdea.getAngle();
+                view.setV(v);
+                double oldAngle = view.getAngle();
+                double newAngle = oldAngle  + (view.getV() / view.getLength());
+                if (previousView != null) {
+                    double previousAngle = previousView.getAngle();
                     if (previousAngle > newAngle - minDiffAngle) {
-                        previousIdea.setAngle(newAngle - minDiffAngle);
+                        previousView.setAngle(newAngle - minDiffAngle);
                         newAngle = previousAngle + minDiffAngle;
-                        double previousV = previousIdea.getV();
+                        double previousV = previousView.getV();
                         double diffV = v - previousV;
                         if (diffV > 0) {
-                            idea.setV(diffV);
-                            previousIdea.setV(-diffV);
+                            view.setV(diffV);
+                            previousView.setV(-diffV);
                         } else {
-                            idea.setV(-diffV);
-                            previousIdea.setV(diffV);
+                            view.setV(-diffV);
+                            previousView.setV(diffV);
                         }
-                        v = idea.getV();
+                        v = view.getV();
                     }
                 } else {
                     double previousAngle = -Math.PI;
                     if (!hasParent) {
-                        previousAngle = ideas.get(ideas.size() - 1).getAngle() - 2 * Math.PI;
+                        previousAngle = views.get(views.size() - 1).getAngle() - 2 * Math.PI;
                     }
                     if (previousAngle > newAngle - minDiffAngle) {
                         newAngle = previousAngle + minDiffAngle;
                         double previousV = 0.0;
                         double diffV = v - previousV;
                         if (diffV > 0) {
-                            idea.setV(diffV);
+                            view.setV(diffV);
                         } else {
-                            idea.setV(-diffV);
+                            view.setV(-diffV);
                         }
-                        v = idea.getV();
+                        v = view.getV();
                     }
                 }
-                if (nextIdea != null) {
-                    double nextAngle = nextIdea.getAngle();
+                if (nextView != null) {
+                    double nextAngle = nextView.getAngle();
                     if (nextAngle < newAngle + minDiffAngle) {
-                        nextIdea.setAngle(newAngle + minDiffAngle);
+                        nextView.setAngle(newAngle + minDiffAngle);
                         newAngle = nextAngle - minDiffAngle;
-                        double nextV = nextIdea.getV();
+                        double nextV = nextView.getV();
                         double diffV = 0.0;
                         if (diffV > 0) {
-                            idea.setV(-diffV);
-                            nextIdea.setV(diffV);
+                            view.setV(-diffV);
+                            nextView.setV(diffV);
                         } else {
-                            idea.setV(diffV);
-                            nextIdea.setV(-diffV);
+                            view.setV(diffV);
+                            nextView.setV(-diffV);
                         }
-                        v = idea.getV();
+                        v = view.getV();
                     }
                 } else {
                     double nextAngle = Math.PI;
                     if (!hasParent) {
-                        nextAngle = ideas.get(0).getAngle() +  2 * Math.PI;
+                        nextAngle = views.get(0).getAngle() +  2 * Math.PI;
                     }
                     if (nextAngle < newAngle + minDiffAngle) {
                         newAngle = nextAngle - minDiffAngle;
                         double nextV = 0.0;
                         double diffV = 0.0;
                         if (diffV > 0) {
-                            idea.setV(-diffV);
+                            view.setV(-diffV);
                         } else {
-                            idea.setV(diffV);
+                            view.setV(diffV);
                         }
-                        v = idea.getV();
+                        v = view.getV();
                     }
                 }
-                idea.setAngle(newAngle);
+                view.setAngle(newAngle);
             }
         }
         return new Point2D.Double(totForceX, totForceY);
     }
     
-    private void createPoints(List<Fred2> ideas, Point2D c, double initAngle) {
+    private void createPoints(Vector<Fred2View> views, Point2D c, double initAngle) {
         points.add(ORIGIN);
-        synchronized(ideas) {
-            for(Fred2 idea: ideas) {
-                Point2D point = getPoint(idea, c, initAngle);
+        synchronized(views) {
+            for(Fred2View view: views) {
+                Point2D point = getPoint(view, c, initAngle);
                 points.add(point);
-                createPoints(idea.getSubIdeas(), point, idea.getAngle());
+                createPoints(view.getSubViews(), point, view.getAngle());
             }
         }
     }
     
-    private Point2D getPoint(Fred2 idea, Point2D c, double initAngle) {
-        double angle = idea.getAngle() + initAngle;
-        double length = idea.getLength();
+    private Point2D getPoint(Fred2View view, Point2D c, double initAngle) {
+        double angle = view.getAngle() + initAngle;
+        double length = view.getLength();
         double x = c.getX() + Math.sin(angle) * length;
         double y = c.getY() + Math.cos(angle) * length;
         return new Point2D.Double(x, y);
     }
     
     private static class Fred2 {
-        private double length;
-        private double angle;
-        private double v;
         private String text = "hipster";
-        private List<Fred2> subIdeas = new ArrayList<Fred2>();
+        private Vector<Fred2> subIdeas = new Vector<Fred2>();
+        private Vector<Fred2Listener> listeners = new Vector<Fred2Listener>();
         
         public Fred2() {
             
+        }
+        
+        public synchronized void add(Fred2 subIdea) {
+            subIdeas.add(subIdea);
+            notify("ADDED", new Object[] {subIdea});
+        }
+        
+        public synchronized void remove(Fred2 subIdea) {
+            subIdeas.remove(subIdea);
+            notify("REMOVED", new Object[] {subIdea});
+        }
+        
+        public void addFred2Listener(Fred2Listener al) {
+            listeners.add(al);
+        }
+        
+        public void removeFred2Listener(Fred2Listener al) {
+            listeners.remove(al);
+        }
+        
+        private void notify(String command, Object[] paras) {
+            for (Fred2Listener listener: listeners) {
+                listener.fred2Changed(new Fred2Event(this, command, paras));
+            }
+        }
+        
+        public synchronized Vector<Fred2> getSubIdeas() {
+            return subIdeas;
+        }
+        
+        public String getText() {
+            return text;
+        }
+        
+        public void setText(String text) {
+            this.text = text;
+        }
+    }
+    
+    
+    
+    
+    
+    private static class Fred2View implements Fred2Listener {
+        private double length;
+        private double angle;
+        private double v;
+        private Vector<Fred2View> subViews = new Vector<Fred2View>();
+        private Fred2 idea;
+        
+        public Fred2View(Fred2 anIdea) {
+            this.idea = anIdea;
+            anIdea.addFred2Listener(this);
         }
         
         public double getLength() {
@@ -375,9 +414,36 @@ public class Fred extends JComponent {
         public void setAngle(double angle) {
             this.angle = angle;
         }
+        public void fred2Changed(Fred2Event fe) {
+            String cmd = fe.getCommand();
+            if ("ADDED".equals(cmd)) {
+                Fred2 subIdea = (Fred2)fe.getParas()[0];
+                Fred2View subView = new Fred2View(subIdea);
+                 subView.setLength(100);
+                subView.setAngle(Math.PI / 4);
+               add(subView);
+            } else if ("REMOVED".equals(cmd)) {
+                Fred2 subIdea = (Fred2)fe.getParas()[0];
+                for (int i = 0; i < subViews.size(); i++) {
+                    Fred2 idea = (Fred2)subViews.get(i).getIdea();
+                    if (idea.equals(subIdea)) {
+                        subViews.remove(i);
+                        break;
+                    }
+                }
+            }
+        }
         
-        public List<Fred2> getSubIdeas() {
-            return subIdeas;
+        public synchronized void add(Fred2View subView) {
+            subViews.add(subView);
+        }
+        
+        public synchronized void remove(Fred2View subView) {
+            subViews.remove(subView);
+        }
+        
+        public synchronized Vector<Fred2View> getSubViews() {
+            return subViews;
         }
         
         public double getV() {
@@ -387,14 +453,51 @@ public class Fred extends JComponent {
         public void setV(double v) {
             this.v = v;
         }
-
-        public String getText() {
-            return text;
-        }
-
-        public void setText(String text) {
-            this.text = text;
+        
+        public Fred2 getIdea() {
+            return idea;
         }
     }
     
+}
+
+interface Fred2Listener {
+    public void fred2Changed(Fred2Event fe);
+}
+
+class Fred2Event {
+    private Object source;
+    private String command;
+    private Object[] paras;
+    
+    public Fred2Event(Object aSource, String aCommand,
+            Object[] theParas) {
+        this.source = aSource;
+        this.command = aCommand;
+        this.paras = theParas;
+    }
+    
+    public Object getSource() {
+        return source;
+    }
+    
+    public void setSource(Object source) {
+        this.source = source;
+    }
+    
+    public String getCommand() {
+        return command;
+    }
+    
+    public void setCommand(String command) {
+        this.command = command;
+    }
+    
+    public Object[] getParas() {
+        return paras;
+    }
+    
+    public void setParas(Object[] paras) {
+        this.paras = paras;
+    }
 }
