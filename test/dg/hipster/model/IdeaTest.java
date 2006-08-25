@@ -157,35 +157,12 @@ public class IdeaTest extends TestCase {
         
     }
 
-//    /**
-//     * Test of getText method, of class dg.hipster.model.Idea.
-//     */
-//    public void testGetText() {
-//        System.out.println("getText");
-//
-//        Idea instance = new Idea();
-//
-//        String expResult = "";
-//        String result = instance.getText();
-//        assertEquals(expResult, result);
-//
-//        // TODO review the generated test code and remove the default call to fail.
-//        fail("The test case is a prototype.");
-//    }
-//
-//    /**
-//     * Test of setText method, of class dg.hipster.model.Idea.
-//     */
-//    public void testSetText() {
-//        System.out.println("setText");
-//
-//        String text = "";
-//        Idea instance = new Idea();
-//
-//        instance.setText(text);
-//
-//        // TODO review the generated test code and remove the default call to fail.
-//        fail("The test case is a prototype.");
-//    }
-//
+    /**
+     * Test of getText method, of class dg.hipster.model.Idea.
+     */
+    public void testGetSetText() {
+        assertEquals("Text should initially be zero-length", "", idea.getText());
+        idea.setText("Some text");
+        assertEquals("Text should have been updated", "Some text", idea.getText());
+    }
 }

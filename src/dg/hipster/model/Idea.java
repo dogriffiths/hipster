@@ -17,7 +17,7 @@ import java.util.Vector;
  * @author davidg
  */
 public class Idea {
-    private String text = "hipster";
+    private String text = "";
     private Vector<Idea> subIdeas = new Vector<Idea>();
     private Vector<IdeaListener> listeners = new Vector<IdeaListener>();
     
