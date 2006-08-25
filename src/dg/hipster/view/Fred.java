@@ -35,6 +35,7 @@
 
 package dg.hipster.view;
 
+import dg.hipster.model.Idea;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FontMetrics;
@@ -56,8 +57,8 @@ public class Fred extends JComponent {
     private static final double MAX_MOVE_TIME_SECS = 3.0;
     private final static Point2D.Double ORIGIN = new Point2D.Double(0.0, 0.0);
     
-    private Fred2 root;
-    private Fred2View rootView;
+    private Idea persistence;
+    private IdeaView persistenceView;
     
     /** Creates a new instance of Fred */
     public Fred() {
@@ -65,44 +66,72 @@ public class Fred extends JComponent {
     }
     
     private void buildModel() {
-        root = new Fred2();
-        rootView = new Fred2View(root);
-        final int lines = 15;
-        (new Thread(){public void run() {
-            for (int i = 0; i < lines; i++) {
-                Fred2 fred2 = new Fred2();
-                synchronized(root) {
-                    root.add(fred2);
-                    timeAdded = System.currentTimeMillis();
-                }
-                //try { Thread.sleep(100);} catch(Exception e){}
-            }
-            
-            Fred2 sub = root.getSubIdeas().get(0);
-            
-            Fred2 subIdea0 = null;
-            for (int i = 0; i < 4; i++) {
-                subIdea0 = new Fred2();
-                sub.add(subIdea0);
-                timeAdded = System.currentTimeMillis();
-                try { Thread.sleep(1000);} catch(Exception e){}
-            }
-            
-            Fred2 s2 = subIdea0;
-            for (int i = 0; i < 6; i++) {
-                Fred2 subIdea2 = new Fred2();
-                s2.add(subIdea2);
-                timeAdded = System.currentTimeMillis();
-                try { Thread.sleep(1000);} catch(Exception e){}
-            }
-        }}).start();
+        persistence = new Idea("Persistence");
+        persistenceView = new IdeaView(persistence);
+        
+        Idea mistakes = new Idea("Mistakes");
+        Idea platforms = new Idea("Platforms");
+        mistakes.add(platforms);
+        Idea attempts = new Idea("Attempts");
+        platforms.add(attempts);
+        Idea continual = new Idea("Continual");
+        attempts.add(continual);
+        Idea further = new Idea("Further");
+        attempts.add(further);
+        Idea enjoyed = new Idea("Enjoyed");
+        attempts.add(enjoyed);
+        Idea thousands = new Idea("Thousands");
+        mistakes.add(thousands);
+        Idea making = new Idea("Making");
+        mistakes.add(making);
+        Idea progress = new Idea("Progress");
+        mistakes.add(progress);
+        Idea learning = new Idea("Learning");
+        persistence.add(learning);
+        Idea love = new Idea("Love");
+        learning.add(love);
+        love.add(mistakes);
+        persistence.add(mistakes);
+        
+        
+        
+        
+//        final int lines = 15;
+//        (new Thread(){public void run() {
+//            for (int i = 0; i < lines; i++) {
+//                Idea fred2 = new Idea();
+//                synchronized(persistence) {
+//                    persistence.add(fred2);
+//                    timeAdded = System.currentTimeMillis();
+//                }
+//                //try { Thread.sleep(100);} catch(Exception e){}
+//            }
+//            
+//            Idea sub = persistence.getSubIdeas().get(0);
+//            
+//            Idea subIdea0 = null;
+//            for (int i = 0; i < 4; i++) {
+//                subIdea0 = new Idea();
+//                sub.add(subIdea0);
+//                timeAdded = System.currentTimeMillis();
+//                try { Thread.sleep(1000);} catch(Exception e){}
+//            }
+//            
+//            Idea s2 = subIdea0;
+//            for (int i = 0; i < 6; i++) {
+//                Idea subIdea2 = new Idea();
+//                s2.add(subIdea2);
+//                timeAdded = System.currentTimeMillis();
+//                try { Thread.sleep(1000);} catch(Exception e){}
+//            }
+//        }}).start();
     }
     
     public void paintComponent(Graphics g) {
         ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g.setColor(Color.BLACK);
         Dimension size = getSize();
-        Vector<Fred2View> views = rootView.getSubViews();
+        Vector<IdeaView> views = persistenceView.getSubViews();
         Point c = new Point(size.width / 2, size.height / 2);
         displayIdeas(g, 0.0, c, views);
         adjustModel();
@@ -110,9 +139,9 @@ public class Fred extends JComponent {
     }
     
     
-    private void displayIdeas(final Graphics g, final double initAngle, final Point c, final Vector<Fred2View> views) {
+    private void displayIdeas(final Graphics g, final double initAngle, final Point c, final Vector<IdeaView> views) {
         synchronized(views) {
-            for (Fred2View view: views) {
+            for (IdeaView view: views) {
                 double a = view.getAngle() + initAngle;
                 double len = view.getLength();
                 Point2D p = new Point2D.Double(Math.sin(a) * len, Math.cos(a) * len);
@@ -170,12 +199,12 @@ public class Fred extends JComponent {
     Vector<Point2D> points;
     private void adjustModel() {
         points = new Vector<Point2D>();
-        Vector<Fred2View> views = rootView.getSubViews();
+        Vector<IdeaView> views = persistenceView.getSubViews();
         createPoints(views, ORIGIN, 0.0);
         tweakIdeas(views, ORIGIN, 0.0, false);
     }
     
-    private Point2D tweakIdeas(final Vector<Fred2View> views, final Point2D c, final double initAngle, final boolean hasParent) {
+    private Point2D tweakIdeas(final Vector<IdeaView> views, final Point2D c, final double initAngle, final boolean hasParent) {
         if (views.size() == 0) {
             return new Point2D.Double(0.0, 0.0);
         }
@@ -193,9 +222,9 @@ public class Fred extends JComponent {
         synchronized(views) {
             double minDiffAngle = Math.PI / 2 / views.size();
             for (int i = 0; i < views.size(); i++) {
-                Fred2View previousView = null;
-                Fred2View nextView = null;
-                Fred2View view = views.get(i);
+                IdeaView previousView = null;
+                IdeaView nextView = null;
+                IdeaView view = views.get(i);
                 if (i > 0) {
                     previousView = views.get(i - 1);
                 }
@@ -318,10 +347,10 @@ public class Fred extends JComponent {
         return new Point2D.Double(totForceX, totForceY);
     }
     
-    private void createPoints(Vector<Fred2View> views, Point2D c, double initAngle) {
+    private void createPoints(Vector<IdeaView> views, Point2D c, double initAngle) {
         points.add(ORIGIN);
         synchronized(views) {
-            for(Fred2View view: views) {
+            for(IdeaView view: views) {
                 Point2D point = getPoint(view, c, initAngle);
                 points.add(point);
                 createPoints(view.getSubViews(), point, view.getAngle());
@@ -329,175 +358,11 @@ public class Fred extends JComponent {
         }
     }
     
-    private Point2D getPoint(Fred2View view, Point2D c, double initAngle) {
+    private Point2D getPoint(IdeaView view, Point2D c, double initAngle) {
         double angle = view.getAngle() + initAngle;
         double length = view.getLength();
         double x = c.getX() + Math.sin(angle) * length;
         double y = c.getY() + Math.cos(angle) * length;
         return new Point2D.Double(x, y);
-    }
-    
-    private static class Fred2 {
-        private String text = "hipster";
-        private Vector<Fred2> subIdeas = new Vector<Fred2>();
-        private Vector<Fred2Listener> listeners = new Vector<Fred2Listener>();
-        
-        public Fred2() {
-            
-        }
-        
-        public synchronized void add(Fred2 subIdea) {
-            subIdeas.add(subIdea);
-            notify("ADDED", new Object[] {subIdea});
-        }
-        
-        public synchronized void remove(Fred2 subIdea) {
-            subIdeas.remove(subIdea);
-            notify("REMOVED", new Object[] {subIdea});
-        }
-        
-        public void addFred2Listener(Fred2Listener al) {
-            listeners.add(al);
-        }
-        
-        public void removeFred2Listener(Fred2Listener al) {
-            listeners.remove(al);
-        }
-        
-        private void notify(String command, Object[] paras) {
-            for (Fred2Listener listener: listeners) {
-                listener.fred2Changed(new Fred2Event(this, command, paras));
-            }
-        }
-        
-        public synchronized Vector<Fred2> getSubIdeas() {
-            return subIdeas;
-        }
-        
-        public String getText() {
-            return text;
-        }
-        
-        public void setText(String text) {
-            this.text = text;
-        }
-    }
-    
-    
-    
-    
-    
-    private static class Fred2View implements Fred2Listener {
-        private double length;
-        private double angle;
-        private double v;
-        private Vector<Fred2View> subViews = new Vector<Fred2View>();
-        private Fred2 idea;
-        
-        public Fred2View(Fred2 anIdea) {
-            this.idea = anIdea;
-            anIdea.addFred2Listener(this);
-        }
-        
-        public double getLength() {
-            return length;
-        }
-        
-        public void setLength(double length) {
-            this.length = length;
-        }
-        
-        public double getAngle() {
-            return angle;
-        }
-        
-        public void setAngle(double angle) {
-            this.angle = angle;
-        }
-        public void fred2Changed(Fred2Event fe) {
-            String cmd = fe.getCommand();
-            if ("ADDED".equals(cmd)) {
-                Fred2 subIdea = (Fred2)fe.getParas()[0];
-                Fred2View subView = new Fred2View(subIdea);
-                 subView.setLength(100);
-                subView.setAngle(Math.PI / 4);
-               add(subView);
-            } else if ("REMOVED".equals(cmd)) {
-                Fred2 subIdea = (Fred2)fe.getParas()[0];
-                for (int i = 0; i < subViews.size(); i++) {
-                    Fred2 idea = (Fred2)subViews.get(i).getIdea();
-                    if (idea.equals(subIdea)) {
-                        subViews.remove(i);
-                        break;
-                    }
-                }
-            }
-        }
-        
-        public synchronized void add(Fred2View subView) {
-            subViews.add(subView);
-        }
-        
-        public synchronized void remove(Fred2View subView) {
-            subViews.remove(subView);
-        }
-        
-        public synchronized Vector<Fred2View> getSubViews() {
-            return subViews;
-        }
-        
-        public double getV() {
-            return v;
-        }
-        
-        public void setV(double v) {
-            this.v = v;
-        }
-        
-        public Fred2 getIdea() {
-            return idea;
-        }
-    }
-    
-}
-
-interface Fred2Listener {
-    public void fred2Changed(Fred2Event fe);
-}
-
-class Fred2Event {
-    private Object source;
-    private String command;
-    private Object[] paras;
-    
-    public Fred2Event(Object aSource, String aCommand,
-            Object[] theParas) {
-        this.source = aSource;
-        this.command = aCommand;
-        this.paras = theParas;
-    }
-    
-    public Object getSource() {
-        return source;
-    }
-    
-    public void setSource(Object source) {
-        this.source = source;
-    }
-    
-    public String getCommand() {
-        return command;
-    }
-    
-    public void setCommand(String command) {
-        this.command = command;
-    }
-    
-    public Object[] getParas() {
-        return paras;
-    }
-    
-    public void setParas(Object[] paras) {
-        this.paras = paras;
     }
 }
