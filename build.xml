@@ -69,22 +69,61 @@
     <!--                    -->
     <!-- CHECK CODING STYLE -->
     <!--                    -->
-    <target name="checkstyle"
-        description="Generates a report of code convention violations. Any errors about creating a checker means an old checkstyle library is somewhere">
+    <target name="pmd">
+        <property name="pmd.dir" value="dist/pmd"/>
+        <delete dir="${pmd.dir}"/>
+        <mkdir dir="${pmd.dir}"/>
 
         <path id="pmd.classpath">
             <fileset dir="lib">
-                <include name="*.jar"/>
+                <include name="jaxen*.jar"/>
+                <include name="pmd*.jar"/>
             </fileset>
         </path>
         <taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask"
         classpathref="pmd.classpath"/>
         <pmd shortFilenames="true">
             <ruleset>basic</ruleset>
-            <formatter type="xml" toFile="dist/pmd_report.xml"/>
+            <formatter type="html" toFile="${pmd.dir}/pmd_report.html"/>
             <fileset dir="src">
                 <include name="**/*.java"/>
             </fileset>
         </pmd>
     </target>
+    <target name="checkstyle">
+        <property name="checkstyle.dir" value="dist/checkstyle"/>
+        <delete dir="${checkstyle.dir}"/>
+        <mkdir dir="${checkstyle.dir}"/>
+
+        <!-- Extra task for checking style -->
+        <taskdef resource="checkstyletask.properties"
+        classpath="lib/checkstyle-all-4.2.jar"/>
+        <path id="javancss.classpath">
+            <fileset dir="lib">
+                <include name="ccl*.jar"/>
+                <include name="checkstyle*.jar"/>
+                <include name="javancss*.jar"/>
+            </fileset>
+            <fileset dir="src"/>
+        </path>
+        <taskdef name="javancss" classname="net.jernigan.javancss2ant.JavaNCSS"
+        classpathref="javancss.classpath"/>
+        <javancss srcdir="src"
+        abortOnFail="false" ccnPerFuncMax="20"
+        includes="**/*.java"
+        />
+        <checkstyle config="etc/sun_checks.xml"
+            failureProperty="checkstyle.failure"
+            failOnViolation="false">
+            <formatter type="xml" tofile="${checkstyle.dir}/checkstyle_report.xml"/>
+            <fileset dir="src" includes="**/*.java"/>
+        </checkstyle>
+
+        <style in="${checkstyle.dir}/checkstyle_report.xml"
+        out="${checkstyle.dir}/checkstyle_report.html" 
+        style="etc/checkstyle-simple.xsl"/>
+    </target>
+    <target name="inspect"
+        description="Generates a report of code convention violations."
+        depends="pmd,checkstyle"/>
 </project>
