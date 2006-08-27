@@ -64,8 +64,8 @@ public class Fred extends JComponent {
     private static final double MAX_MOVE_TIME_SECS = 5.0;
     private final static Point2D.Double ORIGIN = new Point2D.Double(0.0, 0.0);
     
-    private Idea persistence;
-    private IdeaView persistenceView;
+    private Idea rootIdea;
+    private IdeaView rootView;
     
     /** Creates a new instance of Fred */
     public Fred() {
@@ -128,12 +128,12 @@ public class Fred extends JComponent {
         }
         
         OPMLReader reader = new OPMLReader(new File("etc/test.opml"));
-        persistence = reader.getIdea();
-        persistenceView = new IdeaView(persistence);
+        rootIdea = reader.getIdea();
+        rootView = new IdeaView(rootIdea);
         
-//        persistence = new Idea("Persistence");
-//        System.out.println("persistence = " + persistence);
-//        persistenceView = new IdeaView(persistence);
+//        rootIdea = new Idea("Persistence");
+//        System.out.println("rootIdea = " + rootIdea);
+//        rootView = new IdeaView(rootIdea);
 //
 //
 //
@@ -155,11 +155,11 @@ public class Fred extends JComponent {
 //        Idea progress = new Idea("Progress");
 //        mistakes.add(progress);
 //        Idea learning = new Idea("Learning");
-//        persistence.add(learning);
+//        rootIdea.add(learning);
 //        Idea love = new Idea("Love");
 //        learning.add(love);
 //        love.add(mistakes);
-//        persistence.add(mistakes);
+//        rootIdea.add(mistakes);
         
         
         
@@ -168,14 +168,14 @@ public class Fred extends JComponent {
 //        (new Thread(){public void run() {
 //            for (int i = 0; i < lines; i++) {
 //                Idea fred2 = new Idea();
-//                synchronized(persistence) {
-//                    persistence.add(fred2);
+//                synchronized(rootIdea) {
+//                    rootIdea.add(fred2);
 //                    timeAdded = System.currentTimeMillis();
 //                }
 //                //try { Thread.sleep(100);} catch(Exception e){}
 //            }
 //
-//            Idea sub = persistence.getSubIdeas().get(0);
+//            Idea sub = rootIdea.getSubIdeas().get(0);
 //
 //            Idea subIdea0 = null;
 //            for (int i = 0; i < 4; i++) {
@@ -199,75 +199,19 @@ public class Fred extends JComponent {
         ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g.setColor(Color.BLACK);
         Dimension size = getSize();
-        Vector<IdeaView> views = persistenceView.getSubViews();
         Point c = new Point(size.width / 2, size.height / 2);
-        displayIdeas(g, 0.0, c, views);
+        rootView.paint(g, c);
         adjustModel();
         repaint(100);
     }
     
     
-    private void displayIdeas(final Graphics g, final double initAngle, final Point c, final Vector<IdeaView> views) {
-        synchronized(views) {
-            for (IdeaView view: views) {
-                double a = view.getAngle() + initAngle;
-                double len = view.getLength();
-                Point2D p = new Point2D.Double(Math.sin(a) * len, Math.cos(a) * len);
-                Point s = getView(c, p);
-                g.drawLine(c.x, c.y, s.x, s.y);
-                Point midp = new Point((c.x + s.x) / 2, (c.y + s.y) / 2);
-                double textAngle = (Math.PI / 2.0) - a;
-                if ((a < 0) || (a > Math.PI)) {
-                    textAngle += Math.PI;
-                }
-                drawString((Graphics2D)g, view.getIdea().getText(), midp, 4, textAngle);
-                displayIdeas(g, view.getAngle(), s, view.getSubViews());
-            }
-        }
-    }
-    
-    public void transform(Graphics2D graphics2d, double orientation, int x, int y) {
-        graphics2d.transform(
-                AffineTransform.getRotateInstance(
-                -orientation, x, y
-                )
-                );
-    }
-    public void drawString(Graphics2D graphics2d, String string, Point p, int alignment,
-            double orientation) {
-        
-        int xc = p.x;
-        int yc = p.y;
-        
-        AffineTransform transform = graphics2d.getTransform();
-        
-        transform(graphics2d, orientation, xc, yc);
-        
-        FontMetrics fm = graphics2d.getFontMetrics();
-        double realTextWidth = fm.stringWidth(string);
-        double realTextHeight = fm.getHeight();
-        
-        int offsetX = (int) (realTextWidth * (double) (alignment % 3) / 2.0);
-        int offsetY = (int) (-realTextHeight * (double) (alignment / 3) / 2.0);
-        
-        if ((graphics2d != null) && (string != null)) {
-            graphics2d.drawString(string, xc - offsetX, yc - offsetY);
-        }
-        
-        graphics2d.setTransform(transform);
-    }
-    
-    private Point getView(final Point c, final Point2D p) {
-        int sx = c.x + (int)p.getX();
-        int sy = c.y - (int)p.getY();
-        return new Point(sx, sy);
-    }
     long timeAdded = 0;
     
     Vector<Point2D> points;
     private void adjustModel() {
         points = new Vector<Point2D>();
-        Vector<IdeaView> views = persistenceView.getSubViews();
+        Vector<IdeaView> views = rootView.getSubViews();
         createPoints(views, ORIGIN, 0.0);
         tweakIdeas(views, ORIGIN, 0.0, false);
     }

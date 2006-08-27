@@ -12,6 +12,12 @@ package dg.hipster.view;
 import dg.hipster.model.Idea;
 import dg.hipster.model.IdeaEvent;
 import dg.hipster.model.IdeaListener;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
 import java.util.Vector;
 
 /**
@@ -28,7 +34,7 @@ public class IdeaView implements IdeaListener {
     public IdeaView(Idea anIdea) {
         System.out.println("creating view for "+anIdea);
         this.idea = anIdea;
-        this.setLength(12 * anIdea.getText().length());
+        this.setLength(15 * anIdea.getText().length());
         int subNum = anIdea.getSubIdeas().size();
         int i = 0;
         for (Idea subIdea: anIdea.getSubIdeas()) {
@@ -94,5 +100,71 @@ public class IdeaView implements IdeaListener {
     
     public Idea getIdea() {
         return idea;
+    }
+    
+    public void paint(Graphics g, Point centre) {
+        paint(g, centre, this);
+    }
+    
+    private void paint(final Graphics g, final Point c,
+            final IdeaView aView) {
+        double initAngle = aView.getAngle();
+        Vector<IdeaView> views = aView.getSubViews();
+        synchronized(views) {
+            for (IdeaView view: views) {
+                double a = view.getAngle() + initAngle;
+                double len = view.getLength();
+                Point2D p = new Point2D.Double(Math.sin(a) * len,
+                        Math.cos(a) * len);
+                Point s = getView(c, p);
+                g.drawLine(c.x, c.y, s.x, s.y);
+                Point midp = new Point((c.x + s.x) / 2, (c.y + s.y) / 2);
+                double textAngle = (Math.PI / 2.0) - a;
+                if ((a < 0) || (a > Math.PI)) {
+                    textAngle += Math.PI;
+                }
+                drawString((Graphics2D)g, view.getIdea().getText(), midp, 4,
+                        textAngle);
+                paint(g, s, view);
+            }
+        }
+    }
+    
+    private Point getView(final Point c, final Point2D p) {
+        int sx = c.x + (int)p.getX();
+        int sy = c.y - (int)p.getY();
+        return new Point(sx, sy);
+    }
+    
+    private void drawString(Graphics2D graphics2d, String string, Point p, int alignment,
+            double orientation) {
+        
+        int xc = p.x;
+        int yc = p.y;
+        
+        AffineTransform transform = graphics2d.getTransform();
+        
+        transform(graphics2d, orientation, xc, yc);
+        
+        FontMetrics fm = graphics2d.getFontMetrics();
+        double realTextWidth = fm.stringWidth(string);
+        double realTextHeight = fm.getHeight();
+        
+        int offsetX = (int) (realTextWidth * (double) (alignment % 3) / 2.0);
+        int offsetY = (int) (-realTextHeight * (double) (alignment / 3) / 2.0);
+        
+        if ((graphics2d != null) && (string != null)) {
+            graphics2d.drawString(string, xc - offsetX, yc - offsetY);
+        }
+        
+        graphics2d.setTransform(transform);
+    }
+    
+    private void transform(Graphics2D graphics2d, double orientation, int x, int y) {
+        graphics2d.transform(
+                AffineTransform.getRotateInstance(
+                -orientation, x, y
+                )
+                );
     }
 }
