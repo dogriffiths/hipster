@@ -127,8 +127,8 @@ public class IdeaView implements IdeaListener {
         return idea;
     }
     
-    public void paint(Graphics g, Point centre) {
-        paint(g, centre, this);
+    public void paint(Graphics g) {
+        paint(g, new Point(0, 0), this);
     }
     
     private void paint(final Graphics g, final Point c,

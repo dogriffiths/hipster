@@ -57,17 +57,13 @@ public class OPMLReader extends DefaultHandler implements IdeaReader {
             String qName, // qualified name
             Attributes attrs)
             throws SAXException {
-        System.out.println("qName = " + qName);
         if ("outline".equals(qName)) {
             if (attrs != null) {
                 String text = attrs.getValue("text");
-                System.out.println("text = " + text);
                 Idea i = new Idea(text);
                 if (idea == null) {
                     idea = i;
-                    System.out.println("idea = " + idea);
                 } else {
-                    System.out.println("adding " + i + " to " + current);
                     current.add(i);
                 }
                 current = i;

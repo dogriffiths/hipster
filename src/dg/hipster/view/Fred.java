@@ -150,8 +150,8 @@ public class Fred extends JComponent implements IdeaListener {
                 RenderingHints.VALUE_ANTIALIAS_ON);
         g.setColor(Color.BLACK);
         Dimension size = getSize();
-        Point c = new Point(size.width / 2, size.height / 2);
-        rootView.paint(g, c);
+        g.translate(size.width / 2, size.height / 2);
+        rootView.paint(g);
         adjustModel();
         repaint(100);
     }
