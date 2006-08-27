@@ -26,7 +26,17 @@ public class IdeaView implements IdeaListener {
     private Idea idea;
     
     public IdeaView(Idea anIdea) {
+        System.out.println("creating view for "+anIdea);
         this.idea = anIdea;
+        this.setLength(12 * anIdea.getText().length());
+        int subNum = anIdea.getSubIdeas().size();
+        int i = 0;
+        for (Idea subIdea: anIdea.getSubIdeas()) {
+            IdeaView subView = new IdeaView(subIdea);
+            subView.setAngle(i * (Math.PI / subNum) - (subNum - 1) * Math.PI / subNum);
+            add(subView);
+            i++;
+        }
         anIdea.addIdeaListener(this);
     }
     
@@ -49,11 +59,7 @@ public class IdeaView implements IdeaListener {
         String cmd = fe.getCommand();
         if ("ADDED".equals(cmd)) {
             Idea subIdea = (Idea)fe.getParas()[0];
-            addViewFor(subIdea);
-//            IdeaView subView = new IdeaView(subIdea);
-//            subView.setLength(100);
-//            subView.setAngle(Math.PI / 4);
-//            add(subView);
+            add(new IdeaView(subIdea));
         } else if ("REMOVED".equals(cmd)) {
             Idea subIdea = (Idea)fe.getParas()[0];
             for (int i = 0; i < subViews.size(); i++) {
@@ -68,17 +74,6 @@ public class IdeaView implements IdeaListener {
     
     public synchronized void add(IdeaView subView) {
         subViews.add(subView);
-    }
-    
-    private synchronized void addViewFor(Idea anIdea) {
-        IdeaView subView = new IdeaView(anIdea);
-        subView.setLength(100);
-        subView.setAngle(Math.PI / 4);
-        add(subView);
-        for (Idea subIdea: anIdea.getSubIdeas()) {
-            subView.addViewFor(subIdea);
-        }
-        
     }
     
     public synchronized void remove(IdeaView subView) {

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<opml version="1.0">
+  <head>
+    <title>test</title>
+    <expansionState>0,1,5,6,10,11,15,19</expansionState>
+  </head>
+  <body>
+    <outline text="Fruit">
+      <outline text="Pineapple">
+        <outline text="Cocktail"/>
+        <outline text="Spiky"/>
+        <outline text="Tropical"/>
+      </outline>
+      <outline text="Orange">
+        <outline text="Vitamin">
+          <outline text="C"/>
+        </outline>
+        <outline text="Citrus"/>
+        <outline text="Juice"/>
+      </outline>
+      <outline text="Apple">
+        <outline text="Doctor">
+          <outline text="Away"/>
+        </outline>
+        <outline text="Eve"/>
+        <outline text="Pie"/>
+      </outline>
+      <outline text="Banana">
+        <outline text="Yellow"/>
+        <outline text="Caribbean"/>
+        <outline text="Potassium"/>
+      </outline>
+      <outline text="Cherry">
+        <outline text="Blossom"/>
+        <outline text="Stones"/>
+        <outline text="Orchard"/>
+      </outline>
+    </outline>
+  </body>
+</opml>

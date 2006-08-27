@@ -45,8 +45,15 @@ import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
+import java.io.File;
+import java.util.Stack;
 import java.util.Vector;
 import javax.swing.JComponent;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
 
 /**
  *
@@ -54,7 +61,7 @@ import javax.swing.JComponent;
  */
 public class Fred extends JComponent {
     private static final double MAX_SPEED = 10.0;
-    private static final double MAX_MOVE_TIME_SECS = 3.0;
+    private static final double MAX_MOVE_TIME_SECS = 5.0;
     private final static Point2D.Double ORIGIN = new Point2D.Double(0.0, 0.0);
     
     private Idea persistence;
@@ -66,32 +73,93 @@ public class Fred extends JComponent {
     }
     
     private void buildModel() {
-        persistence = new Idea("Persistence");
+        class OPMLReader extends DefaultHandler {
+            private Idea idea;
+            private Idea current;
+            private Stack<Idea> stack = new Stack<Idea>();
+            public void startElement(String namespaceURI,
+                    String sName, // simple name (localName)
+                    String qName, // qualified name
+                    Attributes attrs)
+                    throws SAXException {
+                System.out.println("qName = " + qName);
+                if ("outline".equals(qName)) {
+                    if (attrs != null) {
+                        String text = attrs.getValue("text");
+                        System.out.println("text = " + text);
+                        Idea i = new Idea(text);
+                        if (idea == null) {
+                            idea = i;
+                            System.out.println("idea = " + idea);
+                        } else {
+                            System.out.println("adding " + i + " to " + current);
+                            current.add(i);
+                        }
+                        current = i;
+                        stack.push(current);
+                    }
+                }
+            }
+            public void endElement(String namespaceURI,
+                    String sName, // simple name
+                    String qName  // qualified name
+                    )
+                    throws SAXException {
+                if ("outline".equals(qName)) {
+                    stack.pop();
+                    if (stack.isEmpty()) {
+                        current = null;
+                    } else {
+                        current = stack.peek();
+                    }
+                }
+            }
+            public OPMLReader(File file) {
+                try {
+                    SAXParser p = SAXParserFactory.newInstance().newSAXParser();
+                    p.parse(file, this);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            public Idea getIdea() {
+                return idea;
+            }
+        }
+        
+        OPMLReader reader = new OPMLReader(new File("etc/test.opml"));
+        persistence = reader.getIdea();
         persistenceView = new IdeaView(persistence);
         
-        Idea mistakes = new Idea("Mistakes");
-        Idea platforms = new Idea("Platforms");
-        mistakes.add(platforms);
-        Idea attempts = new Idea("Attempts");
-        platforms.add(attempts);
-        Idea continual = new Idea("Continual");
-        attempts.add(continual);
-        Idea further = new Idea("Further");
-        attempts.add(further);
-        Idea enjoyed = new Idea("Enjoyed");
-        attempts.add(enjoyed);
-        Idea thousands = new Idea("Thousands");
-        mistakes.add(thousands);
-        Idea making = new Idea("Making");
-        mistakes.add(making);
-        Idea progress = new Idea("Progress");
-        mistakes.add(progress);
-        Idea learning = new Idea("Learning");
-        persistence.add(learning);
-        Idea love = new Idea("Love");
-        learning.add(love);
-        love.add(mistakes);
-        persistence.add(mistakes);
+//        persistence = new Idea("Persistence");
+//        System.out.println("persistence = " + persistence);
+//        persistenceView = new IdeaView(persistence);
+//
+//
+//
+//        Idea mistakes = new Idea("Mistakes");
+//        Idea platforms = new Idea("Platforms");
+//        mistakes.add(platforms);
+//        Idea attempts = new Idea("Attempts");
+//        platforms.add(attempts);
+//        Idea continual = new Idea("Continual");
+//        attempts.add(continual);
+//        Idea further = new Idea("Further");
+//        attempts.add(further);
+//        Idea enjoyed = new Idea("Enjoyed");
+//        attempts.add(enjoyed);
+//        Idea thousands = new Idea("Thousands");
+//        mistakes.add(thousands);
+//        Idea making = new Idea("Making");
+//        mistakes.add(making);
+//        Idea progress = new Idea("Progress");
+//        mistakes.add(progress);
+//        Idea learning = new Idea("Learning");
+//        persistence.add(learning);
+//        Idea love = new Idea("Love");
+//        learning.add(love);
+//        love.add(mistakes);
+//        persistence.add(mistakes);
         
         
         
@@ -106,9 +174,9 @@ public class Fred extends JComponent {
 //                }
 //                //try { Thread.sleep(100);} catch(Exception e){}
 //            }
-//            
+//
 //            Idea sub = persistence.getSubIdeas().get(0);
-//            
+//
 //            Idea subIdea0 = null;
 //            for (int i = 0; i < 4; i++) {
 //                subIdea0 = new Idea();
@@ -116,7 +184,7 @@ public class Fred extends JComponent {
 //                timeAdded = System.currentTimeMillis();
 //                try { Thread.sleep(1000);} catch(Exception e){}
 //            }
-//            
+//
 //            Idea s2 = subIdea0;
 //            for (int i = 0; i < 6; i++) {
 //                Idea subIdea2 = new Idea();
