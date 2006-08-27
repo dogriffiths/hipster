@@ -36,8 +36,11 @@
 package dg.hipster.view;
 
 import dg.hipster.io.IdeaReader;
+import dg.hipster.io.ReaderException;
 import dg.hipster.io.ReaderFactory;
 import dg.hipster.model.Idea;
+import dg.hipster.model.IdeaEvent;
+import dg.hipster.model.IdeaListener;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -53,7 +56,7 @@ import javax.swing.JComponent;
  *
  * @author davidg
  */
-public class Fred extends JComponent {
+public class Fred extends JComponent implements IdeaListener {
     private static final double MAX_SPEED = 10.0;
     private static final double MAX_MOVE_TIME_SECS = 5.0;
     private final static Point2D.Double ORIGIN = new Point2D.Double(0.0, 0.0);
@@ -68,12 +71,15 @@ public class Fred extends JComponent {
     
     private void buildModel() {
         ReaderFactory factory = ReaderFactory.getInstance();
-        IdeaReader reader = factory.read(new File("etc/test.opml"));
-        rootIdea = reader.getIdea();
-        rootView = new IdeaView(rootIdea);
+        try {
+            IdeaReader reader = factory.read(new File("etc/test.opml"));
+            rootIdea = reader.getIdea();
+            rootView = new IdeaView(rootIdea);
+        } catch(ReaderException re) {
+            re.printStackTrace();
+        }
         
 //        rootIdea = new Idea("Persistence");
-//        System.out.println("rootIdea = " + rootIdea);
 //        rootView = new IdeaView(rootIdea);
 //
 //
@@ -105,13 +111,15 @@ public class Fred extends JComponent {
         
         
         
-//        final int lines = 15;
+//        final int lines = 25;
+//        rootIdea = new Idea("Test pattern");
+//        rootView = new IdeaView(rootIdea);
 //        (new Thread(){public void run() {
 //            for (int i = 0; i < lines; i++) {
-//                Idea fred2 = new Idea();
+//                Idea fred2 = new Idea("      i = " + i);
 //                synchronized(rootIdea) {
 //                    rootIdea.add(fred2);
-//                    timeAdded = System.currentTimeMillis();
+//                    timeChanged = System.currentTimeMillis();
 //                }
 //                //try { Thread.sleep(100);} catch(Exception e){}
 //            }
@@ -120,17 +128,18 @@ public class Fred extends JComponent {
 //
 //            Idea subIdea0 = null;
 //            for (int i = 0; i < 4; i++) {
-//                subIdea0 = new Idea();
+//                subIdea0 = new Idea("i = " + i);
 //                sub.add(subIdea0);
-//                timeAdded = System.currentTimeMillis();
+//                timeChanged = System.currentTimeMillis();
 //                try { Thread.sleep(1000);} catch(Exception e){}
 //            }
+//            try { Thread.sleep(10000);} catch(Exception e){}
 //
 //            Idea s2 = subIdea0;
 //            for (int i = 0; i < 6; i++) {
-//                Idea subIdea2 = new Idea();
+//                Idea subIdea2 = new Idea("i = " + i);
 //                s2.add(subIdea2);
-//                timeAdded = System.currentTimeMillis();
+//                timeChanged = System.currentTimeMillis();
 //                try { Thread.sleep(1000);} catch(Exception e){}
 //            }
 //        }}).start();
@@ -147,8 +156,12 @@ public class Fred extends JComponent {
         repaint(100);
     }
     
+    public void ideaChanged(IdeaEvent e) {
+        timeChanged = System.currentTimeMillis();
+    }
     
-    long timeAdded = 0;
+    
+    long timeChanged = 0;
     
     Vector<Point2D> points;
     private void adjustModel() {
@@ -167,13 +180,13 @@ public class Fred extends JComponent {
         * Math.sqrt((double)points.size()));
         double totForceX = 0.0;
         double totForceY = 0.0;
-        if (timeAdded == 0) {
-            timeAdded = System.currentTimeMillis();
+        if (timeChanged == 0) {
+            timeChanged = System.currentTimeMillis();
         }
         long now = System.currentTimeMillis();
         double maxSpeed = 0.0;
-        if ((now - timeAdded) < (MAX_MOVE_TIME_SECS * 1000.0)) {
-            maxSpeed = MAX_SPEED - ((now - timeAdded) * MAX_SPEED / 1000.0
+        if ((now - timeChanged) < (MAX_MOVE_TIME_SECS * 1000.0)) {
+            maxSpeed = MAX_SPEED - ((now - timeChanged) * MAX_SPEED / 1000.0
                     / MAX_MOVE_TIME_SECS);
         }
         synchronized(views) {

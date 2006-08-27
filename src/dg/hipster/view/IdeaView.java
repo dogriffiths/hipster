@@ -58,7 +58,6 @@ public class IdeaView implements IdeaListener {
     private Idea idea;
     
     public IdeaView(Idea anIdea) {
-        System.out.println("creating view for "+anIdea);
         this.idea = anIdea;
         this.setLength(15 * anIdea.getText().length());
         int subNum = anIdea.getSubIdeas().size();
