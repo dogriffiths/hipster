@@ -36,7 +36,7 @@
 package dg.hipster.io;
 
 import dg.hipster.model.Idea;
-import java.io.File;
+import java.io.InputStream;
 import java.util.Stack;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -48,7 +48,7 @@ import org.xml.sax.helpers.DefaultHandler;
  *
  * @author davidg
  */
-public         class OPMLReader extends DefaultHandler {
+public class OPMLReader extends DefaultHandler implements IdeaReader {
     private Idea idea;
     private Idea current;
     private Stack<Idea> stack = new Stack<Idea>();
@@ -89,12 +89,12 @@ public         class OPMLReader extends DefaultHandler {
             }
         }
     }
-    public OPMLReader(File file) {
+    public OPMLReader(InputStream in) throws ReaderException {
         try {
             SAXParser p = SAXParserFactory.newInstance().newSAXParser();
-            p.parse(file, this);
-        } catch (Exception e) {
-            e.printStackTrace();
+            p.parse(in, this);
+        } catch(Exception e) {
+            throw new ReaderException("Unable to read OPML", e);
         }
     }
     public Idea getIdea() {

@@ -35,7 +35,8 @@
 
 package dg.hipster.view;
 
-import dg.hipster.io.OPMLReader;
+import dg.hipster.io.IdeaReader;
+import dg.hipster.io.ReaderFactory;
 import dg.hipster.model.Idea;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -66,8 +67,8 @@ public class Fred extends JComponent {
     }
     
     private void buildModel() {
-        
-        OPMLReader reader = new OPMLReader(new File("etc/test.opml"));
+        ReaderFactory factory = ReaderFactory.getInstance();
+        IdeaReader reader = factory.read(new File("etc/test.opml"));
         rootIdea = reader.getIdea();
         rootView = new IdeaView(rootIdea);
         
