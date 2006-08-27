@@ -35,25 +35,18 @@
 
 package dg.hipster.view;
 
+import dg.hipster.io.OPMLReader;
 import dg.hipster.model.Idea;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.RenderingHints;
-import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.io.File;
-import java.util.Stack;
 import java.util.Vector;
 import javax.swing.JComponent;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
 
 /**
  *
@@ -73,59 +66,6 @@ public class Fred extends JComponent {
     }
     
     private void buildModel() {
-        class OPMLReader extends DefaultHandler {
-            private Idea idea;
-            private Idea current;
-            private Stack<Idea> stack = new Stack<Idea>();
-            public void startElement(String namespaceURI,
-                    String sName, // simple name (localName)
-                    String qName, // qualified name
-                    Attributes attrs)
-                    throws SAXException {
-                System.out.println("qName = " + qName);
-                if ("outline".equals(qName)) {
-                    if (attrs != null) {
-                        String text = attrs.getValue("text");
-                        System.out.println("text = " + text);
-                        Idea i = new Idea(text);
-                        if (idea == null) {
-                            idea = i;
-                            System.out.println("idea = " + idea);
-                        } else {
-                            System.out.println("adding " + i + " to " + current);
-                            current.add(i);
-                        }
-                        current = i;
-                        stack.push(current);
-                    }
-                }
-            }
-            public void endElement(String namespaceURI,
-                    String sName, // simple name
-                    String qName  // qualified name
-                    )
-                    throws SAXException {
-                if ("outline".equals(qName)) {
-                    stack.pop();
-                    if (stack.isEmpty()) {
-                        current = null;
-                    } else {
-                        current = stack.peek();
-                    }
-                }
-            }
-            public OPMLReader(File file) {
-                try {
-                    SAXParser p = SAXParserFactory.newInstance().newSAXParser();
-                    p.parse(file, this);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-            public Idea getIdea() {
-                return idea;
-            }
-        }
         
         OPMLReader reader = new OPMLReader(new File("etc/test.opml"));
         rootIdea = reader.getIdea();
@@ -196,7 +136,8 @@ public class Fred extends JComponent {
     }
     
     public void paintComponent(Graphics g) {
-        ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                RenderingHints.VALUE_ANTIALIAS_ON);
         g.setColor(Color.BLACK);
         Dimension size = getSize();
         Point c = new Point(size.width / 2, size.height / 2);
@@ -216,11 +157,13 @@ public class Fred extends JComponent {
         tweakIdeas(views, ORIGIN, 0.0, false);
     }
     
-    private Point2D tweakIdeas(final Vector<IdeaView> views, final Point2D c, final double initAngle, final boolean hasParent) {
+    private Point2D tweakIdeas(final Vector<IdeaView> views, final Point2D c,
+            final double initAngle, final boolean hasParent) {
         if (views.size() == 0) {
             return new Point2D.Double(0.0, 0.0);
         }
-        double mass = 2000.0 / (points.size() * Math.sqrt((double)points.size()));
+        double mass = 2000.0 / (points.size()
+        * Math.sqrt((double)points.size()));
         double totForceX = 0.0;
         double totForceY = 0.0;
         if (timeAdded == 0) {
@@ -229,7 +172,8 @@ public class Fred extends JComponent {
         long now = System.currentTimeMillis();
         double maxSpeed = 0.0;
         if ((now - timeAdded) < (MAX_MOVE_TIME_SECS * 1000.0)) {
-            maxSpeed = MAX_SPEED - ((now - timeAdded) * MAX_SPEED / 1000.0 / MAX_MOVE_TIME_SECS);
+            maxSpeed = MAX_SPEED - ((now - timeAdded) * MAX_SPEED / 1000.0
+                    / MAX_MOVE_TIME_SECS);
         }
         synchronized(views) {
             double minDiffAngle = Math.PI / 2 / views.size();
@@ -269,7 +213,8 @@ public class Fred extends JComponent {
                     }
                 }
                 Point2D p2 = getPoint(view, ORIGIN, initAngle);
-                Point2D tf = tweakIdeas(view.getSubViews(), point, view.getAngle(), true);
+                Point2D tf = tweakIdeas(view.getSubViews(), point,
+                        view.getAngle(), true);
                 forceX += tf.getX();
                 forceY += tf.getY();
                 double sideForce = (p2.getY() * forceX) + (-p2.getX() * forceY);
@@ -306,7 +251,8 @@ public class Fred extends JComponent {
                 } else {
                     double previousAngle = -Math.PI;
                     if (!hasParent) {
-                        previousAngle = views.get(views.size() - 1).getAngle() - 2 * Math.PI;
+                        previousAngle = views.get(views.size() - 1).getAngle()
+                        - 2 * Math.PI;
                     }
                     if (previousAngle > newAngle - minDiffAngle) {
                         newAngle = previousAngle + minDiffAngle;
@@ -359,7 +305,8 @@ public class Fred extends JComponent {
         return new Point2D.Double(totForceX, totForceY);
     }
     
-    private void createPoints(Vector<IdeaView> views, Point2D c, double initAngle) {
+    private void createPoints(Vector<IdeaView> views, Point2D c,
+            double initAngle) {
         points.add(ORIGIN);
         synchronized(views) {
             for(IdeaView view: views) {
