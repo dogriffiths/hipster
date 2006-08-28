@@ -73,7 +73,11 @@ public class IdeaView implements IdeaListener {
         int i = 0;
         for (Idea subIdea: anIdea.getSubIdeas()) {
             IdeaView subView = new IdeaView(subIdea, false);
-            subView.setAngle((i - subNum + 1) * Math.PI / subNum);
+            double subAngle = (i - subNum + 1) * Math.PI / subNum;
+            if (isRoot) {
+                subAngle = (subAngle - Math.PI / 2) * 2;
+            }
+            subView.setAngle(subAngle);
             add(subView);
             i++;
         }
@@ -207,13 +211,21 @@ public class IdeaView implements IdeaListener {
     
     private void drawString(Graphics2D graphics2d, String string, Point p, int alignment,
             double orientation) {
+        double orient = orientation % Math.PI;
+        
+        if (orient > (Math.PI / 2.0)) {
+            orient -= Math.PI;
+        }
+        if (orient < (-Math.PI / 2.0)) {
+            orient += Math.PI;
+        }
         
         int xc = p.x;
         int yc = p.y;
         
         AffineTransform transform = graphics2d.getTransform();
         
-        transform(graphics2d, orientation, xc, yc);
+        transform(graphics2d, orient, xc, yc);
         
         FontMetrics fm = graphics2d.getFontMetrics();
         double realTextWidth = fm.stringWidth(string);
