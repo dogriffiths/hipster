@@ -57,8 +57,8 @@ import javax.swing.JComponent;
  * @author davidg
  */
 public class Fred extends JComponent implements IdeaListener {
-    private static final double MAX_SPEED = 10.0;
-    private static final double MAX_MOVE_TIME_SECS = 5.0;
+    private static final double MAX_SPEED = 2.0;
+    private static final double MAX_MOVE_TIME_SECS = 15.0;
     private final static Point2D.Double ORIGIN = new Point2D.Double(0.0, 0.0);
     
     private Idea rootIdea;
@@ -111,7 +111,7 @@ public class Fred extends JComponent implements IdeaListener {
         
         
         
-//        final int lines = 25;
+//        final int lines = 35;
 //        rootIdea = new Idea("Test pattern");
 //        rootView = new IdeaView(rootIdea);
 //        (new Thread(){public void run() {
@@ -167,7 +167,7 @@ public class Fred extends JComponent implements IdeaListener {
     private void adjustModel() {
         points = new Vector<Point2D>();
         Vector<IdeaView> views = rootView.getSubViews();
-        createPoints(rootView, ORIGIN);
+        createPoints(rootView, ORIGIN, rootView.getAngle());
         tweakIdeas(views, ORIGIN, 0.0, false);
     }
     
@@ -228,7 +228,7 @@ public class Fred extends JComponent implements IdeaListener {
                 }
                 Point2D p2 = getPoint(view, ORIGIN, initAngle);
                 Point2D tf = tweakIdeas(view.getSubViews(), point,
-                        view.getAngle(), true);
+                        view.getAngle() + initAngle, true);
                 forceX += tf.getX();
                 forceY += tf.getY();
                 double sideForce = (p2.getY() * forceX) + (-p2.getX() * forceY);
@@ -319,22 +319,14 @@ public class Fred extends JComponent implements IdeaListener {
         return new Point2D.Double(totForceX, totForceY);
     }
     
-    private void createPoints(IdeaView parentView, Point2D c) {
+    private void createPoints(IdeaView parentView, Point2D c, double initAngle) {
         Vector<IdeaView> views = parentView.getSubViews();
-        double initAngle = parentView.getAngle();
         points.add(ORIGIN);
         synchronized(views) {
             for(IdeaView view: views) {
                 Point2D point = getPoint(view, c, initAngle);
-//                if (parentView.isRoot()) {
-//                    double x = point.getX();
-//                    double y = point.getY();
-//                    x += Math.sin(view.getAngle()) * parentView.ROOT_RADIUS;
-//                    y += Math.cos(view.getAngle()) * parentView.ROOT_RADIUS;
-//                    point = new Point2D.Double(x, y);
-//                }
                 points.add(point);
-                createPoints(view, point);
+                createPoints(view, point, initAngle + view.getAngle());
             }
         }
     }

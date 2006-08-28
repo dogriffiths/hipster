@@ -61,27 +61,17 @@ public class IdeaView implements IdeaListener {
     int ROOT_RADIUS_X = 70;
     int ROOT_RADIUS_Y = 40;
     
+    public IdeaView() {
+        this(null);
+    }
+    
     public IdeaView(Idea anIdea) {
         this(anIdea, true);
     }
     
     private IdeaView(Idea anIdea, boolean whetherIsRoot) {
         isRoot = whetherIsRoot;
-        this.idea = anIdea;
-        this.setLength(15 * anIdea.getText().length());
-        int subNum = anIdea.getSubIdeas().size();
-        int i = 0;
-        for (Idea subIdea: anIdea.getSubIdeas()) {
-            IdeaView subView = new IdeaView(subIdea, false);
-            double subAngle = (i - subNum + 1) * Math.PI / subNum;
-            if (isRoot) {
-                subAngle = (subAngle - Math.PI / 2) * 2;
-            }
-            subView.setAngle(subAngle);
-            add(subView);
-            i++;
-        }
-        anIdea.addIdeaListener(this);
+        setIdea(anIdea);
     }
     
     public double getLength() {
@@ -163,12 +153,37 @@ public class IdeaView implements IdeaListener {
         return idea;
     }
     
+    public void setIdea(Idea newIdea) {
+        this.idea = newIdea;
+        subViews.clear();
+        if (newIdea != null) {
+            this.setLength(15 * newIdea.getText().length());
+            int subNum = newIdea.getSubIdeas().size();
+            int i = 0;
+            for (Idea subIdea: newIdea.getSubIdeas()) {
+                IdeaView subView = new IdeaView(subIdea, false);
+                double divAngle = 2 * Math.PI / subNum;
+                double mult = i * divAngle;
+                double subAngle = mult - (divAngle * (subNum - 1) / 2.0);
+                if (!isRoot) {
+                    subAngle /= 2.0;
+                }
+                subView.setAngle(subAngle);
+                add(subView);
+                i++;
+            }
+            newIdea.addIdeaListener(this);
+        } else {
+            setLength(0);
+        }
+    }
+    
     public void paint(Graphics g) {
-        paint(g, new Point(0, 0), this);
+        paint(g, new Point(0, 0), this, getAngle());
     }
     
     private void paint(final Graphics g, final Point c2,
-            final IdeaView aView) {
+            final IdeaView aView, final double initAngle) {
         if (aView.isRoot()) {
             g.setColor(Color.BLACK);
             g.drawOval(-ROOT_RADIUS_X, -ROOT_RADIUS_Y, ROOT_RADIUS_X * 2,
@@ -176,7 +191,6 @@ public class IdeaView implements IdeaListener {
             drawString((Graphics2D)g, getIdea().getText(), c2, 4,
                     getAngle());
         }
-        double initAngle = aView.getAngle();
         Vector<IdeaView> views = aView.getSubViews();
         synchronized(views) {
             for (IdeaView view: views) {
@@ -193,12 +207,9 @@ public class IdeaView implements IdeaListener {
                 g.drawLine(c.x, c.y, s.x, s.y);
                 Point midp = new Point((c.x + s.x) / 2, (c.y + s.y) / 2);
                 double textAngle = (Math.PI / 2.0) - a;
-                if ((a < 0) || (a > Math.PI)) {
-                    textAngle += Math.PI;
-                }
                 drawString((Graphics2D)g, view.getIdea().getText(), midp, 4,
                         textAngle);
-                paint(g, s, view);
+                paint(g, s, view, a);
             }
         }
     }

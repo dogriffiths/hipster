@@ -2,13 +2,15 @@
 <opml version="1.0">
   <head>
     <title>test</title>
-    <expansionState>0,1,5,6,10,11,15,19</expansionState>
+    <expansionState>0,1,3,6,7,11,12,16,18,21,24,25,27,29,30</expansionState>
   </head>
   <body>
     <outline text="Fruit">
       <outline text="Pineapple">
         <outline text="Cocktail"/>
-        <outline text="Spiky"/>
+        <outline text="Spiky">
+          <outline text="Hair"/>
+        </outline>
         <outline text="Tropical"/>
       </outline>
       <outline text="Orange">
@@ -27,13 +29,28 @@
       </outline>
       <outline text="Banana">
         <outline text="Yellow"/>
-        <outline text="Caribbean"/>
+        <outline text="Caribbean">
+          <outline text="Sea"/>
+        </outline>
         <outline text="Potassium"/>
       </outline>
       <outline text="Cherry">
         <outline text="Blossom"/>
         <outline text="Stones"/>
-        <outline text="Orchard"/>
+        <outline text="Orchard">
+          <outline text="Tree">
+            <outline text="Washington"/>
+          </outline>
+        </outline>
+      </outline>
+      <outline text="Pomegranate">
+        <outline text="Seeds"/>
+        <outline text="Purple">
+          <outline text="Royal">
+            <outline text="Seashells"/>
+          </outline>
+          <outline text="Caesar"/>
+        </outline>
       </outline>
     </outline>
   </body>
