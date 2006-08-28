@@ -91,6 +91,26 @@ public class IdeaView implements IdeaListener {
         return angle;
     }
     
+    public double getMinSubAngle() {
+        double minAngle = Math.PI;
+        for (IdeaView subView: subViews) {
+            if (subView.getAngle() < minAngle) {
+                minAngle = subView.getAngle();
+            }
+        }
+        return minAngle;
+    }
+    
+    public double getMaxSubAngle() {
+        double maxAngle = -Math.PI;
+        for (IdeaView subView: subViews) {
+            if (subView.getAngle() > maxAngle) {
+                maxAngle = subView.getAngle();
+            }
+        }
+        return maxAngle;
+    }
+    
     public void setAngle(double angle) {
         this.angle = angle;
     }
@@ -98,7 +118,10 @@ public class IdeaView implements IdeaListener {
         String cmd = fe.getCommand();
         if ("ADDED".equals(cmd)) {
             Idea subIdea = (Idea)fe.getParas()[0];
-            add(new IdeaView(subIdea));
+            IdeaView subIdeaView = new IdeaView(subIdea, false);
+            double maxAngle = getMaxSubAngle();
+            subIdeaView.setAngle((maxAngle + Math.PI) / 2.0);
+            add(subIdeaView);
         } else if ("REMOVED".equals(cmd)) {
             Idea subIdea = (Idea)fe.getParas()[0];
             for (int i = 0; i < subViews.size(); i++) {
