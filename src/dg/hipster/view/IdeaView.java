@@ -38,11 +38,13 @@ package dg.hipster.view;
 import dg.hipster.model.Idea;
 import dg.hipster.model.IdeaEvent;
 import dg.hipster.model.IdeaListener;
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.util.Vector;
@@ -52,6 +54,8 @@ import java.util.Vector;
  * @author davidg
  */
 public class IdeaView implements IdeaListener {
+    private static Color[] COLOURS = {Color.RED, Color.ORANGE,
+    Color.GREEN, Color.CYAN};
     private double length;
     private double angle;
     private double v;
@@ -157,7 +161,7 @@ public class IdeaView implements IdeaListener {
         this.idea = newIdea;
         subViews.clear();
         if (newIdea != null) {
-            this.setLength(15 * newIdea.getText().length());
+            this.setLength(15 * newIdea.getText().length() + 10);
             int subNum = newIdea.getSubIdeas().size();
             int i = 0;
             for (Idea subIdea: newIdea.getSubIdeas()) {
@@ -179,19 +183,16 @@ public class IdeaView implements IdeaListener {
     }
     
     public void paint(Graphics g) {
-        paint(g, new Point(0, 0), this, getAngle());
+        paint(g, new Point(0, 0), this, getAngle(), 0);
     }
     
     private void paint(final Graphics g, final Point c2,
-            final IdeaView aView, final double initAngle) {
-        if (aView.isRoot()) {
-            g.setColor(Color.BLACK);
-            g.drawOval(-ROOT_RADIUS_X, -ROOT_RADIUS_Y, ROOT_RADIUS_X * 2,
-                    ROOT_RADIUS_Y * 2);
-            drawString((Graphics2D)g, getIdea().getText(), c2, 4,
-                    getAngle());
-        }
+            final IdeaView aView, final double initAngle, final int depth) {
         Vector<IdeaView> views = aView.getSubViews();
+        Stroke oldStroke = ((Graphics2D)g).getStroke();
+        Stroke stroke = new BasicStroke(20.0f - (depth * 2),
+                BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL);
+        ((Graphics2D)g).setStroke(stroke);
         synchronized(views) {
             for (IdeaView view: views) {
                 Point c = new Point(c2.x, c2.y);
@@ -204,13 +205,26 @@ public class IdeaView implements IdeaListener {
                     c.y -= (int)(Math.cos(a) * ROOT_RADIUS_Y);
                 }
                 Point s = getView(c, p);
+                paint(g, s, view, a, depth + 1);
+                g.setColor(COLOURS[depth % COLOURS.length]);
                 g.drawLine(c.x, c.y, s.x, s.y);
+                g.setColor(Color.BLACK);
                 Point midp = new Point((c.x + s.x) / 2, (c.y + s.y) / 2);
                 double textAngle = (Math.PI / 2.0) - a;
                 drawString((Graphics2D)g, view.getIdea().getText(), midp, 4,
                         textAngle);
-                paint(g, s, view, a);
             }
+        }
+        ((Graphics2D)g).setStroke(oldStroke);
+        if (aView.isRoot()) {
+            g.setColor(Color.WHITE);
+            g.fillOval(-ROOT_RADIUS_X, -ROOT_RADIUS_Y, ROOT_RADIUS_X * 2,
+                    ROOT_RADIUS_Y * 2);
+            g.setColor(Color.BLACK);
+            g.drawOval(-ROOT_RADIUS_X, -ROOT_RADIUS_Y, ROOT_RADIUS_X * 2,
+                    ROOT_RADIUS_Y * 2);
+            drawString((Graphics2D)g, getIdea().getText(), c2, 4,
+                    getAngle());
         }
     }
     
