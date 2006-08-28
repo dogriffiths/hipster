@@ -167,7 +167,7 @@ public class Fred extends JComponent implements IdeaListener {
     private void adjustModel() {
         points = new Vector<Point2D>();
         Vector<IdeaView> views = rootView.getSubViews();
-        createPoints(views, ORIGIN, 0.0);
+        createPoints(rootView, ORIGIN);
         tweakIdeas(views, ORIGIN, 0.0, false);
     }
     
@@ -319,14 +319,22 @@ public class Fred extends JComponent implements IdeaListener {
         return new Point2D.Double(totForceX, totForceY);
     }
     
-    private void createPoints(Vector<IdeaView> views, Point2D c,
-            double initAngle) {
+    private void createPoints(IdeaView parentView, Point2D c) {
+        Vector<IdeaView> views = parentView.getSubViews();
+        double initAngle = parentView.getAngle();
         points.add(ORIGIN);
         synchronized(views) {
             for(IdeaView view: views) {
                 Point2D point = getPoint(view, c, initAngle);
+//                if (parentView.isRoot()) {
+//                    double x = point.getX();
+//                    double y = point.getY();
+//                    x += Math.sin(view.getAngle()) * parentView.ROOT_RADIUS;
+//                    y += Math.cos(view.getAngle()) * parentView.ROOT_RADIUS;
+//                    point = new Point2D.Double(x, y);
+//                }
                 points.add(point);
-                createPoints(view.getSubViews(), point, view.getAngle());
+                createPoints(view, point);
             }
         }
     }

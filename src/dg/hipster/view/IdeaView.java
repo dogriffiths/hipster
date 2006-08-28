@@ -38,6 +38,7 @@ package dg.hipster.view;
 import dg.hipster.model.Idea;
 import dg.hipster.model.IdeaEvent;
 import dg.hipster.model.IdeaListener;
+import java.awt.Color;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -56,15 +57,22 @@ public class IdeaView implements IdeaListener {
     private double v;
     private Vector<IdeaView> subViews = new Vector<IdeaView>();
     private Idea idea;
+    private boolean isRoot;
+    int ROOT_RADIUS = 60;
     
     public IdeaView(Idea anIdea) {
+        this(anIdea, true);
+    }
+    
+    private IdeaView(Idea anIdea, boolean whetherIsRoot) {
+        isRoot = whetherIsRoot;
         this.idea = anIdea;
         this.setLength(15 * anIdea.getText().length());
         int subNum = anIdea.getSubIdeas().size();
         int i = 0;
         for (Idea subIdea: anIdea.getSubIdeas()) {
-            IdeaView subView = new IdeaView(subIdea);
-            subView.setAngle(i * (Math.PI / subNum) - (subNum - 1) * Math.PI / subNum);
+            IdeaView subView = new IdeaView(subIdea, false);
+            subView.setAngle((i - subNum + 1) * Math.PI / subNum);
             add(subView);
             i++;
         }
@@ -131,16 +139,28 @@ public class IdeaView implements IdeaListener {
         paint(g, new Point(0, 0), this);
     }
     
-    private void paint(final Graphics g, final Point c,
+    private void paint(final Graphics g, final Point c2,
             final IdeaView aView) {
+        if (aView.isRoot()) {
+            g.setColor(Color.BLACK);
+            g.drawOval(-ROOT_RADIUS, -ROOT_RADIUS, ROOT_RADIUS * 2,
+                    ROOT_RADIUS * 2);
+            drawString((Graphics2D)g, getIdea().getText(), c2, 4,
+                    getAngle());
+        }
         double initAngle = aView.getAngle();
         Vector<IdeaView> views = aView.getSubViews();
         synchronized(views) {
             for (IdeaView view: views) {
+                Point c = new Point(c2.x, c2.y);
                 double a = view.getAngle() + initAngle;
                 double len = view.getLength();
                 Point2D p = new Point2D.Double(Math.sin(a) * len,
                         Math.cos(a) * len);
+                if (aView.isRoot()) {
+                    c.x += (int)(Math.sin(a) * ROOT_RADIUS);
+                    c.y -= (int)(Math.cos(a) * ROOT_RADIUS);
+                }
                 Point s = getView(c, p);
                 g.drawLine(c.x, c.y, s.x, s.y);
                 Point midp = new Point((c.x + s.x) / 2, (c.y + s.y) / 2);
@@ -191,5 +211,9 @@ public class IdeaView implements IdeaListener {
                 -orientation, x, y
                 )
                 );
+    }
+    
+    public boolean isRoot() {
+        return isRoot;
     }
 }
