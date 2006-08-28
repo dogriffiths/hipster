@@ -58,7 +58,8 @@ public class IdeaView implements IdeaListener {
     private Vector<IdeaView> subViews = new Vector<IdeaView>();
     private Idea idea;
     private boolean isRoot;
-    int ROOT_RADIUS = 60;
+    int ROOT_RADIUS_X = 70;
+    int ROOT_RADIUS_Y = 40;
     
     public IdeaView(Idea anIdea) {
         this(anIdea, true);
@@ -166,8 +167,8 @@ public class IdeaView implements IdeaListener {
             final IdeaView aView) {
         if (aView.isRoot()) {
             g.setColor(Color.BLACK);
-            g.drawOval(-ROOT_RADIUS, -ROOT_RADIUS, ROOT_RADIUS * 2,
-                    ROOT_RADIUS * 2);
+            g.drawOval(-ROOT_RADIUS_X, -ROOT_RADIUS_Y, ROOT_RADIUS_X * 2,
+                    ROOT_RADIUS_Y * 2);
             drawString((Graphics2D)g, getIdea().getText(), c2, 4,
                     getAngle());
         }
@@ -181,8 +182,8 @@ public class IdeaView implements IdeaListener {
                 Point2D p = new Point2D.Double(Math.sin(a) * len,
                         Math.cos(a) * len);
                 if (aView.isRoot()) {
-                    c.x += (int)(Math.sin(a) * ROOT_RADIUS);
-                    c.y -= (int)(Math.cos(a) * ROOT_RADIUS);
+                    c.x += (int)(Math.sin(a) * ROOT_RADIUS_X);
+                    c.y -= (int)(Math.cos(a) * ROOT_RADIUS_Y);
                 }
                 Point s = getView(c, p);
                 g.drawLine(c.x, c.y, s.x, s.y);
@@ -216,7 +217,7 @@ public class IdeaView implements IdeaListener {
         
         FontMetrics fm = graphics2d.getFontMetrics();
         double realTextWidth = fm.stringWidth(string);
-        double realTextHeight = fm.getHeight();
+        double realTextHeight = fm.getHeight() - fm.getDescent();
         
         int offsetX = (int) (realTextWidth * (double) (alignment % 3) / 2.0);
         int offsetY = (int) (-realTextHeight * (double) (alignment / 3) / 2.0);
