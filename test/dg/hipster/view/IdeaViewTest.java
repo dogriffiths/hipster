@@ -52,8 +52,8 @@ public class IdeaViewTest extends TestCase {
         
         ideaView.setIdea(new Idea("fred"));
         
-        assertEquals("New idea should give length of 15 * text length",
-                15.0 * 4,
+        assertEquals("New idea should give length of 15 * text length + 10",
+                15.0 * 4 + 10,
                 ideaView.getLength(), 0.0000001);
         
     }
@@ -63,6 +63,7 @@ public class IdeaViewTest extends TestCase {
      */
     public void testGetSetAngle() {
         IdeaView ideaView = new IdeaView();
+        
         assertEquals("0 Angle should be zero if no idea", 0.0,
                 ideaView.getAngle(), 0.0000001);
         
@@ -74,9 +75,13 @@ public class IdeaViewTest extends TestCase {
         Idea ideaChild0 = new Idea("Child 0");
         ideaParent.add(ideaChild0);
         ideaView.setIdea(ideaParent);
+        assertEquals("1a should have set idea correctly", ideaParent,
+                ideaView.getIdea());
+        assertTrue("1b first idea should be root", ideaView.isRoot());
         List<IdeaView> subViews = ideaView.getSubViews();
         assertEquals("2 Should be one sub-view", 1, subViews.size());
         IdeaView subView0 = subViews.get(0);
+        assertFalse("2a second idea should not be root", subView0.isRoot());
         assertEquals("3 First idea should have angle 0", 0.0, subView0.getAngle(),
                 0.0000001);
         
@@ -146,55 +151,15 @@ public class IdeaViewTest extends TestCase {
                 ).get(0).getSubViews().get(0);
         assertEquals("15 Great grand child should have angle 0.0", 0.0,
                 greatGrandView.getAngle());
+        assertEquals("16 ideaView should have angles from -2Pi/3",
+                -2 * Math.PI / 3, ideaView.getMinSubAngle());
+        assertEquals("17 ideaView should have angles from -2Pi/3",
+                -2 * Math.PI / 3, ideaView.getMinSubAngle());
+        
+        ideaView.setAngle(-3.0);
+        assertEquals("18 Should let me set angle", -3.0, ideaView.getAngle());
     }
     
-//    /**
-//     * Test of getMinSubAngle method, of class dg.hipster.view.IdeaView.
-//     */
-//    public void testGetMinSubAngle() {
-//        System.out.println("getMinSubAngle");
-//
-//        IdeaView instance = null;
-//
-//        double expResult = 0.0;
-//        double result = instance.getMinSubAngle();
-//        assertEquals(expResult, result);
-//
-//        // TODO review the generated test code and remove the default call to fail.
-//        fail("The test case is a prototype.");
-//    }
-//
-//    /**
-//     * Test of getMaxSubAngle method, of class dg.hipster.view.IdeaView.
-//     */
-//    public void testGetMaxSubAngle() {
-//        System.out.println("getMaxSubAngle");
-//
-//        IdeaView instance = null;
-//
-//        double expResult = 0.0;
-//        double result = instance.getMaxSubAngle();
-//        assertEquals(expResult, result);
-//
-//        // TODO review the generated test code and remove the default call to fail.
-//        fail("The test case is a prototype.");
-//    }
-//
-//    /**
-//     * Test of setAngle method, of class dg.hipster.view.IdeaView.
-//     */
-//    public void testSetAngle() {
-//        System.out.println("setAngle");
-//
-//        double angle = 0.0;
-//        IdeaView instance = null;
-//
-//        instance.setAngle(angle);
-//
-//        // TODO review the generated test code and remove the default call to fail.
-//        fail("The test case is a prototype.");
-//    }
-//
 //    /**
 //     * Test of ideaChanged method, of class dg.hipster.view.IdeaView.
 //     */
@@ -241,22 +206,6 @@ public class IdeaViewTest extends TestCase {
 //    }
 //
 //    /**
-//     * Test of getSubViews method, of class dg.hipster.view.IdeaView.
-//     */
-//    public void testGetSubViews() {
-//        System.out.println("getSubViews");
-//
-//        IdeaView instance = null;
-//
-//        Vector<IdeaView> expResult = null;
-//        Vector<IdeaView> result = instance.getSubViews();
-//        assertEquals(expResult, result);
-//
-//        // TODO review the generated test code and remove the default call to fail.
-//        fail("The test case is a prototype.");
-//    }
-//
-//    /**
 //     * Test of getV method, of class dg.hipster.view.IdeaView.
 //     */
 //    public void testGetV() {
@@ -288,22 +237,6 @@ public class IdeaViewTest extends TestCase {
 //    }
 //
 //    /**
-//     * Test of getIdea method, of class dg.hipster.view.IdeaView.
-//     */
-//    public void testGetIdea() {
-//        System.out.println("getIdea");
-//
-//        IdeaView instance = null;
-//
-//        Idea expResult = null;
-//        Idea result = instance.getIdea();
-//        assertEquals(expResult, result);
-//
-//        // TODO review the generated test code and remove the default call to fail.
-//        fail("The test case is a prototype.");
-//    }
-//
-//    /**
 //     * Test of paint method, of class dg.hipster.view.IdeaView.
 //     */
 //    public void testPaint() {
@@ -317,21 +250,4 @@ public class IdeaViewTest extends TestCase {
 //        // TODO review the generated test code and remove the default call to fail.
 //        fail("The test case is a prototype.");
 //    }
-//
-//    /**
-//     * Test of isRoot method, of class dg.hipster.view.IdeaView.
-//     */
-//    public void testIsRoot() {
-//        System.out.println("isRoot");
-//
-//        IdeaView instance = null;
-//
-//        boolean expResult = true;
-//        boolean result = instance.isRoot();
-//        assertEquals(expResult, result);
-//
-//        // TODO review the generated test code and remove the default call to fail.
-//        fail("The test case is a prototype.");
-//    }
-//
 }
