@@ -1,7 +1,7 @@
 /*
- * Fred.java
+ * IdeaMap.java
  *
- * Created on July 20, 2006, 9:49 AM
+ * Created on August 31, 2006, 6:03 PM
  *
  * Copyright (c) 2006, David Griffiths
  * All rights reserved.
@@ -10,10 +10,10 @@
  * modification, are permitted provided that the following conditions are met:
  *
  * * Redistributions of source code must retain the above copyright notice,
- *   this Vector of conditions and the following disclaimer.
+ *   this list of conditions and the following disclaimer.
  *
  * * Redistributions in binary form must reproduce the above copyright notice,
- *   this Vector of conditions and the following disclaimer in the documentation
+ *   this list of conditions and the following disclaimer in the documentation
  *   and/or other materials provided with the distribution.
  *
  * * Neither the name of the David Griffiths nor the names of his contributors
@@ -56,7 +56,7 @@ import javax.swing.JComponent;
  *
  * @author davidg
  */
-public class Fred extends JComponent implements IdeaListener {
+public class IdeaMap extends JComponent implements IdeaListener {
     private static final double MAX_SPEED = 5.0;
     private static final double MAX_MOVE_TIME_SECS = 3.0;
     private final static Point2D.Double ORIGIN = new Point2D.Double(0.0, 0.0);
@@ -65,84 +65,16 @@ public class Fred extends JComponent implements IdeaListener {
     private IdeaView rootView;
     
     /** Creates a new instance of Fred */
-    public Fred() {
-        buildModel();
+    public IdeaMap() {
     }
     
-    private void buildModel() {
-        ReaderFactory factory = ReaderFactory.getInstance();
-        try {
-            IdeaReader reader = factory.read(new File("etc/test.opml"));
-            rootIdea = reader.getIdea();
-            rootView = new IdeaView(rootIdea);
-        } catch(ReaderException re) {
-            re.printStackTrace();
-        }
-        
-//        rootIdea = new Idea("Persistence");
-//        rootView = new IdeaView(rootIdea);
-//
-//
-//
-//        Idea mistakes = new Idea("Mistakes");
-//        Idea platforms = new Idea("Platforms");
-//        mistakes.add(platforms);
-//        Idea attempts = new Idea("Attempts");
-//        platforms.add(attempts);
-//        Idea continual = new Idea("Continual");
-//        attempts.add(continual);
-//        Idea further = new Idea("Further");
-//        attempts.add(further);
-//        Idea enjoyed = new Idea("Enjoyed");
-//        attempts.add(enjoyed);
-//        Idea thousands = new Idea("Thousands");
-//        mistakes.add(thousands);
-//        Idea making = new Idea("Making");
-//        mistakes.add(making);
-//        Idea progress = new Idea("Progress");
-//        mistakes.add(progress);
-//        Idea learning = new Idea("Learning");
-//        rootIdea.add(learning);
-//        Idea love = new Idea("Love");
-//        learning.add(love);
-//        love.add(mistakes);
-//        rootIdea.add(mistakes);
-        
-        
-        
-        
-//        final int lines = 35;
-//        rootIdea = new Idea("Test pattern");
-//        rootView = new IdeaView(rootIdea);
-//        (new Thread(){public void run() {
-//            for (int i = 0; i < lines; i++) {
-//                Idea fred2 = new Idea("      i = " + i);
-//                synchronized(rootIdea) {
-//                    rootIdea.add(fred2);
-//                    timeChanged = System.currentTimeMillis();
-//                }
-//                //try { Thread.sleep(100);} catch(Exception e){}
-//            }
-//
-//            Idea sub = rootIdea.getSubIdeas().get(0);
-//
-//            Idea subIdea0 = null;
-//            for (int i = 0; i < 4; i++) {
-//                subIdea0 = new Idea("i = " + i);
-//                sub.add(subIdea0);
-//                timeChanged = System.currentTimeMillis();
-//                try { Thread.sleep(1000);} catch(Exception e){}
-//            }
-//            try { Thread.sleep(10000);} catch(Exception e){}
-//
-//            Idea s2 = subIdea0;
-//            for (int i = 0; i < 6; i++) {
-//                Idea subIdea2 = new Idea("i = " + i);
-//                s2.add(subIdea2);
-//                timeChanged = System.currentTimeMillis();
-//                try { Thread.sleep(1000);} catch(Exception e){}
-//            }
-//        }}).start();
+    public void setIdea(Idea newRootIdea) {
+        this.rootIdea = newRootIdea;
+        this.rootView = new IdeaView(this.rootIdea);
+    }
+    
+    public Idea getIdea() {
+        return this.rootIdea;
     }
     
     public void paintComponent(Graphics g) {

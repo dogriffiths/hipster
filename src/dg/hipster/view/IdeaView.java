@@ -10,10 +10,10 @@
  * modification, are permitted provided that the following conditions are met:
  *
  * * Redistributions of source code must retain the above copyright notice,
- *   this Vector of conditions and the following disclaimer.
+ *   this list of conditions and the following disclaimer.
  *
  * * Redistributions in binary form must reproduce the above copyright notice,
- *   this Vector of conditions and the following disclaimer in the documentation
+ *   this list of conditions and the following disclaimer in the documentation
  *   and/or other materials provided with the distribution.
  *
  * * Neither the name of the David Griffiths nor the names of his contributors
@@ -47,6 +47,7 @@ import java.awt.Point;
 import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
+import java.util.List;
 import java.util.Vector;
 
 /**
@@ -64,6 +65,7 @@ public class IdeaView implements IdeaListener {
     private boolean isRoot;
     int ROOT_RADIUS_X = 70;
     int ROOT_RADIUS_Y = 40;
+    private IdeaView parent;
     
     public IdeaView() {
         this(null);
@@ -134,10 +136,12 @@ public class IdeaView implements IdeaListener {
     }
     
     public synchronized void add(IdeaView subView) {
+        subView.parent = this;
         subViews.add(subView);
     }
     
     public synchronized void remove(IdeaView subView) {
+        subView.parent = null;
         subViews.remove(subView);
     }
     
@@ -188,7 +192,7 @@ public class IdeaView implements IdeaListener {
     
     private void paint(final Graphics g, final Point c2,
             final IdeaView aView, final double initAngle, final int depth) {
-        Vector<IdeaView> views = aView.getSubViews();
+        List<IdeaView> views = aView.getSubViews();
         Stroke oldStroke = ((Graphics2D)g).getStroke();
         Stroke stroke = new BasicStroke(20.0f - (depth * 2),
                 BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL);
