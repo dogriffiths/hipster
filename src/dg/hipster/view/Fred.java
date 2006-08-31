@@ -45,10 +45,10 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.geom.Point2D;
 import java.io.File;
+import java.util.List;
 import java.util.Vector;
 import javax.swing.JComponent;
 
@@ -57,8 +57,8 @@ import javax.swing.JComponent;
  * @author davidg
  */
 public class Fred extends JComponent implements IdeaListener {
-    private static final double MAX_SPEED = 2.0;
-    private static final double MAX_MOVE_TIME_SECS = 15.0;
+    private static final double MAX_SPEED = 5.0;
+    private static final double MAX_MOVE_TIME_SECS = 3.0;
     private final static Point2D.Double ORIGIN = new Point2D.Double(0.0, 0.0);
     
     private Idea rootIdea;
@@ -163,15 +163,15 @@ public class Fred extends JComponent implements IdeaListener {
     
     long timeChanged = 0;
     
-    Vector<Point2D> points;
+    List<Point2D> points;
     private void adjustModel() {
         points = new Vector<Point2D>();
-        Vector<IdeaView> views = rootView.getSubViews();
+        List<IdeaView> views = rootView.getSubViews();
         createPoints(rootView, ORIGIN, rootView.getAngle());
         tweakIdeas(views, ORIGIN, 0.0, false);
     }
     
-    private Point2D tweakIdeas(final Vector<IdeaView> views, final Point2D c,
+    private Point2D tweakIdeas(final List<IdeaView> views, final Point2D c,
             final double initAngle, final boolean hasParent) {
         if (views.size() == 0) {
             return new Point2D.Double(0.0, 0.0);
@@ -320,14 +320,12 @@ public class Fred extends JComponent implements IdeaListener {
     }
     
     private void createPoints(IdeaView parentView, Point2D c, double initAngle) {
-        Vector<IdeaView> views = parentView.getSubViews();
+        List<IdeaView> views = parentView.getSubViews();
         points.add(ORIGIN);
-        synchronized(views) {
-            for(IdeaView view: views) {
-                Point2D point = getPoint(view, c, initAngle);
-                points.add(point);
-                createPoints(view, point, initAngle + view.getAngle());
-            }
+        for(IdeaView view: views) {
+            Point2D point = getPoint(view, c, initAngle);
+            points.add(point);
+            createPoints(view, point, initAngle + view.getAngle());
         }
     }
     

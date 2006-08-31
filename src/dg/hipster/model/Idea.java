@@ -36,7 +36,7 @@
 
 package dg.hipster.model;
 
-import dg.hipster.Utilities;
+import java.util.List;
 import java.util.Vector;
 
 /**
@@ -57,7 +57,7 @@ public class Idea {
     /**
      * List of objects that are observing this idea.
      */
-    private Vector<IdeaListener> listeners = new Vector<IdeaListener>();
+    private List<IdeaListener> listeners = new Vector<IdeaListener>();
     
     /**
      * No args constructor.
@@ -121,8 +121,8 @@ public class Idea {
         }
     }
     
-    public synchronized Vector<Idea> getSubIdeas() {
-        return (Vector<Idea>)subIdeas.clone();
+    public synchronized List<Idea> getSubIdeas() {
+        return (List<Idea>)subIdeas.clone();
     }
     
     public String getText() {
