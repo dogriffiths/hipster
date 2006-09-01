@@ -96,14 +96,14 @@ public class IdeaMap extends JComponent implements MapComponent {
     List<Point2D> points;
     private void adjustModel() {
         points = new Vector<Point2D>();
-        List<IdeaView> views = rootView.getSubViews();
         createPoints(rootView, new Position(ORIGIN, rootView.getAngle()));
-        tweakIdeas(views, new Position(ORIGIN, 0.0), false);
+        tweakIdeas(rootView, new Position(ORIGIN, 0.0));
         repaint();
     }
     
-    private Point2D tweakIdeas(final List<IdeaView> views, final Position p,
-            final boolean hasParent) {
+    private Point2D tweakIdeas(final IdeaView parentView, final Position p) {
+        final List<IdeaView> views = parentView.getSubViews();
+        final boolean hasParent = (parentView.getParent() instanceof IdeaView);
         if (views.size() == 0) {
             return new Point2D.Double(0.0, 0.0);
         }
@@ -160,8 +160,8 @@ public class IdeaMap extends JComponent implements MapComponent {
                     }
                 }
                 Point2D p2 = getPoint(view, new Position(ORIGIN, p.angle));
-                Point2D tf = tweakIdeas(view.getSubViews(), new Position(point,
-                        view.getAngle() + p.angle), true);
+                Point2D tf = tweakIdeas(view, new Position(point,
+                        view.getAngle() + p.angle));
                 forceX += tf.getX();
                 forceY += tf.getY();
                 double sideForce = (p2.getY() * forceX) + (-p2.getX() * forceY);
