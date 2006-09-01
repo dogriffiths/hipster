@@ -92,12 +92,28 @@ public class IdeaMap extends JComponent implements MapComponent {
     }
     
     long timeChanged = 0;
+    private double mass = 0.0;
+    private double maxSpeed = 0.0;
     
-    List<Vertex> locations;
+    List<Vertex> particles;
     private void adjust() {
-        locations = new Vector<Vertex>();
-        createLocations(rootView, new Position(ORIGIN, rootView.getAngle()));
+        particles = new Vector<Vertex>();
+        createParticles(rootView, new Position(ORIGIN, rootView.getAngle()));
+        mass = 2000.0 / (particles.size()
+        * Math.sqrt((double)particles.size()));
+        if (timeChanged == 0) {
+            timeChanged = System.currentTimeMillis();
+        }
+        long now = System.currentTimeMillis();
+        maxSpeed = 0.0;
+        if ((now - timeChanged) < (MAX_MOVE_TIME_SECS * 1000.0)) {
+            maxSpeed = MAX_SPEED - ((now - timeChanged) * MAX_SPEED / 1000.0
+                    / MAX_MOVE_TIME_SECS);
+        } else {
+            ticker.stop();
+        }
         endForce(rootView, new Position(ORIGIN, 0.0));
+        adjustAngles(rootView);
         repaint();
     }
     
@@ -106,20 +122,33 @@ public class IdeaMap extends JComponent implements MapComponent {
         if (views.size() == 0) {
             return new Vertex(0.0, 0.0);
         }
-        double mass = 2000.0 / (locations.size()
-        * Math.sqrt((double)locations.size()));
         Vertex totForce = new Vertex(0.0, 0.0);
-        if (timeChanged == 0) {
-            timeChanged = System.currentTimeMillis();
+        for (IdeaView view: views) {
+            Vertex particle = getParticle(view, p);
+            Vertex force = repulsion(particle, view, p);
+            totForce = totForce.add(force);
+            view.setV(getNewVelocity(force, view, p));
         }
-        long now = System.currentTimeMillis();
-        double maxSpeed = 0.0;
-        if ((now - timeChanged) < (MAX_MOVE_TIME_SECS * 1000.0)) {
-            maxSpeed = MAX_SPEED - ((now - timeChanged) * MAX_SPEED / 1000.0
-                    / MAX_MOVE_TIME_SECS);
-        } else {
-            ticker.stop();
+        return totForce;
+    }
+
+    private double getNewVelocity(final Vertex force, final IdeaView view, final Position p) {
+        Vertex p2 = getParticle(view, new Position(ORIGIN, p.angle));
+        double sideForce = (p2.y * force.x) + (-p2.x * force.y);
+        double v = view.getV();
+        v += sideForce / mass;
+        v *= 0.90;
+        if (v > maxSpeed) {
+            v = maxSpeed;
         }
+        if (v < -maxSpeed) {
+            v = -maxSpeed;
+        }
+        return v;
+    }
+
+    private void adjustAngles(final IdeaView parentView) {
+        final List<IdeaView> views = parentView.getSubViews();
         for (int i = 0; i < views.size(); i++) {
             IdeaView previousView = null;
             IdeaView nextView = null;
@@ -130,28 +159,13 @@ public class IdeaMap extends JComponent implements MapComponent {
             if (i < views.size() - 1) {
                 nextView = views.get(i + 1);
             }
-            Vertex point = getLocation(view, p);
-            Vertex force = repulsion(point, view, mass, p);
-            totForce = totForce.add(force);
-            Vertex p2 = getLocation(view, new Position(ORIGIN, p.angle));
-            double sideForce = (p2.y * force.x) + (-p2.x * force.y);
-            double v = view.getV();
-            v += sideForce / mass;
-            v *= 0.90;
-            if (v > maxSpeed) {
-                v = maxSpeed;
-            }
-            if (v < -maxSpeed) {
-                v = -maxSpeed;
-            }
-            view.setV(v);
-            double newAngle = adjustAngles(nextView, parentView, view, previousView);
+            double newAngle = getNewAngle(parentView, previousView, view, nextView);
             view.setAngle(newAngle);
+        adjustAngles(view);
         }
-        return totForce;
     }
 
-    private double adjustAngles(final IdeaView nextView, final IdeaView parentView, final IdeaView view, final IdeaView previousView) {
+    private double getNewAngle(final IdeaView parentView, final IdeaView previousView, final IdeaView view, final IdeaView nextView) {
         final List<IdeaView> views = parentView.getSubViews();
         final double v = view.getV();
         double minDiffAngle = Math.PI / 2 / views.size();
@@ -172,7 +186,6 @@ public class IdeaMap extends JComponent implements MapComponent {
                     view.setV(-diffV);
                     previousView.setV(diffV);
                 }
- //                   v = view.getV();
             }
         } else {
             double previousAngle = -Math.PI;
@@ -189,7 +202,6 @@ public class IdeaMap extends JComponent implements MapComponent {
                 } else {
                     view.setV(-diffV);
                 }
- //                   v = view.getV();
             }
         }
         if (nextView != null) {
@@ -206,7 +218,6 @@ public class IdeaMap extends JComponent implements MapComponent {
                     view.setV(diffV);
                     nextView.setV(-diffV);
                 }
-//                    v = view.getV();
             }
         } else {
             double nextAngle = Math.PI;
@@ -222,15 +233,14 @@ public class IdeaMap extends JComponent implements MapComponent {
                 } else {
                     view.setV(diffV);
                 }
-//                    v = view.getV();
             }
         }
         return newAngle;
     }
 
-    private Vertex repulsion(final Vertex point, final IdeaView view, final double mass, final Position p) {
+    private Vertex repulsion(final Vertex point, final IdeaView view, final Position p) {
         Vertex force = new Vertex(0, 0);
-        for(Vertex other: locations) {
+        for(Vertex other: particles) {
             Vertex dir = point.subtract(other);
             double dSquare = point.distanceSq(other);
             if (dSquare > 0.000001) {
@@ -245,17 +255,18 @@ public class IdeaMap extends JComponent implements MapComponent {
         return force;
     }
     
-    private void createLocations(IdeaView parentView, Position p) {
+    private void createParticles(IdeaView parentView, Position start) {
         List<IdeaView> views = parentView.getSubViews();
-        locations.add(ORIGIN);
+        particles.add(ORIGIN);
         for(IdeaView view: views) {
-            Vertex location = getLocation(view, p);
-            locations.add(location);
-            createLocations(view, new Position(location, p.angle + view.getAngle()));
+            Vertex location = getParticle(view, start);
+            particles.add(location);
+            Position nextStart = new Position(location, start.angle + view.getAngle());
+            createParticles(view, nextStart);
         }
     }
     
-    private Vertex getLocation(IdeaView view, Position p) {
+    private Vertex getParticle(IdeaView view, Position p) {
         double angle = view.getAngle() + p.angle;
         double length = view.getLength();
         double x = p.start.x + Math.sin(angle) * length;
