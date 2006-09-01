@@ -63,7 +63,7 @@ public class IdeaMap extends JComponent implements MapComponent {
     private IdeaView rootView;
     private ActionListener modelUpdater = new ActionListener() {
         public void actionPerformed(ActionEvent evt) {
-            adjustModel();
+            adjust();
         }
     };
     private Timer ticker = new Timer(50, modelUpdater);
@@ -94,23 +94,21 @@ public class IdeaMap extends JComponent implements MapComponent {
     long timeChanged = 0;
     
     List<Point2D> points;
-    private void adjustModel() {
+    private void adjust() {
         points = new Vector<Point2D>();
         createPoints(rootView, new Position(ORIGIN, rootView.getAngle()));
-        tweakIdeas(rootView, new Position(ORIGIN, 0.0));
+        endForce(rootView, new Position(ORIGIN, 0.0));
         repaint();
     }
     
-    private Point2D tweakIdeas(final IdeaView parentView, final Position p) {
+    private Force endForce(final IdeaView parentView, final Position p) {
         final List<IdeaView> views = parentView.getSubViews();
-        final boolean hasParent = (parentView.getParent() instanceof IdeaView);
         if (views.size() == 0) {
-            return new Point2D.Double(0.0, 0.0);
+            return new Force(0.0, 0.0);
         }
         double mass = 2000.0 / (points.size()
         * Math.sqrt((double)points.size()));
-        double totForceX = 0.0;
-        double totForceY = 0.0;
+        Force totForce = new Force(0.0, 0.0);
         if (timeChanged == 0) {
             timeChanged = System.currentTimeMillis();
         }
@@ -122,134 +120,128 @@ public class IdeaMap extends JComponent implements MapComponent {
         } else {
             ticker.stop();
         }
-        synchronized(views) {
-            double minDiffAngle = Math.PI / 2 / views.size();
-            for (int i = 0; i < views.size(); i++) {
-                IdeaView previousView = null;
-                IdeaView nextView = null;
-                IdeaView view = views.get(i);
-                if (i > 0) {
-                    previousView = views.get(i - 1);
-                }
-                if (i < views.size() - 1) {
-                    nextView = views.get(i + 1);
-                }
-                Point2D point = getPoint(view, p);
-                double forceX = 0.0;
-                double forceY = 0.0;
-                for(Point2D other: points) {
-                    double dirX = point.getX() - other.getX();
-                    double dirY = point.getY() - other.getY();
-                    double dSquare = point.distanceSq(other);
-                    if (dSquare > 0.000001) {
-                        double unitFactor = point.distance(other);
-                        forceX += (dirX / unitFactor) * (mass * mass / dSquare);
-                        if (forceX > 1.0) {
-                            forceX = 1.0;
-                        }
-                        if (forceX < -1.0) {
-                            forceX = -1.0;
-                        }
-                        forceY += (dirY / unitFactor) * (mass * mass / dSquare);
-                        if (forceY > 1.0) {
-                            forceY = 1.0;
-                        }
-                        if (forceY < -1.0) {
-                            forceY = -1.0;
-                        }
-                    }
-                }
-                Point2D p2 = getPoint(view, new Position(ORIGIN, p.angle));
-                Point2D tf = tweakIdeas(view, new Position(point,
-                        view.getAngle() + p.angle));
-                forceX += tf.getX();
-                forceY += tf.getY();
-                double sideForce = (p2.getY() * forceX) + (-p2.getX() * forceY);
-                totForceX += forceX;
-                totForceY += forceY;
-                double v = view.getV();
-                v += sideForce / mass;
-                v *= 0.90;
-                if (v > maxSpeed) {
-                    v = maxSpeed;
-                }
-                if (v < -maxSpeed) {
-                    v = -maxSpeed;
-                }
-                view.setV(v);
-                double oldAngle = view.getAngle();
-                double newAngle = oldAngle  + (view.getV() / view.getLength());
-                if (previousView != null) {
-                    double previousAngle = previousView.getAngle();
-                    if (previousAngle > newAngle - minDiffAngle) {
-                        previousView.setAngle(newAngle - minDiffAngle);
-                        newAngle = previousAngle + minDiffAngle;
-                        double previousV = previousView.getV();
-                        double diffV = v - previousV;
-                        if (diffV > 0) {
-                            view.setV(diffV);
-                            previousView.setV(-diffV);
-                        } else {
-                            view.setV(-diffV);
-                            previousView.setV(diffV);
-                        }
-                        v = view.getV();
-                    }
-                } else {
-                    double previousAngle = -Math.PI;
-                    if (!hasParent) {
-                        previousAngle = views.get(views.size() - 1).getAngle()
-                        - 2 * Math.PI;
-                    }
-                    if (previousAngle > newAngle - minDiffAngle) {
-                        newAngle = previousAngle + minDiffAngle;
-                        double previousV = 0.0;
-                        double diffV = v - previousV;
-                        if (diffV > 0) {
-                            view.setV(diffV);
-                        } else {
-                            view.setV(-diffV);
-                        }
-                        v = view.getV();
-                    }
-                }
-                if (nextView != null) {
-                    double nextAngle = nextView.getAngle();
-                    if (nextAngle < newAngle + minDiffAngle) {
-                        nextView.setAngle(newAngle + minDiffAngle);
-                        newAngle = nextAngle - minDiffAngle;
-                        double nextV = nextView.getV();
-                        double diffV = 0.0;
-                        if (diffV > 0) {
-                            view.setV(-diffV);
-                            nextView.setV(diffV);
-                        } else {
-                            view.setV(diffV);
-                            nextView.setV(-diffV);
-                        }
-                        v = view.getV();
-                    }
-                } else {
-                    double nextAngle = Math.PI;
-                    if (!hasParent) {
-                        nextAngle = views.get(0).getAngle() +  2 * Math.PI;
-                    }
-                    if (nextAngle < newAngle + minDiffAngle) {
-                        newAngle = nextAngle - minDiffAngle;
-                        double nextV = 0.0;
-                        double diffV = 0.0;
-                        if (diffV > 0) {
-                            view.setV(-diffV);
-                        } else {
-                            view.setV(diffV);
-                        }
-                        v = view.getV();
-                    }
-                }
-                view.setAngle(newAngle);
+        double minDiffAngle = Math.PI / 2 / views.size();
+        for (int i = 0; i < views.size(); i++) {
+            IdeaView previousView = null;
+            IdeaView nextView = null;
+            IdeaView view = views.get(i);
+            if (i > 0) {
+                previousView = views.get(i - 1);
             }
+            if (i < views.size() - 1) {
+                nextView = views.get(i + 1);
+            }
+            Point2D point = getPoint(view, p);
+            Force force = new Force(0, 0);
+            for(Point2D other: points) {
+                double dirX = point.getX() - other.getX();
+                double dirY = point.getY() - other.getY();
+                double dSquare = point.distanceSq(other);
+                if (dSquare > 0.000001) {
+                    double unitFactor = point.distance(other);
+                    force.x += (dirX / unitFactor) * (mass * mass / dSquare);
+                    if (force.x > 1.0) {
+                        force.x = 1.0;
+                    }
+                    if (force.x < -1.0) {
+                        force.x = -1.0;
+                    }
+                    force.y += (dirY / unitFactor) * (mass * mass / dSquare);
+                    if (force.y > 1.0) {
+                        force.y = 1.0;
+                    }
+                    if (force.y < -1.0) {
+                        force.y = -1.0;
+                    }
+                }
+            }
+            force = force.add(endForce(view, new Position(point,
+                    view.getAngle() + p.angle)));
+            Point2D p2 = getPoint(view, new Position(ORIGIN, p.angle));
+            double sideForce = (p2.getY() * force.x) + (-p2.getX() * force.y);
+            totForce = totForce.add(force);
+            double v = view.getV();
+            v += sideForce / mass;
+            v *= 0.90;
+            if (v > maxSpeed) {
+                v = maxSpeed;
+            }
+            if (v < -maxSpeed) {
+                v = -maxSpeed;
+            }
+            view.setV(v);
+            double oldAngle = view.getAngle();
+            double newAngle = oldAngle  + (view.getV() / view.getLength());
+            if (previousView != null) {
+                double previousAngle = previousView.getAngle();
+                if (previousAngle > newAngle - minDiffAngle) {
+                    previousView.setAngle(newAngle - minDiffAngle);
+                    newAngle = previousAngle + minDiffAngle;
+                    double previousV = previousView.getV();
+                    double diffV = v - previousV;
+                    if (diffV > 0) {
+                        view.setV(diffV);
+                        previousView.setV(-diffV);
+                    } else {
+                        view.setV(-diffV);
+                        previousView.setV(diffV);
+                    }
+                    v = view.getV();
+                }
+            } else {
+                double previousAngle = -Math.PI;
+                if (parentView.isRoot()) {
+                    previousAngle = views.get(views.size() - 1).getAngle()
+                    - 2 * Math.PI;
+                }
+                if (previousAngle > newAngle - minDiffAngle) {
+                    newAngle = previousAngle + minDiffAngle;
+                    double previousV = 0.0;
+                    double diffV = v - previousV;
+                    if (diffV > 0) {
+                        view.setV(diffV);
+                    } else {
+                        view.setV(-diffV);
+                    }
+                    v = view.getV();
+                }
+            }
+            if (nextView != null) {
+                double nextAngle = nextView.getAngle();
+                if (nextAngle < newAngle + minDiffAngle) {
+                    nextView.setAngle(newAngle + minDiffAngle);
+                    newAngle = nextAngle - minDiffAngle;
+                    double nextV = nextView.getV();
+                    double diffV = 0.0;
+                    if (diffV > 0) {
+                        view.setV(-diffV);
+                        nextView.setV(diffV);
+                    } else {
+                        view.setV(diffV);
+                        nextView.setV(-diffV);
+                    }
+                    v = view.getV();
+                }
+            } else {
+                double nextAngle = Math.PI;
+                if (parentView.isRoot()) {
+                    nextAngle = views.get(0).getAngle() +  2 * Math.PI;
+                }
+                if (nextAngle < newAngle + minDiffAngle) {
+                    newAngle = nextAngle - minDiffAngle;
+                    double nextV = 0.0;
+                    double diffV = 0.0;
+                    if (diffV > 0) {
+                        view.setV(-diffV);
+                    } else {
+                        view.setV(diffV);
+                    }
+                    v = view.getV();
+                }
+            }
+            view.setAngle(newAngle);
         }
-        return new Point2D.Double(totForceX, totForceY);
+        return totForce;
     }
     
     private void createPoints(IdeaView parentView, Position p) {
@@ -282,5 +274,31 @@ class Position {
     Position(Point2D aStart, double anAngle) {
         this.start = aStart;
         this.angle = anAngle;
+    }
+}
+
+class Force {
+    double x;
+    double y;
+    Force(double anX, double aY) {
+        this.x = anX;
+        this.y = aY;
+    }
+    
+    Force add(Force other) {
+        return new Force(this.x + other.x, this.y + other.y);
+    }
+}
+
+class Location {
+    double x;
+    double y;
+    Location(double anX, double aY) {
+        this.x = anX;
+        this.y = aY;
+    }
+    
+    Location subtract(Location other) {
+        return new Location(this.x + other.x, this.y + other.y);
     }
 }
