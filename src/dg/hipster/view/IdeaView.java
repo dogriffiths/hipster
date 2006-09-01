@@ -239,8 +239,8 @@ public class IdeaView implements IdeaListener, MapComponent {
         return new Point(sx, sy);
     }
     
-    private void drawString(Graphics2D graphics2d, String string, Point p, int alignment,
-            double orientation) {
+    private void drawString(Graphics2D graphics2d, String string, Point p,
+            int alignment, double orientation) {
         double orient = orientation % Math.PI;
         
         if (orient > (Math.PI / 2.0)) {
@@ -271,7 +271,8 @@ public class IdeaView implements IdeaListener, MapComponent {
         graphics2d.setTransform(transform);
     }
     
-    private void transform(Graphics2D graphics2d, double orientation, int x, int y) {
+    private void transform(Graphics2D graphics2d, double orientation, int x,
+            int y) {
         graphics2d.transform(
                 AffineTransform.getRotateInstance(
                 -orientation, x, y
