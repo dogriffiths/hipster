@@ -35,9 +35,12 @@
 
 package dg.hipster.view;
 
-import dg.hipster.model.Idea;
+import dg.hipster.io.IdeaReader;
+import dg.hipster.io.ReaderException;
+import dg.hipster.io.ReaderFactory;
 import dg.hipster.model.Settings;
 import java.awt.BorderLayout;
+import java.io.File;
 import java.util.ResourceBundle;
 import javax.swing.JFrame;
 
@@ -82,13 +85,13 @@ public class Mainframe extends JFrame {
      * Set up the data.
      */
     private void buildModel() {
-//        ReaderFactory factory = ReaderFactory.getInstance();
-//        try {
-//            IdeaReader reader = factory.read(new File("etc/test.opml"));
-//            ideaMap.setIdea(reader.getIdea());
-//        } catch(ReaderException re) {
-//            re.printStackTrace();
-//        }
+        ReaderFactory factory = ReaderFactory.getInstance();
+        try {
+            IdeaReader reader = factory.read(new File("etc/test.opml"));
+            ideaMap.setIdea(reader.getIdea());
+        } catch(ReaderException re) {
+            re.printStackTrace();
+        }
         
 //        Idea idea = new Idea("Persistence");
 //        ideaMap.setIdea(idea);
@@ -119,34 +122,34 @@ public class Mainframe extends JFrame {
         
         
         
-        final int lines = 35;
-        final Idea idea = new Idea("Test pattern");
-        ideaMap.setIdea(idea);
-        (new Thread(){public void run() {
-            for (int i = 0; i < lines; i++) {
-                Idea fred2 = new Idea("      i = " + i);
-                synchronized(idea) {
-                    idea.add(fred2);
-                }
-                //try { Thread.sleep(100);} catch(Exception e){}
-            }
-
-            Idea sub = idea.getSubIdeas().get(0);
-
-            Idea subIdea0 = null;
-            for (int i = 0; i < 4; i++) {
-                subIdea0 = new Idea("i = " + i);
-                sub.add(subIdea0);
-                try { Thread.sleep(1000);} catch(Exception e){}
-            }
-            try { Thread.sleep(10000);} catch(Exception e){}
-
-            Idea s2 = subIdea0;
-            for (int i = 0; i < 6; i++) {
-                Idea subIdea2 = new Idea("i = " + i);
-                s2.add(subIdea2);
-                try { Thread.sleep(1000);} catch(Exception e){}
-            }
-        }}).start();
+//        final int lines = 35;
+//        final Idea idea = new Idea("Test pattern");
+//        ideaMap.setIdea(idea);
+//        (new Thread(){public void run() {
+//            for (int i = 0; i < lines; i++) {
+//                Idea fred2 = new Idea("      i = " + i);
+//                synchronized(idea) {
+//                    idea.add(fred2);
+//                }
+//                //try { Thread.sleep(100);} catch(Exception e){}
+//            }
+//
+//            Idea sub = idea.getSubIdeas().get(0);
+//
+//            Idea subIdea0 = null;
+//            for (int i = 0; i < 4; i++) {
+//                subIdea0 = new Idea("i = " + i);
+//                sub.add(subIdea0);
+//                try { Thread.sleep(1000);} catch(Exception e){}
+//            }
+//            try { Thread.sleep(10000);} catch(Exception e){}
+//
+//            Idea s2 = subIdea0;
+//            for (int i = 0; i < 6; i++) {
+//                Idea subIdea2 = new Idea("i = " + i);
+//                s2.add(subIdea2);
+//                try { Thread.sleep(1000);} catch(Exception e){}
+//            }
+//        }}).start();
     }
 }

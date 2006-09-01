@@ -64,7 +64,6 @@ public class IdeaMap extends JComponent implements MapComponent {
     private ActionListener modelUpdater = new ActionListener() {
         public void actionPerformed(ActionEvent evt) {
             adjustModel();
-            System.out.println("in timer");
         }
     };
     private Timer ticker = new Timer(50, modelUpdater);
@@ -122,7 +121,6 @@ public class IdeaMap extends JComponent implements MapComponent {
                     / MAX_MOVE_TIME_SECS);
         } else {
             ticker.stop();
-            System.out.println("stopped ticker");
         }
         synchronized(views) {
             double minDiffAngle = Math.PI / 2 / views.size();
@@ -274,7 +272,6 @@ public class IdeaMap extends JComponent implements MapComponent {
     
     public void repaintRequired() {
         timeChanged = System.currentTimeMillis();
-        System.out.println("starting ticker because idea changed");
         ticker.start();
     }
 }
