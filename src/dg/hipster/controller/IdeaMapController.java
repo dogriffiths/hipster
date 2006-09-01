@@ -111,7 +111,8 @@ public class IdeaMapController implements ActionListener {
         return totForce;
     }
     
-    private double getNewVelocity(final Vertex force, final IdeaView view, final Position p) {
+    private double getNewVelocity(final Vertex force, final IdeaView view,
+            final Position p) {
         Vertex p2 = getParticle(view, new Position(ORIGIN, p.angle));
         double sideForce = (p2.y * force.x) + (-p2.x * force.y);
         double v = view.getV();
@@ -138,13 +139,16 @@ public class IdeaMapController implements ActionListener {
             if (i < views.size() - 1) {
                 nextView = views.get(i + 1);
             }
-            double newAngle = getNewAngle(parentView, previousView, view, nextView);
+            double newAngle = getNewAngle(parentView, previousView, view,
+                    nextView);
             view.setAngle(newAngle);
             adjustAngles(view);
         }
     }
     
-    private double getNewAngle(final IdeaView parentView, final IdeaView previousView, final IdeaView view, final IdeaView nextView) {
+    private double getNewAngle(final IdeaView parentView,
+            final IdeaView previousView, final IdeaView view,
+            final IdeaView nextView) {
         final List<IdeaView> views = parentView.getSubViews();
         final double v = view.getV();
         double minDiffAngle = Math.PI / 2 / views.size();
@@ -217,7 +221,8 @@ public class IdeaMapController implements ActionListener {
         return newAngle;
     }
     
-    private Vertex repulsion(final Vertex point, final IdeaView view, final Position p) {
+    private Vertex repulsion(final Vertex point, final IdeaView view,
+            final Position p) {
         Vertex force = new Vertex(0, 0);
         for(Vertex other: particles) {
             Vertex dir = point.subtract(other);
@@ -240,7 +245,8 @@ public class IdeaMapController implements ActionListener {
         for(IdeaView view: views) {
             Vertex location = getParticle(view, start);
             particles.add(location);
-            Position nextStart = new Position(location, start.angle + view.getAngle());
+            Position nextStart = new Position(location,
+                    start.angle + view.getAngle());
             createParticles(view, nextStart);
         }
     }
@@ -281,11 +287,13 @@ class Vertex {
     }
     
     double distanceSq(Vertex other) {
-        return (new Point2D.Double(x, y)).distanceSq(new Point2D.Double(other.x, other.y));
+        return (new Point2D.Double(x, y)).distanceSq(
+                new Point2D.Double(other.x, other.y));
     }
     
     double distance(Vertex other) {
-        return (new Point2D.Double(x, y)).distance(new Point2D.Double(other.x, other.y));
+        return (new Point2D.Double(x, y)).distance(
+                new Point2D.Double(other.x, other.y));
     }
     
     Vertex scale(double factor) {
