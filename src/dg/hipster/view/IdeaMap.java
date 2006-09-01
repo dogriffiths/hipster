@@ -35,51 +35,40 @@
 
 package dg.hipster.view;
 
+import dg.hipster.controller.IdeaMapController;
 import dg.hipster.model.Idea;
-import dg.hipster.model.IdeaEvent;
-import dg.hipster.model.IdeaListener;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.geom.Point2D;
-import java.util.List;
-import java.util.Vector;
 import javax.swing.JComponent;
-import javax.swing.Timer;
 
 /**
  *
  * @author davidg
  */
 public class IdeaMap extends JComponent implements MapComponent {
-    private static final double MAX_SPEED = 5.0;
-    private static final double MAX_MOVE_TIME_SECS = 3.0;
-    private final static Vertex ORIGIN = new Vertex(0.0, 0.0);
-    
+    private IdeaMapController controller;
     private IdeaView rootView;
-    private ActionListener modelUpdater = new ActionListener() {
-        public void actionPerformed(ActionEvent evt) {
-            adjust();
-        }
-    };
-    private Timer ticker = new Timer(50, modelUpdater);
-    
+
     /** Creates a new instance of Fred */
     public IdeaMap() {
+        controller = new IdeaMapController(this);
     }
     
     public void setIdea(Idea idea) {
         this.rootView = new IdeaView(idea);
         this.rootView.setParent(this);
-        ticker.start();
+        this.repaintRequired();
     }
     
     public Idea getIdea() {
         return this.rootView.getIdea();
+    }
+    
+    public IdeaView getRootView() {
+        return this.rootView;
     }
     
     public void paintComponent(Graphics g) {
@@ -91,244 +80,7 @@ public class IdeaMap extends JComponent implements MapComponent {
         rootView.paint(g);
     }
     
-    long timeChanged = 0;
-    private double mass = 0.0;
-    private double maxSpeed = 0.0;
-    
-    List<Vertex> particles;
-    private void adjust() {
-        particles = new Vector<Vertex>();
-        createParticles(rootView, new Position(ORIGIN, rootView.getAngle()));
-        mass = 2000.0 / (particles.size()
-        * Math.sqrt((double)particles.size()));
-        if (timeChanged == 0) {
-            timeChanged = System.currentTimeMillis();
-        }
-        long now = System.currentTimeMillis();
-        maxSpeed = 0.0;
-        if ((now - timeChanged) < (MAX_MOVE_TIME_SECS * 1000.0)) {
-            maxSpeed = MAX_SPEED - ((now - timeChanged) * MAX_SPEED / 1000.0
-                    / MAX_MOVE_TIME_SECS);
-        } else {
-            ticker.stop();
-        }
-        endForce(rootView, new Position(ORIGIN, 0.0));
-        adjustAngles(rootView);
-        repaint();
-    }
-    
-    private Vertex endForce(final IdeaView parentView, final Position p) {
-        final List<IdeaView> views = parentView.getSubViews();
-        if (views.size() == 0) {
-            return new Vertex(0.0, 0.0);
-        }
-        Vertex totForce = new Vertex(0.0, 0.0);
-        for (IdeaView view: views) {
-            Vertex particle = getParticle(view, p);
-            Vertex force = repulsion(particle, view, p);
-            totForce = totForce.add(force);
-            view.setV(getNewVelocity(force, view, p));
-        }
-        return totForce;
-    }
-
-    private double getNewVelocity(final Vertex force, final IdeaView view, final Position p) {
-        Vertex p2 = getParticle(view, new Position(ORIGIN, p.angle));
-        double sideForce = (p2.y * force.x) + (-p2.x * force.y);
-        double v = view.getV();
-        v += sideForce / mass;
-        v *= 0.90;
-        if (v > maxSpeed) {
-            v = maxSpeed;
-        }
-        if (v < -maxSpeed) {
-            v = -maxSpeed;
-        }
-        return v;
-    }
-
-    private void adjustAngles(final IdeaView parentView) {
-        final List<IdeaView> views = parentView.getSubViews();
-        for (int i = 0; i < views.size(); i++) {
-            IdeaView previousView = null;
-            IdeaView nextView = null;
-            IdeaView view = views.get(i);
-            if (i > 0) {
-                previousView = views.get(i - 1);
-            }
-            if (i < views.size() - 1) {
-                nextView = views.get(i + 1);
-            }
-            double newAngle = getNewAngle(parentView, previousView, view, nextView);
-            view.setAngle(newAngle);
-        adjustAngles(view);
-        }
-    }
-
-    private double getNewAngle(final IdeaView parentView, final IdeaView previousView, final IdeaView view, final IdeaView nextView) {
-        final List<IdeaView> views = parentView.getSubViews();
-        final double v = view.getV();
-        double minDiffAngle = Math.PI / 2 / views.size();
-        
-        double oldAngle = view.getAngle();
-        double newAngle = oldAngle  + (view.getV() / view.getLength());
-        if (previousView != null) {
-            double previousAngle = previousView.getAngle();
-            if (previousAngle > newAngle - minDiffAngle) {
-                previousView.setAngle(newAngle - minDiffAngle);
-                newAngle = previousAngle + minDiffAngle;
-                double previousV = previousView.getV();
-                double diffV = v - previousV;
-                if (diffV > 0) {
-                    view.setV(diffV);
-                    previousView.setV(-diffV);
-                } else {
-                    view.setV(-diffV);
-                    previousView.setV(diffV);
-                }
-            }
-        } else {
-            double previousAngle = -Math.PI;
-            if (parentView.isRoot()) {
-                previousAngle = views.get(views.size() - 1).getAngle()
-                - 2 * Math.PI;
-            }
-            if (previousAngle > newAngle - minDiffAngle) {
-                newAngle = previousAngle + minDiffAngle;
-                double previousV = 0.0;
-                double diffV = v - previousV;
-                if (diffV > 0) {
-                    view.setV(diffV);
-                } else {
-                    view.setV(-diffV);
-                }
-            }
-        }
-        if (nextView != null) {
-            double nextAngle = nextView.getAngle();
-            if (nextAngle < newAngle + minDiffAngle) {
-                nextView.setAngle(newAngle + minDiffAngle);
-                newAngle = nextAngle - minDiffAngle;
-                double nextV = nextView.getV();
-                double diffV = 0.0;
-                if (diffV > 0) {
-                    view.setV(-diffV);
-                    nextView.setV(diffV);
-                } else {
-                    view.setV(diffV);
-                    nextView.setV(-diffV);
-                }
-            }
-        } else {
-            double nextAngle = Math.PI;
-            if (parentView.isRoot()) {
-                nextAngle = views.get(0).getAngle() +  2 * Math.PI;
-            }
-            if (nextAngle < newAngle + minDiffAngle) {
-                newAngle = nextAngle - minDiffAngle;
-                double nextV = 0.0;
-                double diffV = 0.0;
-                if (diffV > 0) {
-                    view.setV(-diffV);
-                } else {
-                    view.setV(diffV);
-                }
-            }
-        }
-        return newAngle;
-    }
-
-    private Vertex repulsion(final Vertex point, final IdeaView view, final Position p) {
-        Vertex force = new Vertex(0, 0);
-        for(Vertex other: particles) {
-            Vertex dir = point.subtract(other);
-            double dSquare = point.distanceSq(other);
-            if (dSquare > 0.000001) {
-                double unitFactor = point.distance(other);
-                Vertex scaled = dir.scale(mass * mass / (dSquare * unitFactor));
-                force = force.add(scaled);
-                force.trim(-1.0, 1.0);
-            }
-        }
-        force = force.add(endForce(view, new Position(point,
-                view.getAngle() + p.angle)));
-        return force;
-    }
-    
-    private void createParticles(IdeaView parentView, Position start) {
-        List<IdeaView> views = parentView.getSubViews();
-        particles.add(ORIGIN);
-        for(IdeaView view: views) {
-            Vertex location = getParticle(view, start);
-            particles.add(location);
-            Position nextStart = new Position(location, start.angle + view.getAngle());
-            createParticles(view, nextStart);
-        }
-    }
-    
-    private Vertex getParticle(IdeaView view, Position p) {
-        double angle = view.getAngle() + p.angle;
-        double length = view.getLength();
-        double x = p.start.x + Math.sin(angle) * length;
-        double y = p.start.y + Math.cos(angle) * length;
-        return new Vertex(x, y);
-    }
-    
     public void repaintRequired() {
-        timeChanged = System.currentTimeMillis();
-        ticker.start();
-    }
-}
-
-class Position {
-    Vertex start;
-    double angle;
-    Position(Vertex aStart, double anAngle) {
-        this.start = aStart;
-        this.angle = anAngle;
-    }
-}
-
-class Vertex {
-    double x;
-    double y;
-    Vertex(double anX, double aY) {
-        this.x = anX;
-        this.y = aY;
-    }
-    
-    Vertex add(Vertex other) {
-        return new Vertex(this.x + other.x, this.y + other.y);
-    }
-    
-    Vertex subtract(Vertex other) {
-        return new Vertex(this.x - other.x, this.y - other.y);
-    }
-    
-    double distanceSq(Vertex other) {
-        return (new Point2D.Double(x, y)).distanceSq(new Point2D.Double(other.x, other.y));
-    }
-    
-    double distance(Vertex other) {
-        return (new Point2D.Double(x, y)).distance(new Point2D.Double(other.x, other.y));
-    }
-    
-    Vertex scale(double factor) {
-        return new Vertex(this.x * factor, this.y * factor);
-    }
-    
-    void trim(double min, double max) {
-        if (x < min) {
-            x = min;
-        }
-        if (x > max) {
-            x = max;
-        }
-        if (y < min) {
-            y = min;
-        }
-        if (y > max) {
-            y = max;
-        }
+        controller.repaintRequired();
     }
 }
