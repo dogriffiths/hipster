@@ -54,7 +54,7 @@ import java.util.Vector;
  *
  * @author davidg
  */
-public class IdeaView implements IdeaListener {
+public class IdeaView implements IdeaListener, MapComponent {
     private static Color[] COLOURS = {Color.RED, Color.ORANGE,
     Color.GREEN, Color.CYAN};
     private double length;
@@ -65,7 +65,7 @@ public class IdeaView implements IdeaListener {
     private boolean isRoot;
     int ROOT_RADIUS_X = 70;
     int ROOT_RADIUS_Y = 40;
-    private IdeaView parent;
+    private MapComponent parent;
     
     public IdeaView() {
         this(null);
@@ -133,6 +133,7 @@ public class IdeaView implements IdeaListener {
                 }
             }
         }
+        repaintRequired();
     }
     
     public synchronized void add(IdeaView subView) {
@@ -280,5 +281,19 @@ public class IdeaView implements IdeaListener {
     
     public boolean isRoot() {
         return isRoot;
+    }
+
+    public void repaintRequired() {
+        if (parent != null) {
+            parent.repaintRequired();
+        }
+    }
+
+    public MapComponent getParent() {
+        return parent;
+    }
+
+    public void setParent(MapComponent parent) {
+        this.parent = parent;
     }
 }

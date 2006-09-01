@@ -35,9 +35,6 @@
 
 package dg.hipster.view;
 
-import dg.hipster.io.IdeaReader;
-import dg.hipster.io.ReaderException;
-import dg.hipster.io.ReaderFactory;
 import dg.hipster.model.Idea;
 import dg.hipster.model.IdeaEvent;
 import dg.hipster.model.IdeaListener;
@@ -46,35 +43,44 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.geom.Point2D;
-import java.io.File;
 import java.util.List;
 import java.util.Vector;
 import javax.swing.JComponent;
+import javax.swing.Timer;
 
 /**
  *
  * @author davidg
  */
-public class IdeaMap extends JComponent implements IdeaListener {
+public class IdeaMap extends JComponent implements MapComponent {
     private static final double MAX_SPEED = 5.0;
     private static final double MAX_MOVE_TIME_SECS = 3.0;
     private final static Point2D.Double ORIGIN = new Point2D.Double(0.0, 0.0);
     
-    private Idea rootIdea;
     private IdeaView rootView;
+    private ActionListener modelUpdater = new ActionListener() {
+        public void actionPerformed(ActionEvent evt) {
+            adjustModel();
+            System.out.println("in timer");
+        }
+    };
+    private Timer ticker = new Timer(50, modelUpdater);
     
     /** Creates a new instance of Fred */
     public IdeaMap() {
     }
     
-    public void setIdea(Idea newRootIdea) {
-        this.rootIdea = newRootIdea;
-        this.rootView = new IdeaView(this.rootIdea);
+    public void setIdea(Idea idea) {
+        this.rootView = new IdeaView(idea);
+        this.rootView.setParent(this);
+        ticker.start();
     }
     
     public Idea getIdea() {
-        return this.rootIdea;
+        return this.rootView.getIdea();
     }
     
     public void paintComponent(Graphics g) {
@@ -84,14 +90,7 @@ public class IdeaMap extends JComponent implements IdeaListener {
         Dimension size = getSize();
         g.translate(size.width / 2, size.height / 2);
         rootView.paint(g);
-        adjustModel();
-        repaint(100);
     }
-    
-    public void ideaChanged(IdeaEvent e) {
-        timeChanged = System.currentTimeMillis();
-    }
-    
     
     long timeChanged = 0;
     
@@ -101,6 +100,7 @@ public class IdeaMap extends JComponent implements IdeaListener {
         List<IdeaView> views = rootView.getSubViews();
         createPoints(rootView, ORIGIN, rootView.getAngle());
         tweakIdeas(views, ORIGIN, 0.0, false);
+        repaint();
     }
     
     private Point2D tweakIdeas(final List<IdeaView> views, final Point2D c,
@@ -120,6 +120,9 @@ public class IdeaMap extends JComponent implements IdeaListener {
         if ((now - timeChanged) < (MAX_MOVE_TIME_SECS * 1000.0)) {
             maxSpeed = MAX_SPEED - ((now - timeChanged) * MAX_SPEED / 1000.0
                     / MAX_MOVE_TIME_SECS);
+        } else {
+            ticker.stop();
+            System.out.println("stopped ticker");
         }
         synchronized(views) {
             double minDiffAngle = Math.PI / 2 / views.size();
@@ -267,5 +270,11 @@ public class IdeaMap extends JComponent implements IdeaListener {
         double x = c.getX() + Math.sin(angle) * length;
         double y = c.getY() + Math.cos(angle) * length;
         return new Point2D.Double(x, y);
+    }
+    
+    public void repaintRequired() {
+        timeChanged = System.currentTimeMillis();
+        System.out.println("starting ticker because idea changed");
+        ticker.start();
     }
 }
