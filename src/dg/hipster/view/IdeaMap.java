@@ -120,7 +120,6 @@ public class IdeaMap extends JComponent implements MapComponent {
         } else {
             ticker.stop();
         }
-        double minDiffAngle = Math.PI / 2 / views.size();
         for (int i = 0; i < views.size(); i++) {
             IdeaView previousView = null;
             IdeaView nextView = null;
@@ -146,78 +145,87 @@ public class IdeaMap extends JComponent implements MapComponent {
                 v = -maxSpeed;
             }
             view.setV(v);
-            double oldAngle = view.getAngle();
-            double newAngle = oldAngle  + (view.getV() / view.getLength());
-            if (previousView != null) {
-                double previousAngle = previousView.getAngle();
-                if (previousAngle > newAngle - minDiffAngle) {
-                    previousView.setAngle(newAngle - minDiffAngle);
-                    newAngle = previousAngle + minDiffAngle;
-                    double previousV = previousView.getV();
-                    double diffV = v - previousV;
-                    if (diffV > 0) {
-                        view.setV(diffV);
-                        previousView.setV(-diffV);
-                    } else {
-                        view.setV(-diffV);
-                        previousView.setV(diffV);
-                    }
-                    v = view.getV();
-                }
-            } else {
-                double previousAngle = -Math.PI;
-                if (parentView.isRoot()) {
-                    previousAngle = views.get(views.size() - 1).getAngle()
-                    - 2 * Math.PI;
-                }
-                if (previousAngle > newAngle - minDiffAngle) {
-                    newAngle = previousAngle + minDiffAngle;
-                    double previousV = 0.0;
-                    double diffV = v - previousV;
-                    if (diffV > 0) {
-                        view.setV(diffV);
-                    } else {
-                        view.setV(-diffV);
-                    }
-                    v = view.getV();
-                }
-            }
-            if (nextView != null) {
-                double nextAngle = nextView.getAngle();
-                if (nextAngle < newAngle + minDiffAngle) {
-                    nextView.setAngle(newAngle + minDiffAngle);
-                    newAngle = nextAngle - minDiffAngle;
-                    double nextV = nextView.getV();
-                    double diffV = 0.0;
-                    if (diffV > 0) {
-                        view.setV(-diffV);
-                        nextView.setV(diffV);
-                    } else {
-                        view.setV(diffV);
-                        nextView.setV(-diffV);
-                    }
-                    v = view.getV();
-                }
-            } else {
-                double nextAngle = Math.PI;
-                if (parentView.isRoot()) {
-                    nextAngle = views.get(0).getAngle() +  2 * Math.PI;
-                }
-                if (nextAngle < newAngle + minDiffAngle) {
-                    newAngle = nextAngle - minDiffAngle;
-                    double nextV = 0.0;
-                    double diffV = 0.0;
-                    if (diffV > 0) {
-                        view.setV(-diffV);
-                    } else {
-                        view.setV(diffV);
-                    }
-                    v = view.getV();
-                }
-            }
+            double newAngle = adjustAngles(nextView, parentView, view, previousView);
             view.setAngle(newAngle);
         }
         return totForce;
+    }
+
+    private double adjustAngles(final IdeaView nextView, final IdeaView parentView, final IdeaView view, final IdeaView previousView) {
+        final List<IdeaView> views = parentView.getSubViews();
+        final double v = view.getV();
+        double minDiffAngle = Math.PI / 2 / views.size();
+        
+        double oldAngle = view.getAngle();
+        double newAngle = oldAngle  + (view.getV() / view.getLength());
+        if (previousView != null) {
+            double previousAngle = previousView.getAngle();
+            if (previousAngle > newAngle - minDiffAngle) {
+                previousView.setAngle(newAngle - minDiffAngle);
+                newAngle = previousAngle + minDiffAngle;
+                double previousV = previousView.getV();
+                double diffV = v - previousV;
+                if (diffV > 0) {
+                    view.setV(diffV);
+                    previousView.setV(-diffV);
+                } else {
+                    view.setV(-diffV);
+                    previousView.setV(diffV);
+                }
+ //                   v = view.getV();
+            }
+        } else {
+            double previousAngle = -Math.PI;
+            if (parentView.isRoot()) {
+                previousAngle = views.get(views.size() - 1).getAngle()
+                - 2 * Math.PI;
+            }
+            if (previousAngle > newAngle - minDiffAngle) {
+                newAngle = previousAngle + minDiffAngle;
+                double previousV = 0.0;
+                double diffV = v - previousV;
+                if (diffV > 0) {
+                    view.setV(diffV);
+                } else {
+                    view.setV(-diffV);
+                }
+ //                   v = view.getV();
+            }
+        }
+        if (nextView != null) {
+            double nextAngle = nextView.getAngle();
+            if (nextAngle < newAngle + minDiffAngle) {
+                nextView.setAngle(newAngle + minDiffAngle);
+                newAngle = nextAngle - minDiffAngle;
+                double nextV = nextView.getV();
+                double diffV = 0.0;
+                if (diffV > 0) {
+                    view.setV(-diffV);
+                    nextView.setV(diffV);
+                } else {
+                    view.setV(diffV);
+                    nextView.setV(-diffV);
+                }
+//                    v = view.getV();
+            }
+        } else {
+            double nextAngle = Math.PI;
+            if (parentView.isRoot()) {
+                nextAngle = views.get(0).getAngle() +  2 * Math.PI;
+            }
+            if (nextAngle < newAngle + minDiffAngle) {
+                newAngle = nextAngle - minDiffAngle;
+                double nextV = 0.0;
+                double diffV = 0.0;
+                if (diffV > 0) {
+                    view.setV(-diffV);
+                } else {
+                    view.setV(diffV);
+                }
+//                    v = view.getV();
+            }
+        }
+        return newAngle;
     }
 
     private Vertex repulsion(final Vertex point, final IdeaView view, final double mass, final Position p) {
