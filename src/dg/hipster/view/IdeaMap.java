@@ -58,7 +58,7 @@ import javax.swing.Timer;
 public class IdeaMap extends JComponent implements MapComponent {
     private static final double MAX_SPEED = 5.0;
     private static final double MAX_MOVE_TIME_SECS = 3.0;
-    private final static Point2D.Double ORIGIN = new Point2D.Double(0.0, 0.0);
+    private final static Vertex ORIGIN = new Vertex(0.0, 0.0);
     
     private IdeaView rootView;
     private ActionListener modelUpdater = new ActionListener() {
@@ -93,22 +93,22 @@ public class IdeaMap extends JComponent implements MapComponent {
     
     long timeChanged = 0;
     
-    List<Point2D> points;
+    List<Vertex> locations;
     private void adjust() {
-        points = new Vector<Point2D>();
-        createPoints(rootView, new Position(ORIGIN, rootView.getAngle()));
+        locations = new Vector<Vertex>();
+        createLocations(rootView, new Position(ORIGIN, rootView.getAngle()));
         endForce(rootView, new Position(ORIGIN, 0.0));
         repaint();
     }
     
-    private Force endForce(final IdeaView parentView, final Position p) {
+    private Vertex endForce(final IdeaView parentView, final Position p) {
         final List<IdeaView> views = parentView.getSubViews();
         if (views.size() == 0) {
-            return new Force(0.0, 0.0);
+            return new Vertex(0.0, 0.0);
         }
-        double mass = 2000.0 / (points.size()
-        * Math.sqrt((double)points.size()));
-        Force totForce = new Force(0.0, 0.0);
+        double mass = 2000.0 / (locations.size()
+        * Math.sqrt((double)locations.size()));
+        Vertex totForce = new Vertex(0.0, 0.0);
         if (timeChanged == 0) {
             timeChanged = System.currentTimeMillis();
         }
@@ -131,35 +131,11 @@ public class IdeaMap extends JComponent implements MapComponent {
             if (i < views.size() - 1) {
                 nextView = views.get(i + 1);
             }
-            Point2D point = getPoint(view, p);
-            Force force = new Force(0, 0);
-            for(Point2D other: points) {
-                double dirX = point.getX() - other.getX();
-                double dirY = point.getY() - other.getY();
-                double dSquare = point.distanceSq(other);
-                if (dSquare > 0.000001) {
-                    double unitFactor = point.distance(other);
-                    force.x += (dirX / unitFactor) * (mass * mass / dSquare);
-                    if (force.x > 1.0) {
-                        force.x = 1.0;
-                    }
-                    if (force.x < -1.0) {
-                        force.x = -1.0;
-                    }
-                    force.y += (dirY / unitFactor) * (mass * mass / dSquare);
-                    if (force.y > 1.0) {
-                        force.y = 1.0;
-                    }
-                    if (force.y < -1.0) {
-                        force.y = -1.0;
-                    }
-                }
-            }
-            force = force.add(endForce(view, new Position(point,
-                    view.getAngle() + p.angle)));
-            Point2D p2 = getPoint(view, new Position(ORIGIN, p.angle));
-            double sideForce = (p2.getY() * force.x) + (-p2.getX() * force.y);
+            Vertex point = getLocation(view, p);
+            Vertex force = repulsion(point, view, mass, p);
             totForce = totForce.add(force);
+            Vertex p2 = getLocation(view, new Position(ORIGIN, p.angle));
+            double sideForce = (p2.y * force.x) + (-p2.x * force.y);
             double v = view.getV();
             v += sideForce / mass;
             v *= 0.90;
@@ -243,23 +219,40 @@ public class IdeaMap extends JComponent implements MapComponent {
         }
         return totForce;
     }
+
+    private Vertex repulsion(final Vertex point, final IdeaView view, final double mass, final Position p) {
+        Vertex force = new Vertex(0, 0);
+        for(Vertex other: locations) {
+            Vertex dir = point.subtract(other);
+            double dSquare = point.distanceSq(other);
+            if (dSquare > 0.000001) {
+                double unitFactor = point.distance(other);
+                Vertex scaled = dir.scale(mass * mass / (dSquare * unitFactor));
+                force = force.add(scaled);
+                force.trim(-1.0, 1.0);
+            }
+        }
+        force = force.add(endForce(view, new Position(point,
+                view.getAngle() + p.angle)));
+        return force;
+    }
     
-    private void createPoints(IdeaView parentView, Position p) {
+    private void createLocations(IdeaView parentView, Position p) {
         List<IdeaView> views = parentView.getSubViews();
-        points.add(ORIGIN);
+        locations.add(ORIGIN);
         for(IdeaView view: views) {
-            Point2D point = getPoint(view, p);
-            points.add(point);
-            createPoints(view, new Position(point, p.angle + view.getAngle()));
+            Vertex location = getLocation(view, p);
+            locations.add(location);
+            createLocations(view, new Position(location, p.angle + view.getAngle()));
         }
     }
     
-    private Point2D getPoint(IdeaView view, Position p) {
+    private Vertex getLocation(IdeaView view, Position p) {
         double angle = view.getAngle() + p.angle;
         double length = view.getLength();
-        double x = p.start.getX() + Math.sin(angle) * length;
-        double y = p.start.getY() + Math.cos(angle) * length;
-        return new Point2D.Double(x, y);
+        double x = p.start.x + Math.sin(angle) * length;
+        double y = p.start.y + Math.cos(angle) * length;
+        return new Vertex(x, y);
     }
     
     public void repaintRequired() {
@@ -269,36 +262,54 @@ public class IdeaMap extends JComponent implements MapComponent {
 }
 
 class Position {
-    Point2D start;
+    Vertex start;
     double angle;
-    Position(Point2D aStart, double anAngle) {
+    Position(Vertex aStart, double anAngle) {
         this.start = aStart;
         this.angle = anAngle;
     }
 }
 
-class Force {
+class Vertex {
     double x;
     double y;
-    Force(double anX, double aY) {
+    Vertex(double anX, double aY) {
         this.x = anX;
         this.y = aY;
     }
     
-    Force add(Force other) {
-        return new Force(this.x + other.x, this.y + other.y);
-    }
-}
-
-class Location {
-    double x;
-    double y;
-    Location(double anX, double aY) {
-        this.x = anX;
-        this.y = aY;
+    Vertex add(Vertex other) {
+        return new Vertex(this.x + other.x, this.y + other.y);
     }
     
-    Location subtract(Location other) {
-        return new Location(this.x + other.x, this.y + other.y);
+    Vertex subtract(Vertex other) {
+        return new Vertex(this.x - other.x, this.y - other.y);
+    }
+    
+    double distanceSq(Vertex other) {
+        return (new Point2D.Double(x, y)).distanceSq(new Point2D.Double(other.x, other.y));
+    }
+    
+    double distance(Vertex other) {
+        return (new Point2D.Double(x, y)).distance(new Point2D.Double(other.x, other.y));
+    }
+    
+    Vertex scale(double factor) {
+        return new Vertex(this.x * factor, this.y * factor);
+    }
+    
+    void trim(double min, double max) {
+        if (x < min) {
+            x = min;
+        }
+        if (x > max) {
+            x = max;
+        }
+        if (y < min) {
+            y = min;
+        }
+        if (y > max) {
+            y = max;
+        }
     }
 }
