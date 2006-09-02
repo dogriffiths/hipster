@@ -211,7 +211,14 @@ public class IdeaView implements IdeaListener, MapComponent {
                 }
                 Point s = getView(c, p);
                 paint(g, s, view, a, depth + 1);
-                g.setColor(COLOURS[depth % COLOURS.length]);
+                Color colour = COLOURS[depth % COLOURS.length];
+                Color upper = colour.brighter().brighter();
+                Color lower = colour.darker().darker();
+                g.setColor(lower);
+                g.drawLine(c.x, c.y + 1, s.x, s.y + 1);
+                g.setColor(upper);
+                g.drawLine(c.x, c.y - 1, s.x, s.y - 1);
+                g.setColor(colour);
                 g.drawLine(c.x, c.y, s.x, s.y);
                 g.setColor(Color.BLACK);
                 Point midp = new Point((c.x + s.x) / 2, (c.y + s.y) / 2);
