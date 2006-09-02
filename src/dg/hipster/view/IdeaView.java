@@ -55,14 +55,15 @@ import java.util.Vector;
  * @author davidg
  */
 public class IdeaView implements IdeaListener, MapComponent {
-    private static Color[] COLOURS = {Color.RED, Color.ORANGE,
-    Color.GREEN, Color.CYAN};
+    private static Color[] COLOURS = {new Color(255, 20, 20), Color.ORANGE,
+    new Color(20, 200, 20), Color.CYAN};
     private double length;
     private double angle;
     private double v;
     private Vector<IdeaView> subViews = new Vector<IdeaView>();
     private Idea idea;
-    private boolean isRoot;
+    private boolean root;
+    private boolean selected;
     int ROOT_RADIUS_X = 70;
     int ROOT_RADIUS_Y = 40;
     private MapComponent parent;
@@ -76,7 +77,7 @@ public class IdeaView implements IdeaListener, MapComponent {
     }
     
     private IdeaView(Idea anIdea, boolean whetherIsRoot) {
-        isRoot = whetherIsRoot;
+        root = whetherIsRoot;
         setIdea(anIdea);
     }
     
@@ -174,7 +175,7 @@ public class IdeaView implements IdeaListener, MapComponent {
                 double divAngle = 2 * Math.PI / subNum;
                 double mult = i * divAngle;
                 double subAngle = mult - (divAngle * (subNum - 1) / 2.0);
-                if (!isRoot) {
+                if (!root) {
                     subAngle /= 2.0;
                 }
                 subView.setAngle(subAngle);
@@ -185,6 +186,15 @@ public class IdeaView implements IdeaListener, MapComponent {
         } else {
             setLength(0);
         }
+    }
+    
+    public void setSelected(boolean isSelected) {
+        this.selected = isSelected;
+        repaintRequired();
+    }
+    
+    public boolean isSelected() {
+        return this.selected;
     }
     
     public void paint(Graphics g) {
@@ -212,6 +222,9 @@ public class IdeaView implements IdeaListener, MapComponent {
                 Point s = getView(c, p);
                 paint(g, s, view, a, depth + 1);
                 Color colour = COLOURS[depth % COLOURS.length];
+                if (view.isSelected()) {
+                    colour = invert(colour);
+                }
                 Color upper = colour.brighter().brighter();
                 Color lower = colour.darker().darker();
                 g.setColor(lower);
@@ -229,15 +242,30 @@ public class IdeaView implements IdeaListener, MapComponent {
         }
         ((Graphics2D)g).setStroke(oldStroke);
         if (aView.isRoot()) {
-            g.setColor(Color.WHITE);
+            Color colour = Color.WHITE;
+            if (aView.isSelected()) {
+                colour = invert(colour);
+            }
+            g.setColor(colour);
             g.fillOval(-ROOT_RADIUS_X, -ROOT_RADIUS_Y, ROOT_RADIUS_X * 2,
                     ROOT_RADIUS_Y * 2);
-            g.setColor(Color.BLACK);
+            colour = Color.BLACK;
+            if (aView.isSelected()) {
+                colour = invert(colour);
+            }
+            g.setColor(colour);
             g.drawOval(-ROOT_RADIUS_X, -ROOT_RADIUS_Y, ROOT_RADIUS_X * 2,
                     ROOT_RADIUS_Y * 2);
             drawString((Graphics2D)g, getIdea().getText(), c2, 4,
                     getAngle());
         }
+    }
+    
+    private static Color invert(Color colour) {
+        int red = colour.getRed();
+        int green = colour.getGreen();
+        int blue = colour.getBlue();
+        return new Color(255 - red, 255 - green, 255 - blue);
     }
     
     private Point getView(final Point c, final Point2D p) {
@@ -288,19 +316,19 @@ public class IdeaView implements IdeaListener, MapComponent {
     }
     
     public boolean isRoot() {
-        return isRoot;
+        return root;
     }
-
+    
     public void repaintRequired() {
         if (parent != null) {
             parent.repaintRequired();
         }
     }
-
+    
     public MapComponent getParent() {
         return parent;
     }
-
+    
     public void setParent(MapComponent parent) {
         this.parent = parent;
     }

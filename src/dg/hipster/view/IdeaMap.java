@@ -60,6 +60,7 @@ public class IdeaMap extends JComponent implements MapComponent {
     public void setIdea(Idea idea) {
         this.rootView = new IdeaView(idea);
         this.rootView.setParent(this);
+        rootView.setSelected(true);
         this.repaintRequired();
     }
     
