@@ -47,6 +47,7 @@ import java.awt.Point;
 import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
@@ -145,7 +146,7 @@ public class IdeaView implements IdeaListener, MapComponent {
         return getSibling(+1);
     }
     
-    public IdeaView getSibling(int diff) {
+    public IdeaView getSibling(int difference) {
         MapComponent parent = getParent();
         if (!(parent instanceof IdeaView)) {
             return null;
@@ -153,7 +154,14 @@ public class IdeaView implements IdeaListener, MapComponent {
         IdeaView parentView = (IdeaView)parent;
         int pos = parentView.getSubViews().indexOf(this);
         int subCount = parentView.getSubViews().size();
-        int siblingPos = (pos + subCount + (diff % subCount)) % subCount;
+        int diff = difference % subCount;
+        int siblingPos = pos + diff;
+        if ((siblingPos < 0) || (siblingPos > (subCount - 1))) {
+            if (!parentView.isRoot()) {
+                return null;
+            }
+        }
+        siblingPos = (siblingPos + subCount) % subCount;
         return parentView.getSubViews().get(siblingPos);
     }
     
@@ -351,5 +359,33 @@ public class IdeaView implements IdeaListener, MapComponent {
     
     public void setParent(MapComponent parent) {
         this.parent = parent;
+    }
+    
+    public Point2D getEndPoint() {
+        double x = 0.0;
+        double y = 0.0;
+        double angle = 0.0;
+        IdeaView aView = this;
+        ArrayList<IdeaView> views = new ArrayList<IdeaView>();
+        while(!aView.isRoot()) {
+            MapComponent parent = aView.getParent();
+            if (!(parent instanceof IdeaView)) {
+                break;
+            }
+            views.add(aView);
+            aView = (IdeaView)parent;
+        }
+        for (int i = views.size() - 1; i >= 0; i--) {
+            aView = views.get(i);
+            double length = aView.getLength();
+            angle += aView.getAngle();
+            if (i == (views.size() - 1)) {
+                x += (Math.sin(angle) * ROOT_RADIUS_X);
+                y -= (Math.cos(angle) * ROOT_RADIUS_Y);
+            }
+            x += Math.sin(angle) * length;
+            y -= Math.cos(angle) * length;
+        }
+        return new Point2D.Double(x, y);
     }
 }

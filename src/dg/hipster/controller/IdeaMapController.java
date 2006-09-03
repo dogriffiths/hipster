@@ -45,7 +45,9 @@ import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.geom.Point2D;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 import javax.swing.Timer;
 
@@ -74,7 +76,7 @@ public class IdeaMapController implements ActionListener, KeyListener,
         timeChanged = System.currentTimeMillis();
         ticker.start();
     }
-
+    
     public void actionPerformed(ActionEvent evt) {
         if (timeChanged == 0) {
             timeChanged = System.currentTimeMillis();
@@ -111,10 +113,10 @@ public class IdeaMapController implements ActionListener, KeyListener,
                 selectNext();
                 break;
             case KeyEvent.VK_LEFT:
-                selectParent();
+                selectLeft();
                 break;
             case KeyEvent.VK_RIGHT:
-                selectFirstChild();
+                selectRight();
                 break;
             case KeyEvent.VK_BACK_SPACE:
             case KeyEvent.VK_DELETE:
@@ -126,11 +128,51 @@ public class IdeaMapController implements ActionListener, KeyListener,
     }
     
     private void selectNext() {
-        selectSibling(+1);
+//        selectSibling(+1);
+        final IdeaView selected = this.ideaMap.getSelectedView();
+        if (selected == null) {
+            return;
+        }
+        Map<Point2D, IdeaView> viewMap = endPoints(selected);
+        if (viewMap.size() == 0) {
+            return;
+        }
+        // Find the most Westerly
+        double y = Double.NEGATIVE_INFINITY;
+        IdeaView nextView = null;
+        for (Point2D endPoint: viewMap.keySet()) {
+            if (endPoint.getY() > y) {
+                y = endPoint.getY();
+                nextView = viewMap.get(endPoint);
+            }
+        }
+        if (nextView != null) {
+            this.ideaMap.setSelectedView(nextView);
+        }
     }
     
     private void selectPrevious() {
-        selectSibling(-1);
+//        selectSibling(-1);
+        final IdeaView selected = this.ideaMap.getSelectedView();
+        if (selected == null) {
+            return;
+        }
+        Map<Point2D, IdeaView> viewMap = endPoints(selected);
+        if (viewMap.size() == 0) {
+            return;
+        }
+        // Find the most Westerly
+        double y = Double.POSITIVE_INFINITY;
+        IdeaView nextView = null;
+        for (Point2D endPoint: viewMap.keySet()) {
+            if (endPoint.getY() < y) {
+                y = endPoint.getY();
+                nextView = viewMap.get(endPoint);
+            }
+        }
+        if (nextView != null) {
+            this.ideaMap.setSelectedView(nextView);
+        }
     }
     
     private void selectSibling(int diff) {
@@ -145,29 +187,80 @@ public class IdeaMapController implements ActionListener, KeyListener,
         this.ideaMap.setSelectedView(previous);
     }
     
-    private void selectFirstChild() {
+    private void selectRight() {
         final IdeaView selected = this.ideaMap.getSelectedView();
         if (selected == null) {
             return;
         }
-        List<IdeaView> subViews = selected.getSubViews();
-        if (subViews.size() == 0) {
+        Map<Point2D, IdeaView> viewMap = endPoints(selected);
+        if (viewMap.size() == 0) {
             return;
         }
-        this.ideaMap.setSelectedView(subViews.get(0));
+        // Find the most Easterly
+        double x = Double.NEGATIVE_INFINITY;
+        IdeaView nextView = null;
+        for (Point2D endPoint: viewMap.keySet()) {
+            if (endPoint.getX() > x) {
+                x = endPoint.getX();
+                nextView = viewMap.get(endPoint);
+            }
+        }
+        if (nextView != null) {
+            this.ideaMap.setSelectedView(nextView);
+        }
     }
     
-    private void selectParent() {
+    private void selectLeft() {
         final IdeaView selected = this.ideaMap.getSelectedView();
         if (selected == null) {
             return;
         }
-        MapComponent parent = selected.getParent();
-        if (!(parent instanceof IdeaView)) {
+        Map<Point2D, IdeaView> viewMap = endPoints(selected);
+        if (viewMap.size() == 0) {
             return;
         }
-        IdeaView parentView = (IdeaView)parent;
-        this.ideaMap.setSelectedView(parentView);
+        // Find the most Westerly
+        double x = Double.POSITIVE_INFINITY;
+        IdeaView nextView = null;
+        for (Point2D endPoint: viewMap.keySet()) {
+            if (endPoint.getX() < x) {
+                x = endPoint.getX();
+                nextView = viewMap.get(endPoint);
+            }
+        }
+        if (nextView != null) {
+            this.ideaMap.setSelectedView(nextView);
+        }
+    }
+    
+    private Map<Point2D, IdeaView> endPoints(IdeaView ideaView) {
+        Map<Point2D, IdeaView> results = new HashMap<Point2D, IdeaView>();
+        List<IdeaView> subViews = ideaView.getSubViews();
+        // Add all the sub-views
+        results.put(ideaView.getEndPoint(), ideaView);
+        for(IdeaView subView: subViews) {
+            results.put(subView.getEndPoint(), subView);
+        }
+        IdeaView previousSibling = ideaView.getPreviousSibling();
+        if (previousSibling != null) {
+            results.put(previousSibling.getEndPoint(), previousSibling);
+        }
+        IdeaView nextSibling = ideaView.getNextSibling();
+        if (nextSibling != null) {
+            results.put(nextSibling.getEndPoint(), nextSibling);
+        }
+        MapComponent parent = ideaView.getParent();
+        if (parent instanceof IdeaView) {
+            IdeaView parentView = (IdeaView)parent;
+            MapComponent grandParent = parentView.getParent();
+            if (grandParent instanceof IdeaView) {
+                IdeaView grandParentView = (IdeaView)grandParent;
+                results.put(grandParentView.getEndPoint(), parentView);
+            } else {
+                results.put(parentView.getEndPoint(), parentView);
+            }
+        }
+        return results;
     }
     
     private void deleteSelected() {
@@ -180,8 +273,15 @@ public class IdeaMapController implements ActionListener, KeyListener,
             return;
         }
         IdeaView parentView = (IdeaView)parent;
+        IdeaView nextToSelect = null;
+        IdeaView nextSibling = selected.getNextSibling();
+        if (nextSibling != null) {
+            nextToSelect = nextSibling;
+        } else {
+            nextToSelect = parentView;
+        }
         parentView.remove(selected);
-        this.ideaMap.setSelectedView(parentView);
+        this.ideaMap.setSelectedView(nextToSelect);
     }
     
     private double mass = 0.0;
