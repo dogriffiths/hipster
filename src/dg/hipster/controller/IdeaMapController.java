@@ -126,34 +126,23 @@ public class IdeaMapController implements ActionListener, KeyListener,
     }
     
     public void selectNext() {
-        final IdeaView selected = this.ideaMap.getSelectedView();
-        if (selected == null) {
-            return;
-        }
-        MapComponent parent = selected.getParent();
-        if (!(parent instanceof IdeaView)) {
-            return;
-        }
-        IdeaView parentView = (IdeaView)parent;
-        int pos = parentView.getSubViews().indexOf(selected);
-        int next = (pos + 1) % (parentView.getSubViews().size());
-        this.ideaMap.setSelectedView(parentView.getSubViews().get(next));
+        selectSibling(+1);
     }
     
     public void selectPrevious() {
+        selectSibling(-1);
+    }
+    
+    public void selectSibling(int diff) {
         final IdeaView selected = this.ideaMap.getSelectedView();
         if (selected == null) {
             return;
         }
-        MapComponent parent = selected.getParent();
-        if (!(parent instanceof IdeaView)) {
+        IdeaView previous = selected.getSibling(diff);
+        if (previous == null) {
             return;
         }
-        IdeaView parentView = (IdeaView)parent;
-        int pos = parentView.getSubViews().indexOf(selected);
-        int subCount = parentView.getSubViews().size();
-        int previous = (pos + subCount - 1) % subCount;
-        this.ideaMap.setSelectedView(parentView.getSubViews().get(previous));
+        this.ideaMap.setSelectedView(previous);
     }
     
     public void selectFirstChild() {

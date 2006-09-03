@@ -137,6 +137,26 @@ public class IdeaView implements IdeaListener, MapComponent {
         repaintRequired();
     }
     
+    public IdeaView getPreviousSibling() {
+        return getSibling(-1);
+    }
+    
+    public IdeaView getNextSibling() {
+        return getSibling(+1);
+    }
+    
+    public IdeaView getSibling(int diff) {
+        MapComponent parent = getParent();
+        if (!(parent instanceof IdeaView)) {
+            return null;
+        }
+        IdeaView parentView = (IdeaView)parent;
+        int pos = parentView.getSubViews().indexOf(this);
+        int subCount = parentView.getSubViews().size();
+        int siblingPos = (pos + subCount + (diff % subCount)) % subCount;
+        return parentView.getSubViews().get(siblingPos);
+    }
+    
     public synchronized void add(IdeaView subView) {
         subView.parent = this;
         subViews.add(subView);
