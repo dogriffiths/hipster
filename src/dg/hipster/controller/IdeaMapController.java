@@ -125,15 +125,15 @@ public class IdeaMapController implements ActionListener, KeyListener,
         }
     }
     
-    public void selectNext() {
+    private void selectNext() {
         selectSibling(+1);
     }
     
-    public void selectPrevious() {
+    private void selectPrevious() {
         selectSibling(-1);
     }
     
-    public void selectSibling(int diff) {
+    private void selectSibling(int diff) {
         final IdeaView selected = this.ideaMap.getSelectedView();
         if (selected == null) {
             return;
@@ -145,7 +145,7 @@ public class IdeaMapController implements ActionListener, KeyListener,
         this.ideaMap.setSelectedView(previous);
     }
     
-    public void selectFirstChild() {
+    private void selectFirstChild() {
         final IdeaView selected = this.ideaMap.getSelectedView();
         if (selected == null) {
             return;
@@ -157,7 +157,7 @@ public class IdeaMapController implements ActionListener, KeyListener,
         this.ideaMap.setSelectedView(subViews.get(0));
     }
     
-    public void selectParent() {
+    private void selectParent() {
         final IdeaView selected = this.ideaMap.getSelectedView();
         if (selected == null) {
             return;
@@ -170,7 +170,7 @@ public class IdeaMapController implements ActionListener, KeyListener,
         this.ideaMap.setSelectedView(parentView);
     }
     
-    public void deleteSelected() {
+    private void deleteSelected() {
         final IdeaView selected = this.ideaMap.getSelectedView();
         if (selected == null) {
             return;
