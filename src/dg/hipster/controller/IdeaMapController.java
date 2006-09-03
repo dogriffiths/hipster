@@ -107,10 +107,10 @@ public class IdeaMapController implements ActionListener, KeyListener,
     public void keyPressed(KeyEvent evt) {
         switch(evt.getKeyCode()) {
             case KeyEvent.VK_UP:
-                selectPrevious();
+                selectUp();
                 break;
             case KeyEvent.VK_DOWN:
-                selectNext();
+                selectDown();
                 break;
             case KeyEvent.VK_LEFT:
                 selectLeft();
@@ -127,8 +127,7 @@ public class IdeaMapController implements ActionListener, KeyListener,
         }
     }
     
-    private void selectNext() {
-//        selectSibling(+1);
+    private void selectDown() {
         final IdeaView selected = this.ideaMap.getSelectedView();
         if (selected == null) {
             return;
@@ -151,8 +150,7 @@ public class IdeaMapController implements ActionListener, KeyListener,
         }
     }
     
-    private void selectPrevious() {
-//        selectSibling(-1);
+    private void selectUp() {
         final IdeaView selected = this.ideaMap.getSelectedView();
         if (selected == null) {
             return;
