@@ -66,7 +66,6 @@ public class IdeaMapController implements ActionListener, KeyListener,
     public IdeaMapController(IdeaMap newIdeaMap) {
         this.ideaMap = newIdeaMap;
         this.ideaMap.setFocusable(true);
-        this.ideaMap.requestFocusInWindow();
         this.ideaMap.addFocusListener(this);
         this.ideaMap.addKeyListener(this);
     }
@@ -189,7 +188,6 @@ public class IdeaMapController implements ActionListener, KeyListener,
         }
         MapComponent parent = selected.getParent();
         if (!(parent instanceof IdeaView)) {
-        this.ideaMap.setSelectedView(null);
             return;
         }
         IdeaView parentView = (IdeaView)parent;

@@ -70,6 +70,7 @@ public class Mainframe extends JFrame {
                 s.getWindowWidth(), s.getWindowHeight());
         buildView();
         buildModel();
+        this.ideaMap.requestFocusInWindow();
     }
     
     /**
