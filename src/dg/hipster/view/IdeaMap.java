@@ -42,6 +42,7 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.util.List;
 import javax.swing.JComponent;
 
 /**
@@ -51,6 +52,7 @@ import javax.swing.JComponent;
 public class IdeaMap extends JComponent implements MapComponent {
     private IdeaMapController controller;
     private IdeaView rootView;
+    private IdeaView selected;
 
     /** Creates a new instance of Fred */
     public IdeaMap() {
@@ -61,7 +63,46 @@ public class IdeaMap extends JComponent implements MapComponent {
         this.rootView = new IdeaView(idea);
         this.rootView.setParent(this);
         rootView.setSelected(true);
+        this.selected = rootView;
         this.repaintRequired();
+    }
+    
+    public Idea getSelected() {
+        return this.selected.getIdea();
+    }
+
+    public void setSelected(Idea selectedIdea) {
+        setSelectedView(findIdeaViewFor(rootView, selectedIdea));
+    }
+    
+    private IdeaView findIdeaViewFor(IdeaView parentView, Idea idea) {
+        if (idea == null) {
+            return null;
+        }
+        if (parentView.getIdea().equals(idea)) {
+            return parentView;
+        }
+        for (IdeaView subView: parentView.getSubViews()) {
+            IdeaView ideaView = findIdeaViewFor(subView, idea);
+            if (ideaView != null) {
+                return ideaView;
+            }
+        }
+        return null;
+    }
+    
+    public IdeaView getSelectedView() {
+        return this.selected;
+    }
+    
+    public void setSelectedView(IdeaView newSelectedView) {
+        if (this.selected != null) {
+            this.selected.setSelected(false);
+        }
+        this.selected = newSelectedView;
+        if (this.selected != null) {
+            this.selected.setSelected(true);
+        }
     }
     
     public Idea getIdea() {

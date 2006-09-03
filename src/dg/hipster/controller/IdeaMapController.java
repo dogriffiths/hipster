@@ -37,8 +37,11 @@ package dg.hipster.controller;
 
 import dg.hipster.view.IdeaMap;
 import dg.hipster.view.IdeaView;
+import dg.hipster.view.MapComponent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.geom.Point2D;
@@ -50,7 +53,8 @@ import javax.swing.Timer;
  *
  * @author davidg
  */
-public class IdeaMapController implements ActionListener, KeyListener {
+public class IdeaMapController implements ActionListener, KeyListener,
+        FocusListener {
     private static final double MAX_SPEED = 5.0;
     private static final double MAX_MOVE_TIME_SECS = 3.0;
     private final static Vertex ORIGIN = new Vertex(0.0, 0.0);
@@ -61,6 +65,9 @@ public class IdeaMapController implements ActionListener, KeyListener {
     /** Creates a new instance of IdeaMapController */
     public IdeaMapController(IdeaMap newIdeaMap) {
         this.ideaMap = newIdeaMap;
+        this.ideaMap.setFocusable(true);
+        this.ideaMap.requestFocusInWindow();
+        this.ideaMap.addFocusListener(this);
         this.ideaMap.addKeyListener(this);
     }
     
@@ -84,32 +91,110 @@ public class IdeaMapController implements ActionListener, KeyListener {
         adjust();
     }
     
+    public void focusGained(FocusEvent evt) {
+    }
+    
+    public void focusLost(FocusEvent evt) {
+    }
+    
     public void keyReleased(KeyEvent evt) {
-        System.out.println("released");
     }
     
     public void keyTyped(KeyEvent evt) {
-        System.out.println("type");
     }
     
     public void keyPressed(KeyEvent evt) {
-        System.out.println("press");
         switch(evt.getKeyCode()) {
             case KeyEvent.VK_UP:
-                System.out.println("Up");
+                selectPrevious();
                 break;
             case KeyEvent.VK_DOWN:
-                System.out.println("Down");
+                selectNext();
                 break;
             case KeyEvent.VK_LEFT:
-                System.out.println("Left");
+                selectParent();
                 break;
             case KeyEvent.VK_RIGHT:
-                System.out.println("Right");
+                selectFirstChild();
+                break;
+            case KeyEvent.VK_BACK_SPACE:
+            case KeyEvent.VK_DELETE:
+                deleteSelected();
                 break;
             default:
                 // Do nothing
         }
+    }
+    
+    public void selectNext() {
+        final IdeaView selected = this.ideaMap.getSelectedView();
+        if (selected == null) {
+            return;
+        }
+        MapComponent parent = selected.getParent();
+        if (!(parent instanceof IdeaView)) {
+            return;
+        }
+        IdeaView parentView = (IdeaView)parent;
+        int pos = parentView.getSubViews().indexOf(selected);
+        int next = (pos + 1) % (parentView.getSubViews().size());
+        this.ideaMap.setSelectedView(parentView.getSubViews().get(next));
+    }
+    
+    public void selectPrevious() {
+        final IdeaView selected = this.ideaMap.getSelectedView();
+        if (selected == null) {
+            return;
+        }
+        MapComponent parent = selected.getParent();
+        if (!(parent instanceof IdeaView)) {
+            return;
+        }
+        IdeaView parentView = (IdeaView)parent;
+        int pos = parentView.getSubViews().indexOf(selected);
+        int subCount = parentView.getSubViews().size();
+        int previous = (pos + subCount - 1) % subCount;
+        this.ideaMap.setSelectedView(parentView.getSubViews().get(previous));
+    }
+    
+    public void selectFirstChild() {
+        final IdeaView selected = this.ideaMap.getSelectedView();
+        if (selected == null) {
+            return;
+        }
+        List<IdeaView> subViews = selected.getSubViews();
+        if (subViews.size() == 0) {
+            return;
+        }
+        this.ideaMap.setSelectedView(subViews.get(0));
+    }
+    
+    public void selectParent() {
+        final IdeaView selected = this.ideaMap.getSelectedView();
+        if (selected == null) {
+            return;
+        }
+        MapComponent parent = selected.getParent();
+        if (!(parent instanceof IdeaView)) {
+            return;
+        }
+        IdeaView parentView = (IdeaView)parent;
+        this.ideaMap.setSelectedView(parentView);
+    }
+    
+    public void deleteSelected() {
+        final IdeaView selected = this.ideaMap.getSelectedView();
+        if (selected == null) {
+            return;
+        }
+        MapComponent parent = selected.getParent();
+        if (!(parent instanceof IdeaView)) {
+        this.ideaMap.setSelectedView(null);
+            return;
+        }
+        IdeaView parentView = (IdeaView)parent;
+        parentView.remove(selected);
+        this.ideaMap.setSelectedView(parentView);
     }
     
     private double mass = 0.0;
