@@ -412,10 +412,10 @@ public class IdeaMapController implements ActionListener, KeyListener,
             }
         } else {
             double previousAngle = -Math.PI;
-            if (parentView.isRoot()) {
-                previousAngle = views.get(views.size() - 1).getAngle()
-                - 2 * Math.PI;
-            }
+//            if (parentView.isRoot()) {
+//                previousAngle = views.get(views.size() - 1).getAngle()
+//                - 2 * Math.PI;
+//            }
             if (previousAngle > newAngle - minDiffAngle) {
                 newAngle = previousAngle + minDiffAngle;
                 double previousV = 0.0;
@@ -444,9 +444,9 @@ public class IdeaMapController implements ActionListener, KeyListener,
             }
         } else {
             double nextAngle = Math.PI;
-            if (parentView.isRoot()) {
-                nextAngle = views.get(0).getAngle() +  2 * Math.PI;
-            }
+//            if (parentView.isRoot()) {
+//                nextAngle = views.get(0).getAngle() +  2 * Math.PI;
+//            }
             if (nextAngle < newAngle + minDiffAngle) {
                 newAngle = nextAngle - minDiffAngle;
                 double nextV = 0.0;
