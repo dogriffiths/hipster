@@ -35,6 +35,7 @@
 
 package dg.hipster.controller;
 
+import dg.hipster.model.Idea;
 import dg.hipster.view.IdeaMap;
 import dg.hipster.view.IdeaView;
 import dg.hipster.view.MapComponent;
@@ -67,6 +68,7 @@ public class IdeaMapController implements ActionListener, KeyListener,
     /** Creates a new instance of IdeaMapController */
     public IdeaMapController(IdeaMap newIdeaMap) {
         this.ideaMap = newIdeaMap;
+        this.ideaMap.setFocusTraversalKeysEnabled(false);
         this.ideaMap.setFocusable(true);
         this.ideaMap.addFocusListener(this);
         this.ideaMap.addKeyListener(this);
@@ -121,6 +123,12 @@ public class IdeaMapController implements ActionListener, KeyListener,
             case KeyEvent.VK_BACK_SPACE:
             case KeyEvent.VK_DELETE:
                 deleteSelected();
+                break;
+            case KeyEvent.VK_ENTER:
+                insertIdea();
+                break;
+            case KeyEvent.VK_TAB:
+                insertChild();
                 break;
             default:
                 // Do nothing
@@ -283,6 +291,34 @@ public class IdeaMapController implements ActionListener, KeyListener,
         }
         parentView.getIdea().remove(selected.getIdea());
         this.ideaMap.setSelectedView(nextToSelect);
+    }
+    
+    int newCount = 0;
+    private void insertIdea() {
+        final IdeaView selected = this.ideaMap.getSelectedView();
+        if (selected == null) {
+            return;
+        }
+        MapComponent parent = selected.getParent();
+        if (!(parent instanceof IdeaView)) {
+            return;
+        }
+        IdeaView parentView = (IdeaView)parent;
+        int pos = parentView.getSubViews().indexOf(selected);
+        Idea newIdea = new Idea("New " + (newCount++));
+        parentView.getIdea().add(pos + 1, newIdea);
+        this.ideaMap.setSelectedView(selected.getNextSibling());
+    }
+    
+    private void insertChild() {
+        final IdeaView selected = this.ideaMap.getSelectedView();
+        if (selected == null) {
+            return;
+        }
+        Idea newIdea = new Idea("New " + (newCount++));
+        selected.getIdea().add(newIdea);
+        int next = selected.getSubViews().size() - 1;
+        this.ideaMap.setSelectedView(selected.getSubViews().get(next));
     }
     
     private double mass = 0.0;

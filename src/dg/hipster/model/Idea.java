@@ -80,7 +80,16 @@ public class Idea {
      */
     public synchronized void add(Idea subIdea) {
         subIdeas.add(subIdea);
-        notify("ADDED", new Object[] {subIdea});
+        notify("ADDED", new Object[] {subIdea, subIdeas.size() - 1});
+    }
+    
+    /**
+     * Add a sub-idea to this idea.
+     * @param subIdea sub-idea to add
+     */
+    public synchronized void add(int pos, Idea subIdea) {
+        subIdeas.add(pos, subIdea);
+        notify("ADDED", new Object[] {subIdea, pos});
     }
     
     /**

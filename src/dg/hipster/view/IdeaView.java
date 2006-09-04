@@ -121,10 +121,11 @@ public class IdeaView implements IdeaListener, MapComponent {
         String cmd = fe.getCommand();
         if ("ADDED".equals(cmd)) {
             Idea subIdea = (Idea)fe.getParas()[0];
+            int pos = (Integer)fe.getParas()[1];
             IdeaView subIdeaView = new IdeaView(subIdea, false);
             double maxAngle = getMaxSubAngle();
             subIdeaView.setAngle((maxAngle + Math.PI) / 2.0);
-            add(subIdeaView);
+            add(pos, subIdeaView);
         } else if ("REMOVED".equals(cmd)) {
             Idea subIdea = (Idea)fe.getParas()[0];
             for (int i = 0; i < subViews.size(); i++) {
@@ -166,6 +167,11 @@ public class IdeaView implements IdeaListener, MapComponent {
     public synchronized void add(IdeaView subView) {
         subView.parent = this;
         subViews.add(subView);
+    }
+    
+    public synchronized void add(int pos, IdeaView subView) {
+        subView.parent = this;
+        subViews.add(pos, subView);
     }
     
     public synchronized void remove(IdeaView subView) {
