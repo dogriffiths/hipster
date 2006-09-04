@@ -273,8 +273,11 @@ public class IdeaMapController implements ActionListener, KeyListener,
         IdeaView parentView = (IdeaView)parent;
         IdeaView nextToSelect = null;
         IdeaView nextSibling = selected.getNextSibling();
+        IdeaView previousSibling = selected.getPreviousSibling();
         if (nextSibling != null) {
             nextToSelect = nextSibling;
+        } else if (previousSibling != null) {
+            nextToSelect = previousSibling;
         } else {
             nextToSelect = parentView;
         }
