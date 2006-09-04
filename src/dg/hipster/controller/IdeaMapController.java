@@ -281,7 +281,7 @@ public class IdeaMapController implements ActionListener, KeyListener,
         } else {
             nextToSelect = parentView;
         }
-        parentView.remove(selected);
+        parentView.getIdea().remove(selected.getIdea());
         this.ideaMap.setSelectedView(nextToSelect);
     }
     

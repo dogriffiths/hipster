@@ -156,10 +156,8 @@ public class IdeaView implements IdeaListener, MapComponent {
         int subCount = parentView.getSubViews().size();
         int diff = difference % subCount;
         int siblingPos = pos + diff;
-        if ((siblingPos < 0) || (siblingPos > (subCount - 1))) {
-            if (!parentView.isRoot()) {
-                return null;
-            }
+        if ((diff == 0) || (siblingPos < 0) || (siblingPos > (subCount - 1))) {
+            return null;
         }
         siblingPos = (siblingPos + subCount) % subCount;
         return parentView.getSubViews().get(siblingPos);
