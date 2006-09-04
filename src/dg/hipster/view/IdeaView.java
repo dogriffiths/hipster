@@ -259,7 +259,11 @@ public class IdeaView implements IdeaListener, MapComponent {
                 g.drawLine(c.x, c.y - 1, s.x, s.y - 1);
                 g.setColor(colour);
                 g.drawLine(c.x, c.y, s.x, s.y);
-                g.setColor(Color.BLACK);
+                if (view.isSelected()) {
+                    g.setColor(Color.WHITE);
+                } else {
+                    g.setColor(Color.BLACK);
+                }
                 Point midp = new Point((c.x + s.x) / 2, (c.y + s.y) / 2);
                 double textAngle = (Math.PI / 2.0) - a;
                 drawString((Graphics2D)g, view.getIdea().getText(), midp, 4,
