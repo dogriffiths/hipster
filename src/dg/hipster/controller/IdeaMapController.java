@@ -271,18 +271,18 @@ public class IdeaMapController implements ActionListener, KeyListener,
             return;
         }
         IdeaView parentView = (IdeaView)parent;
-        IdeaView nextViewToSelect = null;
+        IdeaView nextToSelect = null;
         IdeaView nextSibling = selected.getNextSibling();
         IdeaView previousSibling = selected.getPreviousSibling();
         if (nextSibling != null) {
-            nextViewToSelect = nextSibling;
+            nextToSelect = nextSibling;
         } else if (previousSibling != null) {
-            nextViewToSelect = previousSibling;
+            nextToSelect = previousSibling;
         } else {
-            nextViewToSelect = parentView;
+            nextToSelect = parentView;
         }
         parentView.remove(selected);
-        this.ideaMap.setSelectedView(nextViewToSelect);
+        this.ideaMap.setSelectedView(nextToSelect);
     }
     
     private double mass = 0.0;
