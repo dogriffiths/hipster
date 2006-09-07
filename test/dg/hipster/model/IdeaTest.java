@@ -95,11 +95,14 @@ public class IdeaTest extends TestCase {
         assertEquals("Listener should have received an ADDED command",
                 "ADDED", listener0.ie.getCommand());
         
-        assertEquals("Listener should have a single para",
-                1, listener0.ie.getParas().length);
+        assertEquals("Listener should have 2 paras",
+                2, listener0.ie.getParas().length);
         
-        assertEquals("Para should be the idea added",
+        assertEquals("1st Para should be the idea added",
                 subIdea0, listener0.ie.getParas()[0]);
+        
+        assertEquals("2nd Para should be position added",
+                0, listener0.ie.getParas()[1]);
         
         listener0.ie = null;
         

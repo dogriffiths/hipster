@@ -35,14 +35,12 @@
 
 package dg.hipster.view;
 
-import dg.hipster.io.IdeaReader;
-import dg.hipster.io.ReaderException;
-import dg.hipster.io.ReaderFactory;
+import dg.hipster.model.Idea;
 import dg.hipster.model.Settings;
 import java.awt.BorderLayout;
-import java.io.File;
 import java.util.ResourceBundle;
 import javax.swing.JFrame;
+import javax.swing.JTextField;
 
 /**
  * Main window of the application.
@@ -86,39 +84,39 @@ public class Mainframe extends JFrame {
      * Set up the data.
      */
     private void buildModel() {
-        ReaderFactory factory = ReaderFactory.getInstance();
-        try {
-            IdeaReader reader = factory.read(new File("etc/test.opml"));
-            ideaMap.setIdea(reader.getIdea());
-        } catch(ReaderException re) {
-            re.printStackTrace();
-        }
+//        ReaderFactory factory = ReaderFactory.getInstance();
+//        try {
+//            IdeaReader reader = factory.read(new File("etc/test.opml"));
+//            ideaMap.setIdea(reader.getIdea());
+//        } catch(ReaderException re) {
+//            re.printStackTrace();
+//        }
         
-//        Idea idea = new Idea("Persistence");
-//        ideaMap.setIdea(idea);
-//        Idea mistakes = new Idea("Mistakes");
-//        Idea platforms = new Idea("Platforms");
-//        mistakes.add(platforms);
-//        Idea attempts = new Idea("Attempts");
-//        platforms.add(attempts);
-//        Idea continual = new Idea("Continual");
-//        attempts.add(continual);
-//        Idea further = new Idea("Further");
-//        attempts.add(further);
-//        Idea enjoyed = new Idea("Enjoyed");
-//        attempts.add(enjoyed);
-//        Idea thousands = new Idea("Thousands");
-//        mistakes.add(thousands);
-//        Idea making = new Idea("Making");
-//        mistakes.add(making);
-//        Idea progress = new Idea("Progress");
-//        mistakes.add(progress);
-//        Idea learning = new Idea("Learning");
-//        idea.add(learning);
-//        Idea love = new Idea("Love");
-//        learning.add(love);
-//        love.add(mistakes);
-//        idea.add(mistakes);
+        Idea idea = new Idea("Persistence");
+        ideaMap.setIdea(idea);
+        Idea mistakes = new Idea("Mistakes");
+        Idea platforms = new Idea("Platforms");
+        mistakes.add(platforms);
+        Idea attempts = new Idea("Attempts");
+        platforms.add(attempts);
+        Idea continual = new Idea("Continual");
+        attempts.add(continual);
+        Idea further = new Idea("Further");
+        attempts.add(further);
+        Idea enjoyed = new Idea("Enjoyed");
+        attempts.add(enjoyed);
+        Idea thousands = new Idea("Thousands");
+        mistakes.add(thousands);
+        Idea making = new Idea("Making");
+        mistakes.add(making);
+        Idea progress = new Idea("Progress");
+        mistakes.add(progress);
+        Idea learning = new Idea("Learning");
+        idea.add(learning);
+        Idea love = new Idea("Love");
+        learning.add(love);
+        love.add(mistakes);
+        idea.add(mistakes);
         
         
         
