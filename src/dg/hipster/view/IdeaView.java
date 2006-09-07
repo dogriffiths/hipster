@@ -237,7 +237,11 @@ public class IdeaView implements IdeaListener, MapComponent {
             final IdeaView aView, final double initAngle, final int depth) {
         List<IdeaView> views = aView.getSubViews();
         Stroke oldStroke = ((Graphics2D)g).getStroke();
-        Stroke stroke = new BasicStroke(20.0f - (depth * 2),
+        float strokeWidth = 20.0f - (depth * 2);
+        if (strokeWidth < 10.0f) {
+            strokeWidth = 10.0f;
+        }
+        Stroke stroke = new BasicStroke(strokeWidth,
                 BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL);
         ((Graphics2D)g).setStroke(stroke);
         synchronized(views) {
