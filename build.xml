@@ -125,7 +125,7 @@
     </target>
     <target name="inspect"
     description="Generates a report of code convention violations."
-    depends="pmd,checkstyle"/>
+    depends="pmd,checkstyle,coverage"/>
     <target name="coverage">
         <property name="cobertura.dir" value="lib" />
 
@@ -177,13 +177,13 @@
             <formatter type="xml"/>
         </junit>
         
-        
-        
         <cobertura-report format="html" datafile="cobertura.ser" destdir="dist/coverage" >
             <fileset dir="src">
                 <include name="**/*.java" />
             </fileset>
         </cobertura-report>
         
+        <delete dir="instrument" />
+        <delete file="cobertura.ser" />
     </target>
 </project>
