@@ -60,13 +60,13 @@ public class AboutBox extends JFrame implements ActionListener {
     protected Font titleFont, bodyFont;
     protected static ResourceBundle resBundle = ResourceBundle.getBundle(
             "dg/hipster/resource/strings");
-    
+
     public AboutBox() {
         super("");
         this.setResizable(false);
         SymWindow aSymWindow = new SymWindow();
         this.addWindowListener(aSymWindow);
-        
+
         // Initialize useful fonts
         titleFont = new Font("Lucida Grande", Font.BOLD, 14);
         if (titleFont == null) {
@@ -76,9 +76,9 @@ public class AboutBox extends JFrame implements ActionListener {
         if (bodyFont == null) {
             bodyFont = new Font("SansSerif", Font.PLAIN, 10);
         }
-        
+
         this.getContentPane().setLayout(new BorderLayout(15, 15));
-        
+
         aboutLabel = new JLabel[labelCount];
         aboutLabel[0] = new JLabel("");
         aboutLabel[1] = new JLabel(resBundle.getString("app.name"));
@@ -92,7 +92,7 @@ public class AboutBox extends JFrame implements ActionListener {
         aboutLabel[6] = new JLabel(resBundle.getString("copyright"));
         aboutLabel[6].setFont(bodyFont);
         aboutLabel[7] = new JLabel("");
-        
+
         Panel textPanel2 = new Panel(new GridLayout(labelCount, 1));
         for (int i = 0; i<labelCount; i++) {
             aboutLabel[i].setHorizontalAlignment(JLabel.CENTER);
@@ -103,13 +103,13 @@ public class AboutBox extends JFrame implements ActionListener {
         this.setLocation(aboutLeft, aboutTop);
         this.setSize(aboutWidth, aboutHeight);
     }
-    
+
     class SymWindow extends java.awt.event.WindowAdapter {
         public void windowClosing(java.awt.event.WindowEvent event) {
             setVisible(false);
         }
     }
-    
+
     public void actionPerformed(ActionEvent newEvent) {
         setVisible(false);
     }

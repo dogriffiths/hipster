@@ -51,11 +51,11 @@ public class MacAppListener implements ApplicationListener {
         application.addApplicationListener(new MacAppListener());
         application.setEnabledPreferencesMenu(true);
     }
-    
-    
+
+
     public MacAppListener() {
     }
-    
+
     public void handleAbout(ApplicationEvent event)  {
         Main.showAbout();
         event.setHandled(true);

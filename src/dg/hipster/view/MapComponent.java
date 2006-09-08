@@ -14,5 +14,5 @@ package dg.hipster.view;
  * @author davidg
  */
 public interface MapComponent {
-    void repaintRequired();    
+    void repaintRequired();
 }

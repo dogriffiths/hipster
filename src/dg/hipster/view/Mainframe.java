@@ -53,16 +53,16 @@ public class Mainframe extends JFrame {
      */
     protected static ResourceBundle resBundle = ResourceBundle.getBundle(
             "dg/hipster/resource/strings");
-    
+
     /**
      * Main idea processor component.
      */
     private IdeaMap ideaMap;
-    
+
     /** Creates a new instance of Mainframe */
     public Mainframe() {
         setTitle(resBundle.getString("app.name"));
-        
+
         Settings s = Settings.getInstance();
         setBounds(s.getWindowLeft(), s.getWindowTop(),
                 s.getWindowWidth(), s.getWindowHeight());
@@ -70,7 +70,7 @@ public class Mainframe extends JFrame {
         buildModel();
         this.ideaMap.requestFocusInWindow();
     }
-    
+
     /**
      * Lay the window out.
      */
@@ -78,8 +78,8 @@ public class Mainframe extends JFrame {
         ideaMap = new IdeaMap();
         this.getContentPane().add(ideaMap, BorderLayout.CENTER);
     }
-    
-    
+
+
     /**
      * Set up the data.
      */
@@ -91,7 +91,7 @@ public class Mainframe extends JFrame {
 //        } catch(ReaderException re) {
 //            re.printStackTrace();
 //        }
-        
+
         Idea idea = new Idea("Persistence");
         ideaMap.setIdea(idea);
         Idea mistakes = new Idea("Mistakes");
@@ -117,10 +117,10 @@ public class Mainframe extends JFrame {
         learning.add(love);
         love.add(mistakes);
         idea.add(mistakes);
-        
-        
-        
-        
+
+
+
+
 //        final int lines = 35;
 //        final Idea idea = new Idea("Test pattern");
 //        ideaMap.setIdea(idea);

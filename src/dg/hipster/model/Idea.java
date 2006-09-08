@@ -58,14 +58,14 @@ public class Idea {
      * List of objects that are observing this idea.
      */
     private List<IdeaListener> listeners = new Vector<IdeaListener>();
-    
+
     /**
      * No args constructor.
      */
     public Idea() {
-        
+
     }
-    
+
     /**
      * Constructor for an idea with the given text.
      * @param text zhort text description of the idea
@@ -73,25 +73,26 @@ public class Idea {
     public Idea(String text) {
         setText(text);
     }
-    
+
     /**
      * Add a sub-idea to this idea.
      * @param subIdea sub-idea to add
      */
     public synchronized void add(Idea subIdea) {
         subIdeas.add(subIdea);
-        notify("ADDED", new Object[] {subIdea, subIdeas.size() - 1});
+        notify("ADDED", subIdea, subIdeas.size() - 1);
     }
-    
+
     /**
-     * Add a sub-idea to this idea.
+     * Add a sub-idea to this idea at the given position.
+     * @param pos position in the list of sub-ideas to insert
      * @param subIdea sub-idea to add
      */
     public synchronized void add(int pos, Idea subIdea) {
         subIdeas.add(pos, subIdea);
-        notify("ADDED", new Object[] {subIdea, pos});
+        notify("ADDED", subIdea, pos);
     }
-    
+
     /**
      * Remove the given sub-idea from this idea. No
      * exception is raised if the idea given is
@@ -100,9 +101,9 @@ public class Idea {
      */
     public synchronized void remove(Idea subIdea) {
         subIdeas.remove(subIdea);
-        notify("REMOVED", new Object[] {subIdea});
+        notify("REMOVED", subIdea);
     }
-    
+
     /**
      * Add an idea listener to this idea. The idea listener
      * will be informed when anything changes about this
@@ -112,7 +113,7 @@ public class Idea {
     public void addIdeaListener(IdeaListener ideaListener) {
         listeners.add(ideaListener);
     }
-    
+
     /**
      * The given idea-listener will no longer be
      * notified of changes to this idea. No exception
@@ -123,25 +124,50 @@ public class Idea {
     public void removeIdeaListener(IdeaListener ideaListener) {
         listeners.remove(ideaListener);
     }
-    
-    private void notify(String command, Object[] paras) {
+
+    /**
+     * Notify all listeners that something has changed. The parameters
+     * provide more detail about the change.
+     * @param command Text string describing the command. See source for
+     * details.
+     * @param paras objects providing more information about the change
+     */
+    private void notify(String command, Object... paras) {
         for (IdeaListener listener: listeners) {
             listener.ideaChanged(new IdeaEvent(this, command, paras));
         }
     }
-    
-    public synchronized List<Idea> getSubIdeas() {
+
+    /**
+     * Get a list of the sub-ideas for this idea.
+     *@return list of idea objects
+     */
+    public List<Idea> getSubIdeas() {
         return (List<Idea>)subIdeas.clone();
     }
-    
+
+    /**
+     * Get the short text description of this idea.
+     * @return short text string, using for idea maps
+     */
     public String getText() {
         return text;
     }
-    
+
+    /**
+     * Specify the short text description of this idea.
+     * @param text string to use
+     */
     public void setText(String text) {
         this.text = text;
     }
 
+    /**
+     * String version of this idea. It will be the short text
+     * description, followed by a recursive list of the
+     * sub-ideas.
+     * @return string describing this idea and its sub-ideas.
+     */
     public String toString() {
         return this.text + subIdeas.toString();
     }

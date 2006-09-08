@@ -58,7 +58,7 @@ public class IdeaMap extends JComponent implements MapComponent {
     public IdeaMap() {
         controller = new IdeaMapController(this);
     }
-    
+
     public void setIdea(Idea idea) {
         this.rootView = new IdeaView(idea);
         this.rootView.setParent(this);
@@ -66,7 +66,7 @@ public class IdeaMap extends JComponent implements MapComponent {
         this.selected = rootView;
         this.repaintRequired();
     }
-    
+
     public Idea getSelected() {
         return this.selected.getIdea();
     }
@@ -74,7 +74,7 @@ public class IdeaMap extends JComponent implements MapComponent {
     public void setSelected(Idea selectedIdea) {
         setSelectedView(findIdeaViewFor(rootView, selectedIdea));
     }
-    
+
     private IdeaView findIdeaViewFor(IdeaView parentView, Idea idea) {
         if (idea == null) {
             return null;
@@ -90,11 +90,11 @@ public class IdeaMap extends JComponent implements MapComponent {
         }
         return null;
     }
-    
+
     public IdeaView getSelectedView() {
         return this.selected;
     }
-    
+
     public void setSelectedView(IdeaView newSelectedView) {
         if (this.selected != null) {
             this.selected.setSelected(false);
@@ -104,15 +104,15 @@ public class IdeaMap extends JComponent implements MapComponent {
             this.selected.setSelected(true);
         }
     }
-    
+
     public Idea getIdea() {
         return this.rootView.getIdea();
     }
-    
+
     public IdeaView getRootView() {
         return this.rootView;
     }
-    
+
     public void paintComponent(Graphics g) {
         ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_ON);
@@ -121,7 +121,7 @@ public class IdeaMap extends JComponent implements MapComponent {
         g.translate(size.width / 2, size.height / 2);
         rootView.paint(g);
     }
-    
+
     public void repaintRequired() {
         controller.repaintRequired();
     }

@@ -55,11 +55,11 @@ public class Main {
      */
     protected static ResourceBundle resBundle = ResourceBundle.getBundle(
             "dg/hipster/resource/strings");
-    
+
     /** Creates a new instance of Main */
     public Main() {
     }
-    
+
     /**
      * @param args the command line arguments
      */
@@ -80,7 +80,7 @@ public class Main {
         });
         mainframe.setVisible(true);
     }
-    
+
     /**
      * True if we are running on a Mac.
      * @return true if the current platform is a Mac, false otherwise
@@ -89,21 +89,21 @@ public class Main {
         String osName = System.getProperty("os.name");
         return ((osName != null) && (osName.indexOf("Mac") != -1));
     }
-    
+
     /**
      * Display the about box.
      */
     public static void showAbout() {
         aboutBox.setVisible(true);
     }
-    
+
     /**
      * Display the preferences dialog
      */
     public static void showPreferences() {
-        
+
     }
-    
+
     /**
      * Called when the application being closed down.
      */
@@ -112,6 +112,6 @@ public class Main {
         Settings.getInstance().setWindowLeft(bounds.x);
         Settings.getInstance().setWindowTop(bounds.y);
         Settings.getInstance().setWindowWidth(bounds.width);
-        Settings.getInstance().setWindowHeight(bounds.height);        
+        Settings.getInstance().setWindowHeight(bounds.height);
     }
 }
