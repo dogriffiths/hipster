@@ -48,22 +48,33 @@ import java.util.ResourceBundle;
  * @author davidg
  */
 public class Main {
-    private static Mainframe mainframe;
-    private static AboutBox aboutBox = new AboutBox();
+    private static Main main;
+    private Mainframe frame;
+    private AboutBox aboutBox = new AboutBox();
     /**
      * Internationalization strings.
      */
     protected static ResourceBundle resBundle = ResourceBundle.getBundle(
             "dg/hipster/resource/strings");
-
-    /** Creates a new instance of Main */
-    public Main() {
-    }
-
+    
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
+        main = new Main();
+        main.initView();
+        main.initControllers();
+        main.setVisible(true);
+    }
+    
+    public Main() {
+    }
+    
+    private void initView() {
+        frame = new Mainframe();
+    }
+    
+    private void initControllers() {
         if (isMac()) {
             try {
                 Class.forName("dg.hipster.controller.MacAppListener");
@@ -71,16 +82,22 @@ public class Main {
                 cnfe.printStackTrace();
             }
         }
-        mainframe = new Mainframe();
-        mainframe.addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
-                handleQuit();
-                System.exit(0);
-            }
-        });
-        mainframe.setVisible(true);
+        if (frame != null) {
+            frame.addWindowListener(new WindowAdapter() {
+                public void windowClosing(WindowEvent e) {
+                    handleQuit();
+                    System.exit(0);
+                }
+            });
+        }
     }
-
+    
+    public void setVisible(boolean visible) {
+        if (frame != null) {
+            frame.setVisible(visible);
+        }
+    }
+    
     /**
      * True if we are running on a Mac.
      * @return true if the current platform is a Mac, false otherwise
@@ -89,26 +106,26 @@ public class Main {
         String osName = System.getProperty("os.name");
         return ((osName != null) && (osName.indexOf("Mac") != -1));
     }
-
+    
     /**
      * Display the about box.
      */
     public static void showAbout() {
-        aboutBox.setVisible(true);
+        main.aboutBox.setVisible(true);
     }
-
+    
     /**
      * Display the preferences dialog
      */
     public static void showPreferences() {
-
+        
     }
-
+    
     /**
      * Called when the application being closed down.
      */
     public static void handleQuit() {
-        Rectangle bounds = mainframe.getBounds();
+        Rectangle bounds = main.frame.getBounds();
         Settings.getInstance().setWindowLeft(bounds.x);
         Settings.getInstance().setWindowTop(bounds.y);
         Settings.getInstance().setWindowWidth(bounds.width);
