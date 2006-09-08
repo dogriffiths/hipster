@@ -60,13 +60,30 @@ public class IdeaTest extends TestCase {
         assertEquals("Should now return the second sub idea in second place",
                 subIdea1, idea.getSubIdeas().get(1));
         
+        Idea subIdea2 = new Idea();
+        
+        idea.add(1, subIdea2);
+        
+        assertEquals("Should now be 3 sub-ideas", 3,
+                idea.getSubIdeas().size());
+        
+        assertEquals("Should still return the first sub idea in first place",
+                subIdea0, idea.getSubIdeas().get(0));
+        
+        assertEquals("Should now return the third sub idea in second place",
+                subIdea2, idea.getSubIdeas().get(1));
+        
+        assertEquals("Should now return the second sub idea in third place",
+                subIdea1, idea.getSubIdeas().get(2));
+        
         idea.remove(subIdea0);
+        idea.remove(subIdea1);
         
         assertEquals("Should now be just 1 sub-idea",
                 1, idea.getSubIdeas().size());
         
-        assertEquals("First should now be subIdea1",
-                subIdea1, idea.getSubIdeas().get(0));
+        assertEquals("First should now be subIdea2",
+                subIdea2, idea.getSubIdeas().get(0));
         
     }
     
@@ -167,5 +184,17 @@ public class IdeaTest extends TestCase {
         assertEquals("Text should initially be zero-length", "", idea.getText());
         idea.setText("Some text");
         assertEquals("Text should have been updated", "Some text", idea.getText());
+    }
+    
+    public void testToString() {
+        assertEquals("Should be blank initially", "[]", idea.toString());
+        idea.setText("testRoot");
+        assertEquals("Should have picked up name", "testRoot[]", idea.toString());
+        Idea subIdea0 = new Idea("subIdea0");
+        Idea subIdea1 = new Idea("subIdea1");
+        idea.add(subIdea0);
+        idea.add(subIdea1);
+        assertEquals("Should include subs", "testRoot[subIdea0[], subIdea1[]]",
+                idea.toString());
     }
 }
