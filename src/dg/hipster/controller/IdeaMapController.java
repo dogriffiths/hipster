@@ -59,7 +59,7 @@ import javax.swing.Timer;
 public class IdeaMapController implements ActionListener, KeyListener,
         FocusListener {
     private static final double MAX_SPEED = 5.0;
-    private static final double MAX_MOVE_TIME_SECS = 3.0;
+    private static final double MAX_MOVE_TIME_SECS = 23.0;
     private final static Vertex ORIGIN = new Vertex(0.0, 0.0);
     private IdeaMap ideaMap;
     private Timer ticker = new Timer(50, this);

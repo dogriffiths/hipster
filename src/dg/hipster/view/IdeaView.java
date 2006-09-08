@@ -124,7 +124,8 @@ public class IdeaView implements IdeaListener, MapComponent {
             int pos = (Integer)fe.getParas()[1];
             IdeaView subIdeaView = new IdeaView(subIdea, false);
             double maxAngle = getMaxSubAngle();
-            subIdeaView.setAngle((maxAngle + Math.PI) / 2.0);
+            double angle = (maxAngle + Math.PI) / 2.0;
+            subIdeaView.setAngle(angle);
             add(pos, subIdeaView);
         } else if ("REMOVED".equals(cmd)) {
             Idea subIdea = (Idea)fe.getParas()[0];
