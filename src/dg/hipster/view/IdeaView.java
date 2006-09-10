@@ -235,17 +235,18 @@ public class IdeaView implements IdeaListener, MapComponent {
     }
     
     public IdeaView getViewAt(Point2D p) {
+        IdeaView hit = null;
         if (hits(p)) {
-            return this;
-        } else {
-            for (IdeaView subView: subViews) {
-                IdeaView hit = subView.getViewAt(p);
-                if (hit != null) {
-                    return hit;
-                }
+            hit = this;
+        }
+        
+        for (IdeaView subView: subViews) {
+            IdeaView hit2 = subView.getViewAt(p);
+            if (hit2 != null) {
+                hit = hit2;
             }
         }
-        return null;
+        return hit;
     }
     
     private boolean hits(Point2D p) {
@@ -282,7 +283,7 @@ public class IdeaView implements IdeaListener, MapComponent {
                 ) / magNormal;
         
         // Check if the
-        if (Math.abs(distance) <= thickness) {
+        if (Math.abs(distance) <= (thickness / 2)) {
             return true;
         }
         return false;
