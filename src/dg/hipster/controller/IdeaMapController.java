@@ -48,6 +48,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.awt.geom.Point2D;
 import java.util.HashMap;
 import java.util.List;
@@ -60,14 +61,14 @@ import javax.swing.Timer;
  * @author davidg
  */
 public class IdeaMapController implements ActionListener, KeyListener,
-        FocusListener, MouseListener {
+        FocusListener, MouseListener, MouseMotionListener {
     private static final double MAX_SPEED = 5.0;
     private static final double MAX_MOVE_TIME_SECS = 23.0;
     private final static Vertex ORIGIN = new Vertex(0.0, 0.0);
     private IdeaMap ideaMap;
     private Timer ticker = new Timer(50, this);
     long timeChanged = 0;
-
+    
     /** Creates a new instance of IdeaMapController */
     public IdeaMapController(IdeaMap newIdeaMap) {
         this.ideaMap = newIdeaMap;
@@ -76,9 +77,14 @@ public class IdeaMapController implements ActionListener, KeyListener,
         this.ideaMap.addFocusListener(this);
         this.ideaMap.addKeyListener(this);
         this.ideaMap.addMouseListener(this);
+        this.ideaMap.addMouseMotionListener(this);
     }
     
     public void mouseClicked(MouseEvent evt) {
+        
+    }
+    
+    public void mousePressed(MouseEvent evt) {
         Dimension size = this.ideaMap.getSize();
         Point2D p = new Point2D.Double(evt.getX() - (size.width / 2),
                 evt.getY() - (size.height / 2));
@@ -87,28 +93,61 @@ public class IdeaMapController implements ActionListener, KeyListener,
             this.ideaMap.setSelectedView(hit);
         }
     }
-
-    public void mousePressed(MouseEvent evt) {
-        
-    }
-
+    
     public void mouseReleased(MouseEvent evt) {
         
     }
-
+    
     public void mouseExited(MouseEvent evt) {
         
     }
-
+    
     public void mouseEntered(MouseEvent evt) {
         
     }
-
+    
+    public void mouseMoved(MouseEvent evt) {
+        
+    }
+    
+    public synchronized void mouseDragged(MouseEvent evt) {
+        IdeaView current = this.ideaMap.getSelectedView();
+        if (current == null) {
+            return;
+        }
+        Dimension size = this.ideaMap.getSize();
+        Point2D p = new Point2D.Double(evt.getX() - (size.width / 2),
+                evt.getY() - (size.height / 2));
+        Point2D fromPoint = current.getFromPoint();
+        double angle = getAngleBetween(fromPoint, p);
+        MapComponent parent = current.getParent();
+        if (parent instanceof IdeaView) {
+            IdeaView parentView = (IdeaView)parent;
+            angle = angle - parentView.getRealAngle();
+        }
+        current.setAngle(angle);
+    }
+    
+    static double getAngleBetween(final Point2D fromP, final Point2D toP) {
+        double diffX = toP.getX() - fromP.getX();
+        double diffY = toP.getY() - fromP.getY();
+        double angle = 0.0;
+        double tan = Math.abs(diffX) / Math.abs(diffY);
+        angle = Math.atan(tan);
+        if (diffY > 0) {
+            angle = (Math.PI - angle);
+        }
+        if (diffX < 0) {
+            angle *= -1;
+        }
+        return angle;
+    }
+    
     public void repaintRequired() {
         timeChanged = System.currentTimeMillis();
         ticker.start();
     }
-
+    
     public void actionPerformed(ActionEvent evt) {
         if (timeChanged == 0) {
             timeChanged = System.currentTimeMillis();
@@ -123,19 +162,19 @@ public class IdeaMapController implements ActionListener, KeyListener,
         }
         adjust();
     }
-
+    
     public void focusGained(FocusEvent evt) {
     }
-
+    
     public void focusLost(FocusEvent evt) {
     }
-
+    
     public void keyReleased(KeyEvent evt) {
     }
-
+    
     public void keyTyped(KeyEvent evt) {
     }
-
+    
     public void keyPressed(KeyEvent evt) {
         switch(evt.getKeyCode()) {
             case KeyEvent.VK_UP:
@@ -164,7 +203,7 @@ public class IdeaMapController implements ActionListener, KeyListener,
                 // Do nothing
         }
     }
-
+    
     private void selectDown() {
         final IdeaView selected = this.ideaMap.getSelectedView();
         if (selected == null) {
@@ -187,7 +226,7 @@ public class IdeaMapController implements ActionListener, KeyListener,
             this.ideaMap.setSelectedView(nextView);
         }
     }
-
+    
     private void selectUp() {
         final IdeaView selected = this.ideaMap.getSelectedView();
         if (selected == null) {
@@ -210,7 +249,7 @@ public class IdeaMapController implements ActionListener, KeyListener,
             this.ideaMap.setSelectedView(nextView);
         }
     }
-
+    
     private void selectSibling(int diff) {
         final IdeaView selected = this.ideaMap.getSelectedView();
         if (selected == null) {
@@ -222,7 +261,7 @@ public class IdeaMapController implements ActionListener, KeyListener,
         }
         this.ideaMap.setSelectedView(previous);
     }
-
+    
     private void selectRight() {
         final IdeaView selected = this.ideaMap.getSelectedView();
         if (selected == null) {
@@ -245,7 +284,7 @@ public class IdeaMapController implements ActionListener, KeyListener,
             this.ideaMap.setSelectedView(nextView);
         }
     }
-
+    
     private void selectLeft() {
         final IdeaView selected = this.ideaMap.getSelectedView();
         if (selected == null) {
@@ -268,7 +307,7 @@ public class IdeaMapController implements ActionListener, KeyListener,
             this.ideaMap.setSelectedView(nextView);
         }
     }
-
+    
     private Map<Point2D, IdeaView> endPoints(IdeaView ideaView) {
         Map<Point2D, IdeaView> results = new HashMap<Point2D, IdeaView>();
         List<IdeaView> subViews = ideaView.getSubViews();
@@ -298,7 +337,7 @@ public class IdeaMapController implements ActionListener, KeyListener,
         }
         return results;
     }
-
+    
     private void deleteSelected() {
         final IdeaView selected = this.ideaMap.getSelectedView();
         if (selected == null) {
@@ -322,7 +361,7 @@ public class IdeaMapController implements ActionListener, KeyListener,
         parentView.getIdea().remove(selected.getIdea());
         this.ideaMap.setSelectedView(nextToSelect);
     }
-
+    
     int newCount = 0;
     private void insertIdea() {
         final IdeaView selected = this.ideaMap.getSelectedView();
@@ -339,7 +378,7 @@ public class IdeaMapController implements ActionListener, KeyListener,
         parentView.getIdea().add(pos + 1, newIdea);
         this.ideaMap.setSelectedView(selected.getNextSibling());
     }
-
+    
     private void insertChild() {
         final IdeaView selected = this.ideaMap.getSelectedView();
         if (selected == null) {
@@ -350,10 +389,10 @@ public class IdeaMapController implements ActionListener, KeyListener,
         int next = selected.getSubViews().size() - 1;
         this.ideaMap.setSelectedView(selected.getSubViews().get(next));
     }
-
+    
     private double mass = 0.0;
     private double maxSpeed = 0.0;
-
+    
     List<Vertex> particles;
     private void adjust() {
         IdeaView rootView = ideaMap.getRootView();
@@ -365,7 +404,7 @@ public class IdeaMapController implements ActionListener, KeyListener,
         adjustAngles(rootView);
         ideaMap.repaint();
     }
-
+    
     private Vertex endForce(final IdeaView parentView, final Position p) {
         final List<IdeaView> views = parentView.getSubViews();
         if (views.size() == 0) {
@@ -380,7 +419,7 @@ public class IdeaMapController implements ActionListener, KeyListener,
         }
         return totForce;
     }
-
+    
     private double getNewVelocity(final Vertex force, final IdeaView view,
             final Position p) {
         Vertex p2 = getParticle(view, new Position(ORIGIN, p.angle));
@@ -396,7 +435,7 @@ public class IdeaMapController implements ActionListener, KeyListener,
         }
         return v;
     }
-
+    
     private void adjustAngles(final IdeaView parentView) {
         final List<IdeaView> views = parentView.getSubViews();
         for (int i = 0; i < views.size(); i++) {
@@ -415,14 +454,14 @@ public class IdeaMapController implements ActionListener, KeyListener,
             adjustAngles(view);
         }
     }
-
+    
     private double getNewAngle(final IdeaView parentView,
             final IdeaView previousView, final IdeaView view,
             final IdeaView nextView) {
         final List<IdeaView> views = parentView.getSubViews();
         final double v = view.getV();
         double minDiffAngle = Math.PI / 2 / views.size();
-
+        
         double oldAngle = view.getAngle();
         double newAngle = oldAngle  + (view.getV() / view.getLength());
         if (previousView != null) {
@@ -490,7 +529,7 @@ public class IdeaMapController implements ActionListener, KeyListener,
         }
         return newAngle;
     }
-
+    
     private Vertex repulsion(final Vertex point, final IdeaView view,
             final Position p) {
         Vertex force = new Vertex(0, 0);
@@ -508,7 +547,7 @@ public class IdeaMapController implements ActionListener, KeyListener,
                 view.getAngle() + p.angle)));
         return force;
     }
-
+    
     private void createParticles(IdeaView parentView, Position start) {
         List<IdeaView> views = parentView.getSubViews();
         particles.add(ORIGIN);
@@ -520,7 +559,7 @@ public class IdeaMapController implements ActionListener, KeyListener,
             createParticles(view, nextStart);
         }
     }
-
+    
     private Vertex getParticle(IdeaView view, Position p) {
         double angle = view.getAngle() + p.angle;
         double length = view.getLength();
@@ -528,7 +567,7 @@ public class IdeaMapController implements ActionListener, KeyListener,
         double y = p.start.y + Math.cos(angle) * length;
         return new Vertex(x, y);
     }
-
+    
 }
 
 class Position {
@@ -547,29 +586,29 @@ class Vertex {
         this.x = anX;
         this.y = aY;
     }
-
+    
     Vertex add(Vertex other) {
         return new Vertex(this.x + other.x, this.y + other.y);
     }
-
+    
     Vertex subtract(Vertex other) {
         return new Vertex(this.x - other.x, this.y - other.y);
     }
-
+    
     double distanceSq(Vertex other) {
         return (new Point2D.Double(x, y)).distanceSq(
                 new Point2D.Double(other.x, other.y));
     }
-
+    
     double distance(Vertex other) {
         return (new Point2D.Double(x, y)).distance(
                 new Point2D.Double(other.x, other.y));
     }
-
+    
     Vertex scale(double factor) {
         return new Vertex(this.x * factor, this.y * factor);
     }
-
+    
     void trim(double min, double max) {
         if (x < min) {
             x = min;

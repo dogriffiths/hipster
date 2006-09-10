@@ -71,6 +71,7 @@ public class IdeaView implements IdeaListener, MapComponent {
     private Point2D fromPoint;
     private Point2D toPoint;
     private double thickness;
+    private double realAngle;
     
     public IdeaView() {
         this(null);
@@ -306,6 +307,7 @@ public class IdeaView implements IdeaListener, MapComponent {
             for (IdeaView view: views) {
                 Point c = new Point(c2.x, c2.y);
                 double a = view.getAngle() + initAngle;
+                view.realAngle = a;
                 double len = view.getLength();
                 Point2D p = new Point2D.Double(Math.sin(a) * len,
                         Math.cos(a) * len);
@@ -460,5 +462,21 @@ public class IdeaView implements IdeaListener, MapComponent {
             y -= Math.cos(angle) * length;
         }
         return new Point2D.Double(x, y);
+    }
+    
+    public Point2D getFromPoint() {
+        return this.fromPoint;
+    }
+    
+    public Point2D getToPoint() {
+        return this.toPoint;
+    }
+    
+    public double getThickness() {
+        return this.thickness;
+    }
+    
+    public double getRealAngle() {
+        return this.realAngle;
     }
 }
