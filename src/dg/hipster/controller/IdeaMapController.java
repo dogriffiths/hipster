@@ -39,12 +39,15 @@ import dg.hipster.model.Idea;
 import dg.hipster.view.IdeaMap;
 import dg.hipster.view.IdeaView;
 import dg.hipster.view.MapComponent;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.geom.Point2D;
 import java.util.HashMap;
 import java.util.List;
@@ -57,7 +60,7 @@ import javax.swing.Timer;
  * @author davidg
  */
 public class IdeaMapController implements ActionListener, KeyListener,
-        FocusListener {
+        FocusListener, MouseListener {
     private static final double MAX_SPEED = 5.0;
     private static final double MAX_MOVE_TIME_SECS = 23.0;
     private final static Vertex ORIGIN = new Vertex(0.0, 0.0);
@@ -72,6 +75,33 @@ public class IdeaMapController implements ActionListener, KeyListener,
         this.ideaMap.setFocusable(true);
         this.ideaMap.addFocusListener(this);
         this.ideaMap.addKeyListener(this);
+        this.ideaMap.addMouseListener(this);
+    }
+    
+    public void mouseClicked(MouseEvent evt) {
+        Dimension size = this.ideaMap.getSize();
+        Point2D p = new Point2D.Double(evt.getX() - (size.width / 2),
+                evt.getY() - (size.height / 2));
+        IdeaView hit = this.ideaMap.getRootView().getViewAt(p);
+        if (hit != null) {
+            this.ideaMap.setSelectedView(hit);
+        }
+    }
+
+    public void mousePressed(MouseEvent evt) {
+        
+    }
+
+    public void mouseReleased(MouseEvent evt) {
+        
+    }
+
+    public void mouseExited(MouseEvent evt) {
+        
+    }
+
+    public void mouseEntered(MouseEvent evt) {
+        
     }
 
     public void repaintRequired() {

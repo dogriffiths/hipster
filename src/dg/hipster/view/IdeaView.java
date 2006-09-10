@@ -68,32 +68,35 @@ public class IdeaView implements IdeaListener, MapComponent {
     int ROOT_RADIUS_X = 70;
     int ROOT_RADIUS_Y = 40;
     private MapComponent parent;
-
+    private Point2D fromPoint;
+    private Point2D toPoint;
+    private double thickness;
+    
     public IdeaView() {
         this(null);
     }
-
+    
     public IdeaView(Idea anIdea) {
         this(anIdea, true);
     }
-
+    
     private IdeaView(Idea anIdea, boolean whetherIsRoot) {
         root = whetherIsRoot;
         setIdea(anIdea);
     }
-
+    
     public double getLength() {
         return length;
     }
-
+    
     public void setLength(double length) {
         this.length = length;
     }
-
+    
     public double getAngle() {
         return angle;
     }
-
+    
     public double getMinSubAngle() {
         double minAngle = Math.PI;
         for (IdeaView subView: subViews) {
@@ -103,7 +106,7 @@ public class IdeaView implements IdeaListener, MapComponent {
         }
         return minAngle;
     }
-
+    
     public double getMaxSubAngle() {
         double maxAngle = -Math.PI;
         for (IdeaView subView: subViews) {
@@ -113,7 +116,7 @@ public class IdeaView implements IdeaListener, MapComponent {
         }
         return maxAngle;
     }
-
+    
     public void setAngle(double angle) {
         this.angle = angle;
     }
@@ -139,15 +142,15 @@ public class IdeaView implements IdeaListener, MapComponent {
         }
         repaintRequired();
     }
-
+    
     public IdeaView getPreviousSibling() {
         return getSibling(-1);
     }
-
+    
     public IdeaView getNextSibling() {
         return getSibling(+1);
     }
-
+    
     public IdeaView getSibling(int difference) {
         MapComponent parent = getParent();
         if (!(parent instanceof IdeaView)) {
@@ -164,38 +167,38 @@ public class IdeaView implements IdeaListener, MapComponent {
         siblingPos = (siblingPos + subCount) % subCount;
         return parentView.getSubViews().get(siblingPos);
     }
-
+    
     public synchronized void add(IdeaView subView) {
         subView.parent = this;
         subViews.add(subView);
     }
-
+    
     public synchronized void add(int pos, IdeaView subView) {
         subView.parent = this;
         subViews.add(pos, subView);
     }
-
+    
     public synchronized void remove(IdeaView subView) {
         subView.parent = null;
         subViews.remove(subView);
     }
-
+    
     public synchronized Vector<IdeaView> getSubViews() {
         return (Vector<IdeaView>)subViews.clone();
     }
-
+    
     public double getV() {
         return v;
     }
-
+    
     public void setV(double v) {
         this.v = v;
     }
-
+    
     public Idea getIdea() {
         return idea;
     }
-
+    
     public void setIdea(Idea newIdea) {
         this.idea = newIdea;
         subViews.clear();
@@ -220,20 +223,74 @@ public class IdeaView implements IdeaListener, MapComponent {
             setLength(0);
         }
     }
-
+    
     public void setSelected(boolean isSelected) {
         this.selected = isSelected;
         repaintRequired();
     }
-
+    
     public boolean isSelected() {
         return this.selected;
     }
-
+    
+    public IdeaView getViewAt(Point2D p) {
+        if (hits(p)) {
+            return this;
+        } else {
+            for (IdeaView subView: subViews) {
+                IdeaView hit = subView.getViewAt(p);
+                if (hit != null) {
+                    return hit;
+                }
+            }
+        }
+        return null;
+    }
+    
+    private boolean hits(Point2D p) {
+        if ((fromPoint == null) || (toPoint == null)) {
+            return false;
+        }
+        double vx0 = fromPoint.getX();
+        double vy0 = fromPoint.getY();
+        double vx1 = toPoint.getX();
+        double vy1 = toPoint.getY();
+        double vx2 = p.getX();
+        double vy2 = p.getY();
+        
+        double minX = Math.min(vx0, vx1) - thickness;
+        double maxX = Math.max(vx0, vx1) + thickness;
+        double minY = Math.min(vy0, vy1) - thickness;
+        double maxY = Math.max(vy0, vy1) + thickness;
+        
+        if ((vx2 > maxX) || (vx2 < minX)) {
+            return false;
+        }
+        if ((vy2 > maxY) || (vy2 < minY)) {
+            return false;
+        }
+        
+        // Calculate magnitude of the normal to the line-segment
+        double magNormal = Math.sqrt(
+                ((vx1 - vx0) * (vx1 - vx0)) + ((vy1 - vy0) * (vy1 - vy0))
+                );
+        
+        // Calculate (signed) distance of the point from the line-segment
+        double distance = (
+                ((vx2 - vx0) * (vy0 - vy1)) + ((vy2 - vy0) * (vx1 - vx0))
+                ) / magNormal;
+        
+        // Check if the
+        if (Math.abs(distance) <= thickness) {
+            return true;
+        }
+        return false;
+    }
+    
     public void paint(Graphics g) {
         paint(g, new Point(0, 0), this, getAngle(), 0);
     }
-
+    
     private void paint(final Graphics g, final Point c2,
             final IdeaView aView, final double initAngle, final int depth) {
         List<IdeaView> views = aView.getSubViews();
@@ -264,6 +321,9 @@ public class IdeaView implements IdeaListener, MapComponent {
                 }
                 Color upper = colour.brighter().brighter();
                 Color lower = colour.darker().darker();
+                view.fromPoint = c;
+                view.toPoint = s;
+                view.thickness = strokeWidth;
                 g.setColor(lower);
                 g.drawLine(c.x, c.y + 1, s.x, s.y + 1);
                 g.setColor(upper);
@@ -301,52 +361,52 @@ public class IdeaView implements IdeaListener, MapComponent {
                     getAngle());
         }
     }
-
+    
     private static Color invert(Color colour) {
         int red = colour.getRed();
         int green = colour.getGreen();
         int blue = colour.getBlue();
         return new Color(255 - red, 255 - green, 255 - blue);
     }
-
+    
     private Point getView(final Point c, final Point2D p) {
         int sx = c.x + (int)p.getX();
         int sy = c.y - (int)p.getY();
         return new Point(sx, sy);
     }
-
+    
     private void drawString(Graphics2D graphics2d, String string, Point p,
             int alignment, double orientation) {
         double orient = orientation % Math.PI;
-
+        
         if (orient > (Math.PI / 2.0)) {
             orient -= Math.PI;
         }
         if (orient < (-Math.PI / 2.0)) {
             orient += Math.PI;
         }
-
+        
         int xc = p.x;
         int yc = p.y;
-
+        
         AffineTransform transform = graphics2d.getTransform();
-
+        
         transform(graphics2d, orient, xc, yc);
-
+        
         FontMetrics fm = graphics2d.getFontMetrics();
         double realTextWidth = fm.stringWidth(string);
         double realTextHeight = fm.getHeight() - fm.getDescent();
-
+        
         int offsetX = (int) (realTextWidth * (double) (alignment % 3) / 2.0);
         int offsetY = (int) (-realTextHeight * (double) (alignment / 3) / 2.0);
-
+        
         if ((graphics2d != null) && (string != null)) {
             graphics2d.drawString(string, xc - offsetX, yc - offsetY);
         }
-
+        
         graphics2d.setTransform(transform);
     }
-
+    
     private void transform(Graphics2D graphics2d, double orientation, int x,
             int y) {
         graphics2d.transform(
@@ -355,25 +415,25 @@ public class IdeaView implements IdeaListener, MapComponent {
                 )
                 );
     }
-
+    
     public boolean isRoot() {
         return root;
     }
-
+    
     public void repaintRequired() {
         if (parent != null) {
             parent.repaintRequired();
         }
     }
-
+    
     public MapComponent getParent() {
         return parent;
     }
-
+    
     public void setParent(MapComponent parent) {
         this.parent = parent;
     }
-
+    
     public Point2D getEndPoint() {
         double x = 0.0;
         double y = 0.0;
