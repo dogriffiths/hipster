@@ -177,6 +177,10 @@ public class IdeaMapController implements ActionListener, KeyListener,
     
     public void keyPressed(KeyEvent evt) {
         switch(evt.getKeyCode()) {
+            case KeyEvent.VK_SPACE:
+                ticker.stop();
+                maxSpeed = 0.0;
+                break;
             case KeyEvent.VK_UP:
                 selectUp();
                 break;
