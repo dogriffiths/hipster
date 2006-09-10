@@ -389,7 +389,7 @@ public class IdeaMapController implements ActionListener, KeyListener,
             return;
         }
         Idea newIdea = new Idea("New " + (newCount++));
-        selected.getIdea().add(newIdea);
+        selected.getIdea().add(0, newIdea);
         int next = selected.getSubViews().size() - 1;
         this.ideaMap.setSelectedView(selected.getSubViews().get(next));
     }
