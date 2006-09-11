@@ -160,6 +160,7 @@ public class Idea {
      */
     public void setText(String text) {
         this.text = text;
+        notify("CHANGED");
     }
 
     /**

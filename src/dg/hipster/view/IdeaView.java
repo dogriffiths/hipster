@@ -65,6 +65,7 @@ public class IdeaView implements IdeaListener, MapComponent {
     private Idea idea;
     private boolean root;
     private boolean selected;
+    private boolean editing;
     int ROOT_RADIUS_X = 70;
     int ROOT_RADIUS_Y = 40;
     private MapComponent parent;
@@ -140,6 +141,8 @@ public class IdeaView implements IdeaListener, MapComponent {
                     break;
                 }
             }
+        } else {
+            this.setLength(15 * idea.getText().length() + 10);
         }
         repaintRequired();
     }
@@ -227,11 +230,24 @@ public class IdeaView implements IdeaListener, MapComponent {
     
     public void setSelected(boolean isSelected) {
         this.selected = isSelected;
+//        Mainframe.text.setText(idea.getText());
         repaintRequired();
     }
     
     public boolean isSelected() {
         return this.selected;
+    }
+    
+    public void setEditing(boolean isEditing) {
+        this.editing = isEditing;
+        if (this.editing) {
+            Mainframe.text.setText(idea.getText());
+        }
+        repaintRequired();
+    }
+    
+    public boolean isEditing() {
+        return this.editing;
     }
     
     public IdeaView getViewAt(Point2D p) {
@@ -341,7 +357,7 @@ public class IdeaView implements IdeaListener, MapComponent {
                 Point midp = new Point((c.x + s.x) / 2, (c.y + s.y) / 2);
                 double textAngle = (Math.PI / 2.0) - a;
                 drawString((Graphics2D)g, view.getIdea().getText(), midp, 4,
-                        textAngle);
+                        textAngle, view.isEditing());
             }
         }
         ((Graphics2D)g).setStroke(oldStroke);
@@ -361,7 +377,7 @@ public class IdeaView implements IdeaListener, MapComponent {
             g.drawOval(-ROOT_RADIUS_X, -ROOT_RADIUS_Y, ROOT_RADIUS_X * 2,
                     ROOT_RADIUS_Y * 2);
             drawString((Graphics2D)g, getIdea().getText(), c2, 4,
-                    getAngle());
+                    getAngle(), aView.isEditing());
         }
     }
     
@@ -379,7 +395,7 @@ public class IdeaView implements IdeaListener, MapComponent {
     }
     
     private void drawString(Graphics2D graphics2d, String string, Point p,
-            int alignment, double orientation) {
+            int alignment, double orientation, boolean editing) {
         double orient = orientation % Math.PI;
         
         if (orient > (Math.PI / 2.0)) {
@@ -403,8 +419,18 @@ public class IdeaView implements IdeaListener, MapComponent {
         int offsetX = (int) (realTextWidth * (double) (alignment % 3) / 2.0);
         int offsetY = (int) (-realTextHeight * (double) (alignment / 3) / 2.0);
         
-        if ((graphics2d != null) && (string != null)) {
-            graphics2d.drawString(string, xc - offsetX, yc - offsetY);
+        if (!editing) {
+            
+            if ((graphics2d != null) && (string != null)) {
+                graphics2d.drawString(string, xc - offsetX, yc - offsetY);
+            }
+        } else {
+            Graphics2D g2d = (Graphics2D)graphics2d.create(xc - offsetX - 5, yc + offsetY - 5,
+                    (int)realTextWidth + 10, (int)realTextHeight + 10);
+//            graphics2d.translate(xc - offsetX + 5, yc + offsetY - 5);
+//            graphics2d.clipRect(0, 0, (int)realTextWidth + 10, (int)realTextHeight + 10);
+            Mainframe.text.paint(g2d);
+            g2d.dispose();
         }
         
         graphics2d.setTransform(transform);

@@ -38,9 +38,24 @@ package dg.hipster.view;
 import dg.hipster.model.Idea;
 import dg.hipster.model.Settings;
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
+import java.awt.Point;
+import java.awt.RenderingHints;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
 import java.util.ResourceBundle;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.Timer;
 
 /**
  * Main window of the application.
@@ -53,33 +68,56 @@ public class Mainframe extends JFrame {
      */
     protected static ResourceBundle resBundle = ResourceBundle.getBundle(
             "dg/hipster/resource/strings");
-
+    
     /**
      * Main idea processor component.
      */
     private IdeaMap ideaMap;
-
+    
     /** Creates a new instance of Mainframe */
     public Mainframe() {
         setTitle(resBundle.getString("app.name"));
-
+        
         Settings s = Settings.getInstance();
         setBounds(s.getWindowLeft(), s.getWindowTop(),
                 s.getWindowWidth(), s.getWindowHeight());
         buildView();
         buildModel();
+        text.setText(ideaMap.getRootView().getIdea().getText());
+        text.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                ideaMap.requestFocusInWindow();
+                IdeaView current = ideaMap.getSelectedView();
+                if (current != null) {
+                    current.getIdea().setText(Mainframe.text.getText());
+                    current.setEditing(false);
+                    Mainframe.text.setEnabled(false);
+                }
+            }
+        });
         this.ideaMap.requestFocusInWindow();
+        ideaMap.getRootView().setEditing(true);
     }
-
+    
     /**
      * Lay the window out.
      */
     private void buildView() {
+        text = new JTextField("text");
+        this.getContentPane().add(text, BorderLayout.NORTH);
         ideaMap = new IdeaMap();
         this.getContentPane().add(ideaMap, BorderLayout.CENTER);
+//        JPanel rot = new Rotater();
+////        add(rot, BorderLayout.CENTER);
+//        setLayout(null);
+//        add(rot);
+//
+//        Dimension dim = rot.getMinimumSize();
+//        rot.setBounds(100, 100, 200, 100);
     }
-
-
+    public static JTextField text;
+    
+    
     /**
      * Set up the data.
      */
@@ -91,7 +129,7 @@ public class Mainframe extends JFrame {
 //        } catch(ReaderException re) {
 //            re.printStackTrace();
 //        }
-
+        
         Idea idea = new Idea("Persistence");
         ideaMap.setIdea(idea);
         Idea mistakes = new Idea("Mistakes");
@@ -117,10 +155,10 @@ public class Mainframe extends JFrame {
         learning.add(love);
         love.add(mistakes);
         idea.add(mistakes);
-
-
-
-
+        
+        
+        
+        
 //        final int lines = 35;
 //        final Idea idea = new Idea("Test pattern");
 //        ideaMap.setIdea(idea);
@@ -150,5 +188,90 @@ public class Mainframe extends JFrame {
 //                try { Thread.sleep(1000);} catch(Exception e){}
 //            }
 //        }}).start();
+    }
+}
+class Rotater extends JPanel implements ActionListener {
+    private Timer ticker = new Timer(50, this);
+    private double orientation = -Math.PI / 6;
+    private Point p = new Point(0, 0);
+    private JTextField text = new JTextField("this is a text field");
+    private JPanel privPanel;
+    public Rotater() {
+        text.setHighlighter(null);
+        privPanel = new JPanel();
+        privPanel.add(text);
+        ticker.start();
+    }
+    public void actionPerformed(ActionEvent evt) {
+        repaint();
+    }
+    public void setOrientation(double orient) {
+        this.orientation = orient;
+    }
+    public double getOrientation() {
+        return this.orientation;
+    }
+    public Dimension getMinimumSize() {
+        Dimension dim = text.getSize();
+        double orient = orientation;
+        double w = dim.width * Math.cos(orient) + dim.height * Math.sin(orient);
+        double h = dim.width * Math.sin(orient) + dim.height * Math.cos(orient);
+        return new Dimension((int)w, (int)h);
+    }
+    public void update(Graphics g) {
+        paint(g);
+    }
+    public void paint(Graphics g) {
+        Dimension size = getSize();
+        int w = size.width;
+        int h = size.height;
+        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        GraphicsDevice gd = ge.getDefaultScreenDevice();
+        GraphicsConfiguration gc = gd.getDefaultConfiguration();
+        BufferedImage image = gc.createCompatibleImage(w, h);
+        Graphics2D g2 = (Graphics2D)image.getGraphics();
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        
+        double orient = orientation % Math.PI;
+        
+        if (orient > (Math.PI / 2.0)) {
+            orient -= Math.PI;
+        }
+        if (orient < (-Math.PI / 2.0)) {
+            orient += Math.PI;
+        }
+        
+        int xc = p.x;
+        int yc = p.y;
+        
+        AffineTransform transform = g2.getTransform();
+        
+        transform(g2, orient, xc, yc);
+        
+        
+        
+        
+        privPanel.paintComponents(g2);
+        
+        g2.setTransform(transform);
+        
+        g.setColor(Color.WHITE);
+        g.fillRect(0, 0, w, h);
+        g.drawImage(image, 0, 0, this);
+    }
+    
+    private void transform(Graphics2D graphics2d, double orientation, int x,
+            int y) {
+        graphics2d.transform(
+                AffineTransform.getRotateInstance(
+                -orientation, x, y
+                )
+                );
+    }
+    
+    public void paintComponent(Graphics g) {
+    }
+    
+    public void paintComponents(Graphics g) {
     }
 }

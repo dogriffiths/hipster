@@ -38,6 +38,7 @@ package dg.hipster.controller;
 import dg.hipster.model.Idea;
 import dg.hipster.view.IdeaMap;
 import dg.hipster.view.IdeaView;
+import dg.hipster.view.Mainframe;
 import dg.hipster.view.MapComponent;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -85,12 +86,24 @@ public class IdeaMapController implements ActionListener, KeyListener,
     }
     
     public void mousePressed(MouseEvent evt) {
+        IdeaView selected = this.ideaMap.getSelectedView();
+        if (selected != null) {
+            selected.getIdea().setText(Mainframe.text.getText());
+            Mainframe.text.setEnabled(false);
+            selected.setEditing(false);
+        }
         Dimension size = this.ideaMap.getSize();
         Point2D p = new Point2D.Double(evt.getX() - (size.width / 2),
                 evt.getY() - (size.height / 2));
         IdeaView hit = this.ideaMap.getRootView().getViewAt(p);
         if (hit != null) {
             this.ideaMap.setSelectedView(hit);
+            Mainframe.text.setText(hit.getIdea().getText());
+            if (evt.getClickCount() == 2) {
+                Mainframe.text.setEnabled(true);
+                hit.setEditing(true);
+                Mainframe.text.requestFocusInWindow();
+            }
         }
     }
     
@@ -198,7 +211,19 @@ public class IdeaMapController implements ActionListener, KeyListener,
                 deleteSelected();
                 break;
             case KeyEvent.VK_ENTER:
-                insertIdea();
+                if (evt.getModifiers() != 0) {
+                    IdeaView hit = this.ideaMap.getSelectedView();
+                    if (hit != null) {
+                        Mainframe.text.setText(hit.getIdea().getText());
+                        Mainframe.text.setEnabled(true);
+                        hit.setEditing(true);
+                        Mainframe.text.setEnabled(true);
+                        Mainframe.text.requestFocusInWindow();
+                        Mainframe.text.selectAll();
+                    }
+                } else {
+                    insertIdea();
+                }
                 break;
             case KeyEvent.VK_TAB:
                 insertChild();
@@ -381,6 +406,10 @@ public class IdeaMapController implements ActionListener, KeyListener,
         Idea newIdea = new Idea("New " + (newCount++));
         parentView.getIdea().add(pos + 1, newIdea);
         this.ideaMap.setSelectedView(selected.getNextSibling());
+        ideaMap.getSelectedView().setEditing(true);
+        Mainframe.text.setEnabled(true);
+        Mainframe.text.requestFocusInWindow();
+        Mainframe.text.selectAll();
     }
     
     private void insertChild() {
@@ -391,6 +420,10 @@ public class IdeaMapController implements ActionListener, KeyListener,
         Idea newIdea = new Idea("New " + (newCount++));
         selected.getIdea().add(0, newIdea);
         this.ideaMap.setSelectedView(selected.getSubViews().get(0));
+        ideaMap.getSelectedView().setEditing(true);
+        Mainframe.text.setEnabled(true);
+        Mainframe.text.requestFocusInWindow();
+        Mainframe.text.selectAll();
     }
     
     private double mass = 0.0;

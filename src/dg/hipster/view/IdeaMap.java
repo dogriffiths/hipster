@@ -37,13 +37,15 @@ package dg.hipster.view;
 
 import dg.hipster.controller.IdeaMapController;
 import dg.hipster.model.Idea;
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
-import java.util.List;
 import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 
 /**
  *
@@ -53,12 +55,12 @@ public class IdeaMap extends JComponent implements MapComponent {
     private IdeaMapController controller;
     private IdeaView rootView;
     private IdeaView selected;
-
+    
     /** Creates a new instance of Fred */
     public IdeaMap() {
         controller = new IdeaMapController(this);
     }
-
+    
     public void setIdea(Idea idea) {
         this.rootView = new IdeaView(idea);
         this.rootView.setParent(this);
@@ -66,15 +68,15 @@ public class IdeaMap extends JComponent implements MapComponent {
         this.selected = rootView;
         this.repaintRequired();
     }
-
+    
     public Idea getSelected() {
         return this.selected.getIdea();
     }
-
+    
     public void setSelected(Idea selectedIdea) {
         setSelectedView(findIdeaViewFor(rootView, selectedIdea));
     }
-
+    
     private IdeaView findIdeaViewFor(IdeaView parentView, Idea idea) {
         if (idea == null) {
             return null;
@@ -90,11 +92,11 @@ public class IdeaMap extends JComponent implements MapComponent {
         }
         return null;
     }
-
+    
     public IdeaView getSelectedView() {
         return this.selected;
     }
-
+    
     public void setSelectedView(IdeaView newSelectedView) {
         if (this.selected != null) {
             this.selected.setSelected(false);
@@ -104,15 +106,15 @@ public class IdeaMap extends JComponent implements MapComponent {
             this.selected.setSelected(true);
         }
     }
-
+    
     public Idea getIdea() {
         return this.rootView.getIdea();
     }
-
+    
     public IdeaView getRootView() {
         return this.rootView;
     }
-
+    
     public void paintComponent(Graphics g) {
         ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_ON);
@@ -121,7 +123,7 @@ public class IdeaMap extends JComponent implements MapComponent {
         g.translate(size.width / 2, size.height / 2);
         rootView.paint(g);
     }
-
+    
     public void repaintRequired() {
         controller.repaintRequired();
     }
