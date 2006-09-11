@@ -43,8 +43,9 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import javax.swing.JComponent;
-import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 /**
@@ -55,10 +56,18 @@ public class IdeaMap extends JComponent implements MapComponent {
     private IdeaMapController controller;
     private IdeaView rootView;
     private IdeaView selected;
+    private JTextField text;
     
     /** Creates a new instance of Fred */
     public IdeaMap() {
+        text = new JTextField("text");
+        setLayout(new BorderLayout());
+        add(text, BorderLayout.NORTH);
         controller = new IdeaMapController(this);
+    }
+    
+    public JTextField getTextField() {
+        return this.text;
     }
     
     public void setIdea(Idea idea) {
@@ -66,7 +75,8 @@ public class IdeaMap extends JComponent implements MapComponent {
         this.rootView.setParent(this);
         rootView.setSelected(true);
         this.selected = rootView;
-        this.repaintRequired();
+        text.setText(idea.getText());
+        text.setEnabled(false);
     }
     
     public Idea getSelected() {
@@ -115,13 +125,15 @@ public class IdeaMap extends JComponent implements MapComponent {
         return this.rootView;
     }
     
-    public void paintComponent(Graphics g) {
+    public void paintComponent(Graphics gOrig) {
+        Graphics g = gOrig.create();
         ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_ON);
         g.setColor(Color.BLACK);
         Dimension size = getSize();
         g.translate(size.width / 2, size.height / 2);
-        rootView.paint(g);
+        rootView.paint(g, this);
+        g.dispose();
     }
     
     public void repaintRequired() {

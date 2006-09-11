@@ -230,7 +230,6 @@ public class IdeaView implements IdeaListener, MapComponent {
     
     public void setSelected(boolean isSelected) {
         this.selected = isSelected;
-//        Mainframe.text.setText(idea.getText());
         repaintRequired();
     }
     
@@ -240,9 +239,6 @@ public class IdeaView implements IdeaListener, MapComponent {
     
     public void setEditing(boolean isEditing) {
         this.editing = isEditing;
-        if (this.editing) {
-            Mainframe.text.setText(idea.getText());
-        }
         repaintRequired();
     }
     
@@ -305,12 +301,13 @@ public class IdeaView implements IdeaListener, MapComponent {
         return false;
     }
     
-    public void paint(Graphics g) {
-        paint(g, new Point(0, 0), this, getAngle(), 0);
+    public void paint(Graphics g, IdeaMap map) {
+        paint(g, new Point(0, 0), this, getAngle(), 0, map);
     }
     
     private void paint(final Graphics g, final Point c2,
-            final IdeaView aView, final double initAngle, final int depth) {
+            final IdeaView aView, final double initAngle,
+            final int depth, final IdeaMap map) {
         List<IdeaView> views = aView.getSubViews();
         Stroke oldStroke = ((Graphics2D)g).getStroke();
         float strokeWidth = 20.0f - (depth * 2);
@@ -333,7 +330,7 @@ public class IdeaView implements IdeaListener, MapComponent {
                     c.y -= (int)(Math.cos(a) * ROOT_RADIUS_Y);
                 }
                 Point s = getView(c, p);
-                paint(g, s, view, a, depth + 1);
+                paint(g, s, view, a, depth + 1, map);
                 Color colour = COLOURS[depth % COLOURS.length];
                 if (view.isSelected()) {
                     colour = invert(colour);
@@ -357,7 +354,7 @@ public class IdeaView implements IdeaListener, MapComponent {
                 Point midp = new Point((c.x + s.x) / 2, (c.y + s.y) / 2);
                 double textAngle = (Math.PI / 2.0) - a;
                 drawString((Graphics2D)g, view.getIdea().getText(), midp, 4,
-                        textAngle, view.isEditing());
+                        textAngle, view.isEditing(), map);
             }
         }
         ((Graphics2D)g).setStroke(oldStroke);
@@ -377,7 +374,7 @@ public class IdeaView implements IdeaListener, MapComponent {
             g.drawOval(-ROOT_RADIUS_X, -ROOT_RADIUS_Y, ROOT_RADIUS_X * 2,
                     ROOT_RADIUS_Y * 2);
             drawString((Graphics2D)g, getIdea().getText(), c2, 4,
-                    getAngle(), aView.isEditing());
+                    getAngle(), aView.isEditing(), map);
         }
     }
     
@@ -395,7 +392,7 @@ public class IdeaView implements IdeaListener, MapComponent {
     }
     
     private void drawString(Graphics2D graphics2d, String string, Point p,
-            int alignment, double orientation, boolean editing) {
+            int alignment, double orientation, boolean editing, IdeaMap map) {
         double orient = orientation % Math.PI;
         
         if (orient > (Math.PI / 2.0)) {
@@ -427,9 +424,7 @@ public class IdeaView implements IdeaListener, MapComponent {
         } else {
             Graphics2D g2d = (Graphics2D)graphics2d.create(xc - offsetX - 5, yc + offsetY - 5,
                     (int)realTextWidth + 10, (int)realTextHeight + 10);
-//            graphics2d.translate(xc - offsetX + 5, yc + offsetY - 5);
-//            graphics2d.clipRect(0, 0, (int)realTextWidth + 10, (int)realTextHeight + 10);
-            Mainframe.text.paint(g2d);
+            map.getTextField().paint(g2d);
             g2d.dispose();
         }
         

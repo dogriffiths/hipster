@@ -79,6 +79,16 @@ public class IdeaMapController implements ActionListener, KeyListener,
         this.ideaMap.addKeyListener(this);
         this.ideaMap.addMouseListener(this);
         this.ideaMap.addMouseMotionListener(this);
+        this.ideaMap.getTextField().addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                ideaMap.requestFocusInWindow();
+                IdeaView current = ideaMap.getSelectedView();
+                if (current != null) {
+                    unEditIdeaView(current);
+                }
+            }
+        });
+        this.ideaMap.requestFocusInWindow();
     }
     
     public void mouseClicked(MouseEvent evt) {
@@ -88,8 +98,8 @@ public class IdeaMapController implements ActionListener, KeyListener,
     public void mousePressed(MouseEvent evt) {
         IdeaView selected = this.ideaMap.getSelectedView();
         if (selected != null) {
-            selected.getIdea().setText(Mainframe.text.getText());
-            Mainframe.text.setEnabled(false);
+            selected.getIdea().setText(ideaMap.getTextField().getText());
+            ideaMap.getTextField().setEnabled(false);
             selected.setEditing(false);
         }
         Dimension size = this.ideaMap.getSize();
@@ -98,11 +108,8 @@ public class IdeaMapController implements ActionListener, KeyListener,
         IdeaView hit = this.ideaMap.getRootView().getViewAt(p);
         if (hit != null) {
             this.ideaMap.setSelectedView(hit);
-            Mainframe.text.setText(hit.getIdea().getText());
+            ideaMap.getTextField().setText(hit.getIdea().getText());
             if (evt.getClickCount() == 2) {
-//                Mainframe.text.setEnabled(true);
-//                hit.setEditing(true);
-//                Mainframe.text.requestFocusInWindow();
                 editIdeaView(hit);
             }
         }
@@ -221,12 +228,6 @@ public class IdeaMapController implements ActionListener, KeyListener,
                 if (evt.getModifiers() != 0) {
                     IdeaView hit = this.ideaMap.getSelectedView();
                     if (hit != null) {
-//                        Mainframe.text.setText(hit.getIdea().getText());
-//                        Mainframe.text.setEnabled(true);
-//                        hit.setEditing(true);
-//                        Mainframe.text.setEnabled(true);
-//                        Mainframe.text.requestFocusInWindow();
-//                        Mainframe.text.selectAll();
                         editIdeaView(hit);
                     }
                 } else {
@@ -260,7 +261,6 @@ public class IdeaMapController implements ActionListener, KeyListener,
             }
         }
         if (nextView != null) {
-//            this.ideaMap.setSelectedView(nextView);
             selectIdeaView(nextView);
         }
     }
@@ -284,7 +284,6 @@ public class IdeaMapController implements ActionListener, KeyListener,
             }
         }
         if (nextView != null) {
-//            this.ideaMap.setSelectedView(nextView);
             selectIdeaView(nextView);
         }
     }
@@ -298,7 +297,6 @@ public class IdeaMapController implements ActionListener, KeyListener,
         if (previous == null) {
             return;
         }
-//        this.ideaMap.setSelectedView(previous);
         selectIdeaView(previous);
     }
     
@@ -321,7 +319,6 @@ public class IdeaMapController implements ActionListener, KeyListener,
             }
         }
         if (nextView != null) {
-//            this.ideaMap.setSelectedView(nextView);
             selectIdeaView(nextView);
         }
     }
@@ -345,7 +342,6 @@ public class IdeaMapController implements ActionListener, KeyListener,
             }
         }
         if (nextView != null) {
-//            this.ideaMap.setSelectedView(nextView);
             selectIdeaView(nextView);
         }
     }
@@ -401,7 +397,6 @@ public class IdeaMapController implements ActionListener, KeyListener,
             nextToSelect = parentView;
         }
         parentView.getIdea().remove(selected.getIdea());
-//        this.ideaMap.setSelectedView(nextToSelect);
         selectIdeaView(nextToSelect);
     }
     
@@ -425,20 +420,20 @@ public class IdeaMapController implements ActionListener, KeyListener,
     private void editIdeaView(final IdeaView selected) {
         selectIdeaView(selected);
         selected.setEditing(true);
-        Mainframe.text.setEnabled(true);
-        Mainframe.text.requestFocusInWindow();
-        Mainframe.text.selectAll();
+        ideaMap.getTextField().setEnabled(true);
+        ideaMap.getTextField().requestFocusInWindow();
+        ideaMap.getTextField().selectAll();
     }
     
     public void unEditIdeaView(final IdeaView ideaView) {
-        ideaView.getIdea().setText(Mainframe.text.getText());
+        ideaView.getIdea().setText(ideaMap.getTextField().getText());
         ideaView.setEditing(false);
-        Mainframe.text.setEnabled(false);
+        ideaMap.getTextField().setEnabled(false);
     }
     
     private void selectIdeaView(final IdeaView selected) {
         this.ideaMap.setSelectedView(selected);
-        Mainframe.text.setText(selected.getIdea().getText());
+        ideaMap.getTextField().setText(selected.getIdea().getText());
     }
     
     private void insertChild() {
@@ -448,11 +443,7 @@ public class IdeaMapController implements ActionListener, KeyListener,
         }
         Idea newIdea = new Idea("New " + (newCount++));
         selected.getIdea().add(0, newIdea);
-        this.ideaMap.setSelectedView(selected.getSubViews().get(0));
-        ideaMap.getSelectedView().setEditing(true);
-        Mainframe.text.setEnabled(true);
-        Mainframe.text.requestFocusInWindow();
-        Mainframe.text.selectAll();
+        editIdeaView(selected.getSubViews().get(0));
     }
     
     private double mass = 0.0;
@@ -546,10 +537,6 @@ public class IdeaMapController implements ActionListener, KeyListener,
             }
         } else {
             double previousAngle = -Math.PI;
-//            if (parentView.isRoot()) {
-//                previousAngle = views.get(views.size() - 1).getAngle()
-//                - 2 * Math.PI;
-//            }
             if (previousAngle > newAngle - minDiffAngle) {
                 newAngle = previousAngle + minDiffAngle;
                 double previousV = 0.0;
@@ -578,9 +565,6 @@ public class IdeaMapController implements ActionListener, KeyListener,
             }
         } else {
             double nextAngle = Math.PI;
-//            if (parentView.isRoot()) {
-//                nextAngle = views.get(0).getAngle() +  2 * Math.PI;
-//            }
             if (nextAngle < newAngle + minDiffAngle) {
                 newAngle = nextAngle - minDiffAngle;
                 double nextV = 0.0;
