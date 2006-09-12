@@ -309,14 +309,6 @@ public class IdeaView implements IdeaListener, MapComponent {
             final IdeaView aView, final double initAngle,
             final int depth, final IdeaMap map) {
         List<IdeaView> views = aView.getSubViews();
-        Stroke oldStroke = ((Graphics2D)g).getStroke();
-        float strokeWidth = 20.0f - (depth * 2);
-        if (strokeWidth < 10.0f) {
-            strokeWidth = 10.0f;
-        }
-        Stroke stroke = new BasicStroke(strokeWidth,
-                BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL);
-        ((Graphics2D)g).setStroke(stroke);
         synchronized(views) {
             for (IdeaView view: views) {
                 Point c = new Point(c2.x, c2.y);
@@ -339,6 +331,14 @@ public class IdeaView implements IdeaListener, MapComponent {
                 Color lower = colour.darker().darker();
                 view.fromPoint = c;
                 view.toPoint = s;
+                Stroke oldStroke = ((Graphics2D)g).getStroke();
+                float strokeWidth = 20.0f - (depth * 2);
+                if (strokeWidth < 10.0f) {
+                    strokeWidth = 10.0f;
+                }
+                Stroke stroke = new BasicStroke(strokeWidth,
+                        BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL);
+                ((Graphics2D)g).setStroke(stroke);
                 view.thickness = strokeWidth;
                 g.setColor(lower);
                 g.drawLine(c.x, c.y + 1, s.x, s.y + 1);
@@ -346,6 +346,7 @@ public class IdeaView implements IdeaListener, MapComponent {
                 g.drawLine(c.x, c.y - 1, s.x, s.y - 1);
                 g.setColor(colour);
                 g.drawLine(c.x, c.y, s.x, s.y);
+                ((Graphics2D)g).setStroke(oldStroke);
                 if (view.isSelected()) {
                     g.setColor(Color.WHITE);
                 } else {
@@ -357,7 +358,6 @@ public class IdeaView implements IdeaListener, MapComponent {
                         textAngle, view.isEditing(), map);
             }
         }
-        ((Graphics2D)g).setStroke(oldStroke);
         if (aView.isRoot()) {
             Color colour = Color.WHITE;
             if (aView.isSelected()) {
