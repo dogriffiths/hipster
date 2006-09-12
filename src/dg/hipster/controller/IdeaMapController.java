@@ -103,8 +103,14 @@ public class IdeaMapController implements ActionListener, KeyListener,
             selected.setEditing(false);
         }
         Dimension size = this.ideaMap.getSize();
-        Point2D p = new Point2D.Double(evt.getX() - (size.width / 2),
-                evt.getY() - (size.height / 2));
+        double x = evt.getX() - (size.width / 2);
+        double y = evt.getY() - (size.height / 2);
+        double z = ideaMap.getZoom();
+        x /= z;
+        y /= z;
+//        Point2D p = new Point2D.Double(evt.getX() - (size.width / 2),
+//                evt.getY() - (size.height / 2));
+        Point2D p = new Point2D.Double(x, y);
         IdeaView hit = this.ideaMap.getRootView().getViewAt(p);
         if (hit != null) {
             this.ideaMap.setSelectedView(hit);
@@ -137,8 +143,14 @@ public class IdeaMapController implements ActionListener, KeyListener,
             return;
         }
         Dimension size = this.ideaMap.getSize();
-        Point2D p = new Point2D.Double(evt.getX() - (size.width / 2),
-                evt.getY() - (size.height / 2));
+        double x = evt.getX() - (size.width / 2);
+        double y = evt.getY() - (size.height / 2);
+        double z = ideaMap.getZoom();
+        x /= z;
+        y /= z;
+//        Point2D p = new Point2D.Double(evt.getX() - (size.width / 2),
+//                evt.getY() - (size.height / 2));
+        Point2D p = new Point2D.Double(x, y);
         Point2D fromPoint = current.getFromPoint();
         double angle = getAngleBetween(fromPoint, p);
         MapComponent parent = current.getParent();
@@ -236,6 +248,18 @@ public class IdeaMapController implements ActionListener, KeyListener,
                 break;
             case KeyEvent.VK_TAB:
                 insertChild();
+                break;
+            case KeyEvent.VK_PLUS:
+            case KeyEvent.VK_EQUALS:
+                if (evt.getModifiersEx() != 0) {
+                    this.ideaMap.zoomIn();
+                }
+                break;
+            case KeyEvent.VK_MINUS:
+            case KeyEvent.VK_UNDERSCORE:
+                if (evt.getModifiersEx() != 0) {
+                    this.ideaMap.zoomOut();
+                }
                 break;
             default:
                 // Do nothing

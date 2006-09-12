@@ -125,6 +125,7 @@ public class IdeaMap extends JComponent implements MapComponent {
         return this.rootView;
     }
     
+    private double zoom = 1.0;
     public void paintComponent(Graphics gOrig) {
         Graphics g = gOrig.create();
         ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING,
@@ -132,8 +133,21 @@ public class IdeaMap extends JComponent implements MapComponent {
         g.setColor(Color.BLACK);
         Dimension size = getSize();
         g.translate(size.width / 2, size.height / 2);
+        ((Graphics2D)g).scale(zoom, zoom);
         rootView.paint(g, this);
         g.dispose();
+    }
+    
+    public double getZoom() {
+        return zoom;
+    }
+    
+    public void zoomIn() {
+        zoom *= 2;
+    }
+    
+    public void zoomOut() {
+        zoom /= 2;
     }
     
     public void repaintRequired() {
