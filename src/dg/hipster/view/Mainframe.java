@@ -45,7 +45,9 @@ import java.awt.FileDialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 import java.util.ResourceBundle;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -91,8 +93,6 @@ public class Mainframe extends JFrame {
         menu.add(fileMenu);
         JMenuItem openMenu = new JMenuItem("Open");
         fileMenu.add(openMenu);
-        JMenuItem saveMenu = new JMenuItem("Save");
-        fileMenu.add(saveMenu);
         openMenu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 try {
@@ -102,11 +102,22 @@ public class Mainframe extends JFrame {
                 }
             }
         });
+        JMenuItem saveMenu = new JMenuItem("Save");
+        fileMenu.add(saveMenu);
+        saveMenu.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                try {
+                    saveDocument();
+                } catch(Throwable t) {
+                    t.printStackTrace();
+                }
+            }
+        });
         this.setJMenuBar(menu);
     }
     
     public void openDocument() throws IOException, ReaderException {
-        FileDialog chooser = new FileDialog(this, "Open Map Set", FileDialog.LOAD);
+        FileDialog chooser = new FileDialog(this, "Open OPML file", FileDialog.LOAD);
         
         chooser.setVisible(true);
         
@@ -115,11 +126,58 @@ public class Mainframe extends JFrame {
         if (filename != null) {
             String absPath = chooser.getDirectory() + chooser.getFile();
             ReaderFactory factory = ReaderFactory.getInstance();
-            IdeaReader reader = factory.read(new File("etc/test.opml"));
+            IdeaReader reader = factory.read(new File(absPath));
             ideaMap.setIdea(reader.getIdea());
             this.setTitle(resBundle.getString("app.name") + " - "
                     + absPath);
         }
+    }
+    
+    public void saveDocument() throws IOException, ReaderException {
+        FileDialog chooser = new FileDialog(this, "Save OPML file", FileDialog.SAVE);
+        
+        chooser.setVisible(true);
+        
+        String filename = chooser.getFile();
+        
+        if (filename != null) {
+            String absPath = chooser.getDirectory() + chooser.getFile();
+
+            
+            Idea idea = this.ideaMap.getIdea();
+            Writer out = new FileWriter(absPath);
+            save(idea, out);
+            out.flush();
+            out.close();
+            
+            
+            this.setTitle(resBundle.getString("app.name") + " - "
+                    + absPath);
+        }
+    }
+    
+    private void save(Idea idea, Writer out) throws IOException {
+        out.write("<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n");
+        out.write("<opml version=\"1.0\">\n");
+
+        out.write("     <head>\n");
+        out.write("          <title/>\n");
+        out.write("     </head>\n");
+
+        out.write("     <body>\n");
+        
+        saveIdea(idea, out);
+
+        out.write("     </body>\n");
+        out.write("</opml>\n");
+    }
+    
+    private void saveIdea(Idea idea, Writer out) throws IOException {
+        out.write("<outline text=\"" + idea.getText() + "\">\n");
+        for (Idea subIdea: idea.getSubIdeas()) {
+            saveIdea(subIdea, out);
+        }
+        out.write("</outline>\n");
     }
     
     /**
