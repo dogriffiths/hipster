@@ -35,11 +35,22 @@
 
 package dg.hipster.view;
 
+import dg.hipster.io.IdeaReader;
+import dg.hipster.io.ReaderException;
+import dg.hipster.io.ReaderFactory;
 import dg.hipster.model.Idea;
 import dg.hipster.model.Settings;
 import java.awt.BorderLayout;
+import java.awt.FileDialog;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
 import java.util.ResourceBundle;
 import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 
 /**
  * Main window of the application.
@@ -75,8 +86,41 @@ public class Mainframe extends JFrame {
     private void buildView() {
         ideaMap = new IdeaMap();
         this.getContentPane().add(ideaMap, BorderLayout.CENTER);
+        JMenuBar menu = new JMenuBar();
+        JMenu fileMenu = new JMenu("File");
+        menu.add(fileMenu);
+        JMenuItem openMenu = new JMenuItem("Open");
+        fileMenu.add(openMenu);
+        JMenuItem saveMenu = new JMenuItem("Save");
+        fileMenu.add(saveMenu);
+        openMenu.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                try {
+                    openDocument();
+                } catch(Throwable t) {
+                    t.printStackTrace();
+                }
+            }
+        });
+        this.setJMenuBar(menu);
     }
     
+    public void openDocument() throws IOException, ReaderException {
+        FileDialog chooser = new FileDialog(this, "Open Map Set", FileDialog.LOAD);
+        
+        chooser.setVisible(true);
+        
+        String filename = chooser.getFile();
+        
+        if (filename != null) {
+            String absPath = chooser.getDirectory() + chooser.getFile();
+            ReaderFactory factory = ReaderFactory.getInstance();
+            IdeaReader reader = factory.read(new File("etc/test.opml"));
+            ideaMap.setIdea(reader.getIdea());
+            this.setTitle(resBundle.getString("app.name") + " - "
+                    + absPath);
+        }
+    }
     
     /**
      * Set up the data.
