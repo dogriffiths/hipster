@@ -42,8 +42,10 @@ import dg.hipster.model.Idea;
 import dg.hipster.model.Settings;
 import java.awt.BorderLayout;
 import java.awt.FileDialog;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -53,6 +55,7 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.KeyStroke;
 
 /**
  * Main window of the application.
@@ -91,8 +94,23 @@ public class Mainframe extends JFrame {
         JMenuBar menu = new JMenuBar();
         JMenu fileMenu = new JMenu("File");
         menu.add(fileMenu);
-        JMenuItem openMenu = new JMenuItem("Open");
+        JMenuItem newMenu = new JMenuItem("New");
+        fileMenu.add(newMenu);
+        newMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N,
+                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        newMenu.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                try {
+                    newDocument();
+                } catch(Throwable t) {
+                    t.printStackTrace();
+                }
+            }
+        });
+        JMenuItem openMenu = new JMenuItem("Open...");
         fileMenu.add(openMenu);
+        openMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O,
+                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         openMenu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 try {
@@ -104,6 +122,8 @@ public class Mainframe extends JFrame {
         });
         JMenuItem saveMenu = new JMenuItem("Save");
         fileMenu.add(saveMenu);
+        saveMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S,
+                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         saveMenu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 try {
@@ -113,7 +133,26 @@ public class Mainframe extends JFrame {
                 }
             }
         });
+        JMenuItem saveAsMenu = new JMenuItem("Save As...");
+        fileMenu.add(saveAsMenu);
+        saveAsMenu.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                try {
+                    saveAsDocument();
+                } catch(Throwable t) {
+                    t.printStackTrace();
+                }
+            }
+        });
         this.setJMenuBar(menu);
+    }
+    
+    public void newDocument() {
+        Idea idea = new Idea("New idea");
+        this.ideaMap.setIdea(idea);
+        this.ideaMap.getController().editIdeaView(this.ideaMap.getRootView());
+        currentFile = null;
+            this.setTitle(resBundle.getString("app.name"));
     }
     
     public void openDocument() throws IOException, ReaderException {
@@ -130,44 +169,57 @@ public class Mainframe extends JFrame {
             ideaMap.setIdea(reader.getIdea());
             this.setTitle(resBundle.getString("app.name") + " - "
                     + absPath);
+            currentFile = absPath;
+        }
+    }
+    
+    private String currentFile;
+    
+    public void saveAsDocument() throws IOException, ReaderException {
+        String oldFile = currentFile;
+        currentFile = null;
+        saveDocument();
+        if (currentFile == null) {
+            currentFile = oldFile;
         }
     }
     
     public void saveDocument() throws IOException, ReaderException {
-        FileDialog chooser = new FileDialog(this, "Save OPML file", FileDialog.SAVE);
-        
-        chooser.setVisible(true);
-        
-        String filename = chooser.getFile();
-        
-        if (filename != null) {
-            String absPath = chooser.getDirectory() + chooser.getFile();
-
+        if (currentFile == null) {
+            FileDialog chooser = new FileDialog(this, "Save OPML file", FileDialog.SAVE);
             
+            chooser.setVisible(true);
+            
+            if (chooser.getFile() != null) {
+            currentFile = chooser.getDirectory() + chooser.getFile();
+            }
+        }
+        
+        
+        if (currentFile != null) {
             Idea idea = this.ideaMap.getIdea();
-            Writer out = new FileWriter(absPath);
+            Writer out = new FileWriter(currentFile);
             save(idea, out);
             out.flush();
             out.close();
             
-            
             this.setTitle(resBundle.getString("app.name") + " - "
-                    + absPath);
+                    + currentFile);
         }
     }
     
     private void save(Idea idea, Writer out) throws IOException {
         out.write("<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n");
         out.write("<opml version=\"1.0\">\n");
-
+        
         out.write("     <head>\n");
         out.write("          <title/>\n");
         out.write("     </head>\n");
-
+        
         out.write("     <body>\n");
         
         saveIdea(idea, out);
-
+        
         out.write("     </body>\n");
         out.write("</opml>\n");
     }
@@ -184,71 +236,5 @@ public class Mainframe extends JFrame {
      * Set up the data.
      */
     private void buildModel() {
-//        ReaderFactory factory = ReaderFactory.getInstance();
-//        try {
-//            IdeaReader reader = factory.read(new File("etc/test.opml"));
-//            ideaMap.setIdea(reader.getIdea());
-//        } catch(ReaderException re) {
-//            re.printStackTrace();
-//        }
-        
-        Idea idea = new Idea("Persistence");
-        ideaMap.setIdea(idea);
-        Idea mistakes = new Idea("Mistakes");
-        Idea platforms = new Idea("Platforms");
-        mistakes.add(platforms);
-        Idea attempts = new Idea("Attempts");
-        platforms.add(attempts);
-        Idea continual = new Idea("Continual");
-        attempts.add(continual);
-        Idea further = new Idea("Further");
-        attempts.add(further);
-        Idea enjoyed = new Idea("Enjoyed");
-        attempts.add(enjoyed);
-        Idea thousands = new Idea("Thousands");
-        mistakes.add(thousands);
-        Idea making = new Idea("Making");
-        mistakes.add(making);
-        Idea progress = new Idea("Progress");
-        mistakes.add(progress);
-        Idea learning = new Idea("Learning");
-        idea.add(learning);
-        Idea love = new Idea("Love");
-        learning.add(love);
-        love.add(mistakes);
-        idea.add(mistakes);
-        
-        
-        
-        
-//        final int lines = 35;
-//        final Idea idea = new Idea("Test pattern");
-//        ideaMap.setIdea(idea);
-//        (new Thread(){public void run() {
-//            for (int i = 0; i < lines; i++) {
-//                Idea fred2 = new Idea("      i = " + i);
-//                synchronized(idea) {
-//                    idea.add(fred2);
-//                }
-//                //try { Thread.sleep(100);} catch(Exception e){}
-//            }
-//
-//            Idea sub = idea.getSubIdeas().get(0);
-//
-//            Idea subIdea0 = null;
-//            for (int i = 0; i < 4; i++) {
-//                subIdea0 = new Idea("i = " + i);
-//                sub.add(subIdea0);
-//                try { Thread.sleep(1000);} catch(Exception e){}
-//            }
-//            try { Thread.sleep(10000);} catch(Exception e){}
-//
-//            Idea s2 = subIdea0;
-//            for (int i = 0; i < 6; i++) {
-//                Idea subIdea2 = new Idea("i = " + i);
-//                s2.add(subIdea2);
-//                try { Thread.sleep(1000);} catch(Exception e){}
-//            }
-//        }}).start();
     }
 }

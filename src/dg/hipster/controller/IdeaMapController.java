@@ -441,7 +441,7 @@ public class IdeaMapController implements ActionListener, KeyListener,
         editIdeaView(selected.getNextSibling());
     }
     
-    private void editIdeaView(final IdeaView selected) {
+    public void editIdeaView(final IdeaView selected) {
         selectIdeaView(selected);
         selected.setEditing(true);
         ideaMap.getTextField().setEnabled(true);

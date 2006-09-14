@@ -134,7 +134,9 @@ public class IdeaMap extends JComponent implements MapComponent {
         Dimension size = getSize();
         g.translate(size.width / 2, size.height / 2);
         ((Graphics2D)g).scale(zoom, zoom);
-        rootView.paint(g, this);
+        if (rootView != null) {
+            rootView.paint(g, this);
+        }
         g.dispose();
     }
     
@@ -152,5 +154,9 @@ public class IdeaMap extends JComponent implements MapComponent {
     
     public void repaintRequired() {
         controller.repaintRequired();
+    }
+    
+    public IdeaMapController getController() {
+        return this.controller;
     }
 }
