@@ -35,6 +35,7 @@
 
 package dg.hipster.view;
 
+import dg.hipster.Main;
 import dg.hipster.io.IdeaReader;
 import dg.hipster.io.ReaderException;
 import dg.hipster.io.ReaderFactory;
@@ -144,6 +145,27 @@ public class Mainframe extends JFrame {
                 }
             }
         });
+        if (!Main.isMac()) {
+            JMenuItem itemExit = new JMenuItem("Exit");
+            itemExit.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    fileExit();
+                }
+            });
+            fileMenu.addSeparator();
+            fileMenu.add(itemExit);
+        }
+        if (!Main.isMac()) {
+            JMenu helpMenu = new JMenu("Help");
+            JMenuItem about = new JMenuItem("About " + resBundle.getString("app.name"));
+            about.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    helpAbout();
+                }
+            });
+            
+            helpMenu.add(about);
+        }
         this.setJMenuBar(menu);
     }
     
@@ -152,7 +174,7 @@ public class Mainframe extends JFrame {
         this.ideaMap.setIdea(idea);
         this.ideaMap.getController().editIdeaView(this.ideaMap.getRootView());
         currentFile = null;
-            this.setTitle(resBundle.getString("app.name"));
+        this.setTitle(resBundle.getString("app.name"));
     }
     
     public void openDocument() throws IOException, ReaderException {
@@ -191,7 +213,7 @@ public class Mainframe extends JFrame {
             chooser.setVisible(true);
             
             if (chooser.getFile() != null) {
-            currentFile = chooser.getDirectory() + chooser.getFile();
+                currentFile = chooser.getDirectory() + chooser.getFile();
             }
         }
         
@@ -230,6 +252,14 @@ public class Mainframe extends JFrame {
             saveIdea(subIdea, out);
         }
         out.write("</outline>\n");
+    }
+    
+    public void fileExit() {
+        System.exit(0);
+    }
+    
+    public void helpAbout() {
+        Main.showAbout();
     }
     
     /**
