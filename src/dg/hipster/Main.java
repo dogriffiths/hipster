@@ -57,6 +57,10 @@ public class Main {
     protected static ResourceBundle resBundle = ResourceBundle.getBundle(
             "dg/hipster/resource/strings");
     
+    static {
+        System.setProperty("apple.laf.useScreenMenuBar", "true");
+    }
+    
     /**
      * @param args the command line arguments
      */
