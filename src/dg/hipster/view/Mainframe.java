@@ -41,6 +41,8 @@ import dg.hipster.model.Settings;
 import java.awt.BorderLayout;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.ResourceBundle;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -64,6 +66,9 @@ public class Mainframe extends JFrame {
      * Main idea processor component.
      */
     private IdeaMap ideaMap;
+    private MainframeController controller;
+    private MenuManager menuMgr = new MenuManager();
+    private String currentFile;
     
     /** Creates a new instance of Mainframe */
     public Mainframe() {
@@ -76,68 +81,49 @@ public class Mainframe extends JFrame {
         buildModel();
         controller = new MainframeController(this);
     }
-    
-    private JMenuBar menu;
-    private JMenu fileMenu;
-    private JMenuItem newItem;
-    private JMenuItem openItem;
-    private JMenuItem saveItem;
-    private JMenuItem saveAsItem;
-    private JMenuItem exitItem;
-    private JMenu viewMenu;
-    private JMenuItem zoomInItem;
-    private JMenuItem zoomOutItem;
-    private JMenu helpMenu;
-    private JMenuItem aboutItem;
-    private MainframeController controller;
-    
+
     /**
      * Lay the window out.
      */
     private void buildView() {
         ideaMap = new IdeaMap();
         this.getContentPane().add(getIdeaMap(), BorderLayout.CENTER);
-        menu = new JMenuBar();
-        fileMenu = new JMenu("File");
-        menu.add(fileMenu);
-        newItem = new JMenuItem("New");
-        fileMenu.add(newItem);
-        newItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N,
-                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        openItem = new JMenuItem("Open...");
-        fileMenu.add(openItem);
-        openItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O,
-                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        saveItem = new JMenuItem("Save");
-        fileMenu.add(saveItem);
-        saveItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S,
-                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        saveAsItem = new JMenuItem("Save As...");
-        fileMenu.add(saveAsItem);
-        viewMenu = new JMenu("View");
-        menu.add(viewMenu);
-        zoomInItem = new JMenuItem("Make Text Bigger");
-        viewMenu.add(zoomInItem);
-        zoomInItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_PLUS,
-                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        zoomOutItem = new JMenuItem("Make Text Smaller");
-        viewMenu.add(zoomOutItem);
-        zoomOutItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS,
-                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        if (!Main.isMac()) {
-            exitItem = new JMenuItem("Exit");
-            fileMenu.addSeparator();
-            fileMenu.add(exitItem);
-            helpMenu = new JMenu("Help");
-            aboutItem = new JMenuItem("About " + resBundle.getString("app.name"));
-            
-            helpMenu.add(aboutItem);
-        }
-        this.setJMenuBar(getMenu());
+        this.setJMenuBar(createMenu());
     }
     
-    private String currentFile;
+    private JMenuBar createMenu() {
+        JMenuBar menu = new JMenuBar();
+        menuMgr.createMenus(menu, new Object[][]{
+            {"file", new Object[][] {
+                 {"new", KeyEvent.VK_N},
+                 {"-"},
+                 {"open", KeyEvent.VK_O},
+                 {"save", KeyEvent.VK_S},
+                 {"saveAs"}
+             }},
+             {"view", new Object[][]{
+                  {"zoomIn", KeyEvent.VK_PLUS},
+                  {"zoomOut", KeyEvent.VK_MINUS}
+              }}
+        });
+        if (!Main.isMac()) {
+            JMenu fileMenu = getMenu("file");
+            fileMenu.addSeparator();
+            menuMgr.createItem("exit", fileMenu);
+            menuMgr.createMenu("help", menu, new Object[][]{
+                {"about"}
+            });
+        }
+        return menu;
+    }
     
+    public JMenu getMenu(String name) {
+        return menuMgr.getMenu(name);
+    }
+    
+    public JMenuItem getItem(String name) {
+        return menuMgr.getItem(name);
+    }
     
     /**
      * Set up the data.
@@ -161,49 +147,5 @@ public class Mainframe extends JFrame {
     
     public String getCurrentFile() {
         return this.currentFile;
-    }
-    
-    public JMenuBar getMenu() {
-        return menu;
-    }
-    
-    public JMenu getFileMenu() {
-        return fileMenu;
-    }
-    
-    public JMenuItem getNewItem() {
-        return newItem;
-    }
-    
-    public JMenuItem getOpenItem() {
-        return openItem;
-    }
-    
-    public JMenuItem getSaveItem() {
-        return saveItem;
-    }
-    
-    public JMenuItem getSaveAsItem() {
-        return saveAsItem;
-    }
-    
-    public JMenuItem getZoomInItem() {
-        return zoomInItem;
-    }
-    
-    public JMenuItem getZoomOutItem() {
-        return zoomOutItem;
-    }
-    
-    public JMenuItem getExitItem() {
-        return exitItem;
-    }
-    
-    public JMenu getHelpMenu() {
-        return helpMenu;
-    }
-    
-    public JMenuItem getAboutItem() {
-        return aboutItem;
     }
 }

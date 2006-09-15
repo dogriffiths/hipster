@@ -57,7 +57,7 @@ public class MainframeController {
     
     public MainframeController(Mainframe aMainframe) {
         this.mainframe = aMainframe;
-        mainframe.getNewItem().addActionListener(new ActionListener() {
+        mainframe.getItem("new").addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 try {
                     newDocument();
@@ -66,7 +66,7 @@ public class MainframeController {
                 }
             }
         });
-        mainframe.getOpenItem().addActionListener(new ActionListener() {
+        mainframe.getItem("open").addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 try {
                     openDocument();
@@ -75,7 +75,7 @@ public class MainframeController {
                 }
             }
         });
-        mainframe.getSaveItem().addActionListener(new ActionListener() {
+        mainframe.getItem("save").addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 try {
                     saveDocument();
@@ -84,7 +84,7 @@ public class MainframeController {
                 }
             }
         });
-        mainframe.getSaveAsItem().addActionListener(new ActionListener() {
+        mainframe.getItem("saveAs").addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 try {
                     saveAsDocument();
@@ -93,7 +93,7 @@ public class MainframeController {
                 }
             }
         });
-        mainframe.getZoomInItem().addActionListener(new ActionListener() {
+        mainframe.getItem("zoomIn").addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 try {
                     zoomIn();
@@ -102,7 +102,7 @@ public class MainframeController {
                 }
             }
         });
-        mainframe.getZoomOutItem().addActionListener(new ActionListener() {
+        mainframe.getItem("zoomOut").addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 try {
                     zoomOut();
@@ -112,12 +112,12 @@ public class MainframeController {
             }
         });
         if (!Main.isMac()) {
-            mainframe.getExitItem().addActionListener(new ActionListener() {
+            mainframe.getItem("exit").addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     fileExit();
                 }
             });
-            mainframe.getAboutItem().addActionListener(new ActionListener() {
+            mainframe.getItem("about").addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     helpAbout();
                 }
