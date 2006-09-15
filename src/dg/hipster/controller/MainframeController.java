@@ -36,8 +36,6 @@
 package dg.hipster.controller;
 
 import dg.hipster.Main;
-import dg.hipster.io.IdeaReader;
-import dg.hipster.io.IdeaWriter;
 import dg.hipster.io.ReaderException;
 import dg.hipster.io.ReaderFactory;
 import dg.hipster.io.WriterFactory;
@@ -128,9 +126,9 @@ public class MainframeController {
         if (filename != null) {
             String absPath = chooser.getDirectory() + chooser.getFile();
             ReaderFactory factory = ReaderFactory.getInstance();
-            IdeaReader reader = factory.read(new File(absPath));
+            Idea idea = factory.read(new File(absPath));
             IdeaMap ideaMap = mainframe.getIdeaMap();
-            ideaMap.setIdea(reader.getIdea());
+            ideaMap.setIdea(idea);
             mainframe.setCurrentFile(absPath);
         }
     }

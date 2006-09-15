@@ -38,7 +38,6 @@ package dg.hipster.controller;
 import dg.hipster.model.Idea;
 import dg.hipster.view.IdeaMap;
 import dg.hipster.view.IdeaView;
-import dg.hipster.view.Mainframe;
 import dg.hipster.view.MapComponent;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -81,14 +80,26 @@ public class IdeaMapController implements ActionListener, KeyListener,
         this.ideaMap.addMouseMotionListener(this);
         this.ideaMap.getTextField().addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                ideaMap.requestFocusInWindow();
-                IdeaView current = ideaMap.getSelectedView();
-                if (current != null) {
-                    unEditIdeaView(current);
-                }
+                unEditCurrent();
+            }
+        });
+        this.ideaMap.getTextField().addFocusListener(new FocusListener() {
+            public void focusLost(FocusEvent fe) {
+                unEditCurrent();
+            }
+            public void focusGained(FocusEvent fe) {
+                
             }
         });
         this.ideaMap.requestFocusInWindow();
+    }
+    
+    private void unEditCurrent() {
+        ideaMap.requestFocusInWindow();
+        IdeaView current = ideaMap.getSelectedView();
+        if (current != null) {
+            unEditIdeaView(current);
+        }
     }
     
     public void mouseClicked(MouseEvent evt) {
@@ -108,8 +119,6 @@ public class IdeaMapController implements ActionListener, KeyListener,
         double z = ideaMap.getZoom();
         x /= z;
         y /= z;
-//        Point2D p = new Point2D.Double(evt.getX() - (size.width / 2),
-//                evt.getY() - (size.height / 2));
         Point2D p = new Point2D.Double(x, y);
         IdeaView hit = this.ideaMap.getRootView().getViewAt(p);
         if (hit != null) {
@@ -148,8 +157,6 @@ public class IdeaMapController implements ActionListener, KeyListener,
         double z = ideaMap.getZoom();
         x /= z;
         y /= z;
-//        Point2D p = new Point2D.Double(evt.getX() - (size.width / 2),
-//                evt.getY() - (size.height / 2));
         Point2D p = new Point2D.Double(x, y);
         Point2D fromPoint = current.getFromPoint();
         double angle = getAngleBetween(fromPoint, p);

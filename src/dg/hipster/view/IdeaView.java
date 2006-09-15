@@ -230,6 +230,9 @@ public class IdeaView implements IdeaListener, MapComponent {
     
     public void setSelected(boolean isSelected) {
         this.selected = isSelected;
+        if (!isSelected) {
+            setEditing(false);
+        }
         repaintRequired();
     }
     
