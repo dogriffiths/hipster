@@ -84,6 +84,9 @@ public class Mainframe extends JFrame {
     private JMenuItem saveItem;
     private JMenuItem saveAsItem;
     private JMenuItem exitItem;
+    private JMenu viewMenu;
+    private JMenuItem zoomInItem;
+    private JMenuItem zoomOutItem;
     private JMenu helpMenu;
     private JMenuItem aboutItem;
     private MainframeController controller;
@@ -96,29 +99,39 @@ public class Mainframe extends JFrame {
         this.getContentPane().add(getIdeaMap(), BorderLayout.CENTER);
         menu = new JMenuBar();
         fileMenu = new JMenu("File");
-        getMenu().add(getFileMenu());
+        menu.add(fileMenu);
         newItem = new JMenuItem("New");
-        getFileMenu().add(getNewItem());
-        getNewItem().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N,
+        fileMenu.add(newItem);
+        newItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N,
                 Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         openItem = new JMenuItem("Open...");
-        getFileMenu().add(getOpenItem());
-        getOpenItem().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O,
+        fileMenu.add(openItem);
+        openItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O,
                 Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         saveItem = new JMenuItem("Save");
-        getFileMenu().add(getSaveItem());
-        getSaveItem().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S,
+        fileMenu.add(saveItem);
+        saveItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S,
                 Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         saveAsItem = new JMenuItem("Save As...");
-        getFileMenu().add(getSaveAsItem());
+        fileMenu.add(saveAsItem);
+        viewMenu = new JMenu("View");
+        menu.add(viewMenu);
+        zoomInItem = new JMenuItem("Make Text Bigger");
+        viewMenu.add(zoomInItem);
+        zoomInItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_PLUS,
+                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        zoomOutItem = new JMenuItem("Make Text Smaller");
+        viewMenu.add(zoomOutItem);
+        zoomOutItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS,
+                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         if (!Main.isMac()) {
             exitItem = new JMenuItem("Exit");
-            getFileMenu().addSeparator();
-            getFileMenu().add(getExitItem());
+            fileMenu.addSeparator();
+            fileMenu.add(exitItem);
             helpMenu = new JMenu("Help");
             aboutItem = new JMenuItem("About " + resBundle.getString("app.name"));
             
-            getHelpMenu().add(getAboutItem());
+            helpMenu.add(aboutItem);
         }
         this.setJMenuBar(getMenu());
     }
@@ -172,6 +185,14 @@ public class Mainframe extends JFrame {
     
     public JMenuItem getSaveAsItem() {
         return saveAsItem;
+    }
+    
+    public JMenuItem getZoomInItem() {
+        return zoomInItem;
+    }
+    
+    public JMenuItem getZoomOutItem() {
+        return zoomOutItem;
     }
     
     public JMenuItem getExitItem() {

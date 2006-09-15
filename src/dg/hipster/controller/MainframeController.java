@@ -93,6 +93,24 @@ public class MainframeController {
                 }
             }
         });
+        mainframe.getZoomInItem().addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                try {
+                    zoomIn();
+                } catch(Throwable t) {
+                    t.printStackTrace();
+                }
+            }
+        });
+        mainframe.getZoomOutItem().addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                try {
+                    zoomOut();
+                } catch(Throwable t) {
+                    t.printStackTrace();
+                }
+            }
+        });
         if (!Main.isMac()) {
             mainframe.getExitItem().addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
@@ -162,6 +180,14 @@ public class MainframeController {
             WriterFactory.getInstance().write(new File(
                     mainframe.getCurrentFile()), idea);
         }
+    }
+    
+    public void zoomIn() {
+        mainframe.getIdeaMap().zoomIn();
+    }
+    
+    public void zoomOut() {
+        mainframe.getIdeaMap().zoomOut();
     }
     
     public void fileExit() {

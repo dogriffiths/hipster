@@ -40,6 +40,7 @@ import dg.hipster.view.IdeaMap;
 import dg.hipster.view.IdeaView;
 import dg.hipster.view.MapComponent;
 import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
@@ -120,12 +121,14 @@ public class IdeaMapController implements ActionListener, KeyListener,
         x /= z;
         y /= z;
         Point2D p = new Point2D.Double(x, y);
-        IdeaView hit = this.ideaMap.getRootView().getViewAt(p);
-        if (hit != null) {
-            this.ideaMap.setSelectedView(hit);
-            ideaMap.getTextField().setText(hit.getIdea().getText());
-            if (evt.getClickCount() == 2) {
-                editIdeaView(hit);
+        if ((this.ideaMap != null) && (this.ideaMap.getRootView() != null)) {
+            IdeaView hit = this.ideaMap.getRootView().getViewAt(p);
+            if (hit != null) {
+                this.ideaMap.setSelectedView(hit);
+                ideaMap.getTextField().setText(hit.getIdea().getText());
+                if (evt.getClickCount() == 2) {
+                    editIdeaView(hit);
+                }
             }
         }
     }
@@ -256,16 +259,9 @@ public class IdeaMapController implements ActionListener, KeyListener,
             case KeyEvent.VK_TAB:
                 insertChild();
                 break;
-            case KeyEvent.VK_PLUS:
             case KeyEvent.VK_EQUALS:
                 if (evt.getModifiersEx() != 0) {
                     this.ideaMap.zoomIn();
-                }
-                break;
-            case KeyEvent.VK_MINUS:
-            case KeyEvent.VK_UNDERSCORE:
-                if (evt.getModifiersEx() != 0) {
-                    this.ideaMap.zoomOut();
                 }
                 break;
             default:
