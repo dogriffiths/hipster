@@ -37,8 +37,10 @@ package dg.hipster.controller;
 
 import dg.hipster.Main;
 import dg.hipster.io.IdeaReader;
+import dg.hipster.io.IdeaWriter;
 import dg.hipster.io.ReaderException;
 import dg.hipster.io.ReaderFactory;
+import dg.hipster.io.WriterFactory;
 import dg.hipster.model.Idea;
 import dg.hipster.view.IdeaMap;
 import dg.hipster.view.Mainframe;
@@ -46,9 +48,7 @@ import java.awt.FileDialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.Writer;
 
 /**
  *
@@ -161,10 +161,8 @@ public class MainframeController {
         if (mainframe.getCurrentFile() != null) {
             IdeaMap ideaMap = mainframe.getIdeaMap();
             Idea idea = ideaMap.getIdea();
-            Writer out = new FileWriter(mainframe.getCurrentFile());
-            save(idea, out);
-            out.flush();
-            out.close();
+            WriterFactory.getInstance().write(new File(
+                    mainframe.getCurrentFile()), idea);
         }
     }
     
@@ -174,29 +172,5 @@ public class MainframeController {
     
     public void helpAbout() {
         Main.showAbout();
-    }
-    
-    private void save(Idea idea, Writer out) throws IOException {
-        out.write("<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n");
-        out.write("<opml version=\"1.0\">\n");
-        
-        out.write("     <head>\n");
-        out.write("          <title/>\n");
-        out.write("     </head>\n");
-        
-        out.write("     <body>\n");
-        
-        saveIdea(idea, out);
-        
-        out.write("     </body>\n");
-        out.write("</opml>\n");
-    }
-    
-    private void saveIdea(Idea idea, Writer out) throws IOException {
-        out.write("<outline text=\"" + idea.getText() + "\">\n");
-        for (Idea subIdea: idea.getSubIdeas()) {
-            saveIdea(subIdea, out);
-        }
-        out.write("</outline>\n");
     }
 }
