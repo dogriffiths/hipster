@@ -36,21 +36,11 @@
 package dg.hipster.view;
 
 import dg.hipster.Main;
-import dg.hipster.io.IdeaReader;
-import dg.hipster.io.ReaderException;
-import dg.hipster.io.ReaderFactory;
-import dg.hipster.model.Idea;
+import dg.hipster.controller.MainframeController;
 import dg.hipster.model.Settings;
 import java.awt.BorderLayout;
-import java.awt.FileDialog;
 import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
 import java.util.ResourceBundle;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -84,187 +74,115 @@ public class Mainframe extends JFrame {
                 s.getWindowWidth(), s.getWindowHeight());
         buildView();
         buildModel();
+        controller = new MainframeController(this);
     }
+    
+    private JMenuBar menu;
+    private JMenu fileMenu;
+    private JMenuItem newItem;
+    private JMenuItem openItem;
+    private JMenuItem saveItem;
+    private JMenuItem saveAsItem;
+    private JMenuItem exitItem;
+    private JMenu helpMenu;
+    private JMenuItem aboutItem;
+    private MainframeController controller;
     
     /**
      * Lay the window out.
      */
     private void buildView() {
         ideaMap = new IdeaMap();
-        this.getContentPane().add(ideaMap, BorderLayout.CENTER);
-        JMenuBar menu = new JMenuBar();
-        JMenu fileMenu = new JMenu("File");
-        menu.add(fileMenu);
-        JMenuItem newMenu = new JMenuItem("New");
-        fileMenu.add(newMenu);
-        newMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N,
+        this.getContentPane().add(getIdeaMap(), BorderLayout.CENTER);
+        menu = new JMenuBar();
+        fileMenu = new JMenu("File");
+        getMenu().add(getFileMenu());
+        newItem = new JMenuItem("New");
+        getFileMenu().add(getNewItem());
+        getNewItem().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N,
                 Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        newMenu.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent evt) {
-                try {
-                    newDocument();
-                } catch(Throwable t) {
-                    t.printStackTrace();
-                }
-            }
-        });
-        JMenuItem openMenu = new JMenuItem("Open...");
-        fileMenu.add(openMenu);
-        openMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O,
+        openItem = new JMenuItem("Open...");
+        getFileMenu().add(getOpenItem());
+        getOpenItem().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O,
                 Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        openMenu.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent evt) {
-                try {
-                    openDocument();
-                } catch(Throwable t) {
-                    t.printStackTrace();
-                }
-            }
-        });
-        JMenuItem saveMenu = new JMenuItem("Save");
-        fileMenu.add(saveMenu);
-        saveMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S,
+        saveItem = new JMenuItem("Save");
+        getFileMenu().add(getSaveItem());
+        getSaveItem().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S,
                 Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        saveMenu.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent evt) {
-                try {
-                    saveDocument();
-                } catch(Throwable t) {
-                    t.printStackTrace();
-                }
-            }
-        });
-        JMenuItem saveAsMenu = new JMenuItem("Save As...");
-        fileMenu.add(saveAsMenu);
-        saveAsMenu.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent evt) {
-                try {
-                    saveAsDocument();
-                } catch(Throwable t) {
-                    t.printStackTrace();
-                }
-            }
-        });
+        saveAsItem = new JMenuItem("Save As...");
+        getFileMenu().add(getSaveAsItem());
         if (!Main.isMac()) {
-            JMenuItem itemExit = new JMenuItem("Exit");
-            itemExit.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    fileExit();
-                }
-            });
-            fileMenu.addSeparator();
-            fileMenu.add(itemExit);
-        }
-        if (!Main.isMac()) {
-            JMenu helpMenu = new JMenu("Help");
-            JMenuItem about = new JMenuItem("About " + resBundle.getString("app.name"));
-            about.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    helpAbout();
-                }
-            });
+            exitItem = new JMenuItem("Exit");
+            getFileMenu().addSeparator();
+            getFileMenu().add(getExitItem());
+            helpMenu = new JMenu("Help");
+            aboutItem = new JMenuItem("About " + resBundle.getString("app.name"));
             
-            helpMenu.add(about);
+            getHelpMenu().add(getAboutItem());
         }
-        this.setJMenuBar(menu);
-    }
-    
-    public void newDocument() {
-        Idea idea = new Idea("New idea");
-        this.ideaMap.setIdea(idea);
-        this.ideaMap.getController().editIdeaView(this.ideaMap.getRootView());
-        currentFile = null;
-        this.setTitle(resBundle.getString("app.name"));
-    }
-    
-    public void openDocument() throws IOException, ReaderException {
-        FileDialog chooser = new FileDialog(this, "Open OPML file", FileDialog.LOAD);
-        
-        chooser.setVisible(true);
-        
-        String filename = chooser.getFile();
-        
-        if (filename != null) {
-            String absPath = chooser.getDirectory() + chooser.getFile();
-            ReaderFactory factory = ReaderFactory.getInstance();
-            IdeaReader reader = factory.read(new File(absPath));
-            ideaMap.setIdea(reader.getIdea());
-            this.setTitle(resBundle.getString("app.name") + " - "
-                    + absPath);
-            currentFile = absPath;
-        }
+        this.setJMenuBar(getMenu());
     }
     
     private String currentFile;
     
-    public void saveAsDocument() throws IOException, ReaderException {
-        String oldFile = currentFile;
-        currentFile = null;
-        saveDocument();
-        if (currentFile == null) {
-            currentFile = oldFile;
-        }
-    }
-    
-    public void saveDocument() throws IOException, ReaderException {
-        if (currentFile == null) {
-            FileDialog chooser = new FileDialog(this, "Save OPML file", FileDialog.SAVE);
-            
-            chooser.setVisible(true);
-            
-            if (chooser.getFile() != null) {
-                currentFile = chooser.getDirectory() + chooser.getFile();
-            }
-        }
-        
-        
-        if (currentFile != null) {
-            Idea idea = this.ideaMap.getIdea();
-            Writer out = new FileWriter(currentFile);
-            save(idea, out);
-            out.flush();
-            out.close();
-            
-            this.setTitle(resBundle.getString("app.name") + " - "
-                    + currentFile);
-        }
-    }
-    
-    private void save(Idea idea, Writer out) throws IOException {
-        out.write("<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n");
-        out.write("<opml version=\"1.0\">\n");
-        
-        out.write("     <head>\n");
-        out.write("          <title/>\n");
-        out.write("     </head>\n");
-        
-        out.write("     <body>\n");
-        
-        saveIdea(idea, out);
-        
-        out.write("     </body>\n");
-        out.write("</opml>\n");
-    }
-    
-    private void saveIdea(Idea idea, Writer out) throws IOException {
-        out.write("<outline text=\"" + idea.getText() + "\">\n");
-        for (Idea subIdea: idea.getSubIdeas()) {
-            saveIdea(subIdea, out);
-        }
-        out.write("</outline>\n");
-    }
-    
-    public void fileExit() {
-        System.exit(0);
-    }
-    
-    public void helpAbout() {
-        Main.showAbout();
-    }
     
     /**
      * Set up the data.
      */
     private void buildModel() {
+    }
+    
+    public IdeaMap getIdeaMap() {
+        return this.ideaMap;
+    }
+    
+    public void setCurrentFile(String filename) {
+        this.currentFile = filename;
+        if (currentFile != null) {
+            this.setTitle(resBundle.getString("app.name") + " - "
+                    + currentFile);
+        } else {
+            this.setTitle(resBundle.getString("app.name"));
+        }
+    }
+    
+    public String getCurrentFile() {
+        return this.currentFile;
+    }
+    
+    public JMenuBar getMenu() {
+        return menu;
+    }
+    
+    public JMenu getFileMenu() {
+        return fileMenu;
+    }
+    
+    public JMenuItem getNewItem() {
+        return newItem;
+    }
+    
+    public JMenuItem getOpenItem() {
+        return openItem;
+    }
+    
+    public JMenuItem getSaveItem() {
+        return saveItem;
+    }
+    
+    public JMenuItem getSaveAsItem() {
+        return saveAsItem;
+    }
+    
+    public JMenuItem getExitItem() {
+        return exitItem;
+    }
+    
+    public JMenu getHelpMenu() {
+        return helpMenu;
+    }
+    
+    public JMenuItem getAboutItem() {
+        return aboutItem;
     }
 }

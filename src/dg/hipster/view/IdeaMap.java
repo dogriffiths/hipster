@@ -60,7 +60,7 @@ public class IdeaMap extends JComponent implements MapComponent {
     
     /** Creates a new instance of Fred */
     public IdeaMap() {
-        text = new JTextField("text");
+        text = new JTextField("");
         setLayout(new BorderLayout());
         add(text, BorderLayout.NORTH);
         controller = new IdeaMapController(this);
