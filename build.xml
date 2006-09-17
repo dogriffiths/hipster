@@ -218,7 +218,7 @@
         <delete dir="application/hIPster.app"/>
         <mkdir dir="application/hIPster.app"/>
         <copy todir="application/hIPster.app/Contents">
-          <fileset dir="etc/macapp/Contents">
+          <fileset dir="lib/macapp/Contents">
             <exclude name="**/.svn"/>
           </fileset>
         </copy>
