@@ -225,11 +225,17 @@
         <copy file="${dist.dir}/hipster.jar"
             tofile="application/hIPster.app/Contents/Resources/hipster.jar"/>
         <chmod file="application/hIPster.app/Contents/MacOS/hIPster" perm="755"/>
+        <exec dir="lib/macapp/bin" 
+                executable="/bin/zsh" os="Mac OS X">
+            <arg line="mkdmg.sh ${basedir}/application/hIPster.app ${basedir}/dist hipster"/>
+        </exec>
     </target>
     
 	<target name="exeWin" depends="exeInit" if="isWindows">
 		<taskdef name="launch4j" classname="net.sf.launch4j.ant.Launch4jTask"
 		classpath="lib/winapp/launch4j.jar:lib/winapp/xstream.jar" />
 		<launch4j configFile="lib/winapp/launch4jexe.xml" />
+        <zip destfile="dist/hipster-win.zip" basedir="application" includes="hIPster.exe"
+        excludes="**/.svn"/>
 	</target>
 </project>

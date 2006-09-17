@@ -35,15 +35,22 @@
 
 package dg.hipster.view;
 
-import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.awt.GridLayout;
-import java.awt.Panel;
+import java.awt.Image;
+import java.awt.MediaTracker;
+import java.awt.Rectangle;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ResourceBundle;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 /**
  * About box describing this application.
@@ -53,20 +60,22 @@ import javax.swing.JLabel;
 public class AboutBox extends JFrame implements ActionListener {
     protected JLabel titleLabel, aboutLabel[];
     protected static int labelCount = 8;
-    protected static int aboutWidth = 280;
-    protected static int aboutHeight = 230;
-    protected static int aboutTop = 200;
-    protected static int aboutLeft = 350;
+    protected static int aboutWidth = 500;
+    protected static int aboutHeight = 314;
     protected Font titleFont, bodyFont;
     protected static ResourceBundle resBundle = ResourceBundle.getBundle(
             "dg/hipster/resource/strings");
-
+    
     public AboutBox() {
         super("");
         this.setResizable(false);
         SymWindow aSymWindow = new SymWindow();
         this.addWindowListener(aSymWindow);
-
+        
+        ImagePanel backPanel = new ImagePanel("/dg/hipster/resource/hipster_about.png");
+        
+        setContentPane(backPanel);
+        
         // Initialize useful fonts
         titleFont = new Font("Lucida Grande", Font.BOLD, 14);
         if (titleFont == null) {
@@ -76,41 +85,81 @@ public class AboutBox extends JFrame implements ActionListener {
         if (bodyFont == null) {
             bodyFont = new Font("SansSerif", Font.PLAIN, 10);
         }
-
-        this.getContentPane().setLayout(new BorderLayout(15, 15));
-
-        aboutLabel = new JLabel[labelCount];
-        aboutLabel[0] = new JLabel("");
-        aboutLabel[1] = new JLabel(resBundle.getString("app.name"));
-        aboutLabel[1].setFont(titleFont);
-        aboutLabel[2] = new JLabel(resBundle.getString("version"));
-        aboutLabel[2].setFont(bodyFont);
-        aboutLabel[3] = new JLabel("");
-        aboutLabel[4] = new JLabel("");
-        aboutLabel[5] = new JLabel("JDK " + System.getProperty("java.version"));
-        aboutLabel[5].setFont(bodyFont);
-        aboutLabel[6] = new JLabel(resBundle.getString("copyright"));
-        aboutLabel[6].setFont(bodyFont);
-        aboutLabel[7] = new JLabel("");
-
-        Panel textPanel2 = new Panel(new GridLayout(labelCount, 1));
-        for (int i = 0; i<labelCount; i++) {
-            aboutLabel[i].setHorizontalAlignment(JLabel.CENTER);
-            textPanel2.add(aboutLabel[i]);
+        
+        int labCount = 0;
+        aboutLabel = new JLabel[14];
+        aboutLabel[labCount++] = new JLabel("");
+        aboutLabel[labCount++] = new JLabel("");
+        String padding = "          ";
+        aboutLabel[labCount] = new JLabel(resBundle.getString("copyright")
+        + padding);
+        aboutLabel[labCount++].setFont(bodyFont);
+        aboutLabel[labCount] = new JLabel("JDK " + System.getProperty("java.version")
+        + padding);
+        aboutLabel[labCount++].setFont(bodyFont);
+        aboutLabel[labCount] = new JLabel(resBundle.getString("version")
+        + padding);
+        aboutLabel[labCount++].setFont(bodyFont);
+        
+        GridLayout layout = new GridLayout(labCount, 1);
+        backPanel.setLayout(layout);
+        for (int i = 0; i<labCount; i++) {
+            aboutLabel[i].setHorizontalAlignment(JLabel.RIGHT);
+            backPanel.add(aboutLabel[i]);
         }
-        this.getContentPane().add(textPanel2, BorderLayout.CENTER);
         this.pack();
+        
+        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        GraphicsDevice screen = ge.getDefaultScreenDevice();
+        Rectangle screenRect = screen.getDefaultConfiguration().getBounds();
+        int aboutLeft = (int)(screenRect.getWidth() - aboutWidth) / 2;
+        int aboutTop = (int)(screenRect.getHeight() - aboutHeight) / 2;
         this.setLocation(aboutLeft, aboutTop);
         this.setSize(aboutWidth, aboutHeight);
     }
-
+    
     class SymWindow extends java.awt.event.WindowAdapter {
         public void windowClosing(java.awt.event.WindowEvent event) {
             setVisible(false);
         }
     }
-
+    
     public void actionPerformed(ActionEvent newEvent) {
         setVisible(false);
+    }
+}
+
+class ImagePanel extends JPanel {
+    private Image background;
+    
+    ImagePanel(String imageName) {
+        super();
+        java.net.URL url = getClass().getResource(imageName);
+        if (url == null) {
+            throw new RuntimeException("Unable to find picture " + imageName);
+        }
+        background = Toolkit.getDefaultToolkit().getImage(url);
+        loadImage(background);
+    }
+    
+    private void loadImage(Image image) {
+        MediaTracker mediaTracker = new MediaTracker(this);
+        mediaTracker.addImage(image, 0);
+        try {
+            mediaTracker.waitForID(0);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        g.drawImage(background, 0, 0, this);
+    }
+    
+    public Dimension getMinimumSize() {
+        int w = background.getWidth(this);
+        int h = background.getHeight(this);
+        return new Dimension(w, h);
     }
 }
