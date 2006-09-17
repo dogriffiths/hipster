@@ -192,16 +192,15 @@
     </target>
 
     <target name="-post-jar">
-        <copy file="${dist.dir}/hipster.jar"
-            tofile="application/Contents/Resources/hipster.jar"/>
         <delete dir="application/hIPster.app"/>
         <mkdir dir="application/hIPster.app"/>
-        <mkdir dir="application/hIPster.app/Contents"/>
         <copy todir="application/hIPster.app/Contents">
           <fileset dir="etc/macapp/Contents">
             <exclude name="**/.svn"/>
           </fileset>
         </copy>
+        <copy file="${dist.dir}/hipster.jar"
+            tofile="application/hIPster.app/Contents/Resources/hipster.jar"/>
         <chmod file="application/hIPster.app/Contents/MacOS/hIPster" perm="755"/>
     </target>
 </project>
