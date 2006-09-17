@@ -116,6 +116,17 @@ public class AboutBox extends JFrame implements ActionListener {
         int aboutTop = (int)(screenRect.getHeight() - aboutHeight) / 2;
         this.setLocation(aboutLeft, aboutTop);
         this.setSize(aboutWidth, aboutHeight);
+        
+        this.setIconImage(createIcon());
+    }
+    
+    private Image createIcon() {
+        String imageName = "/dg/hipster/resource/hipster_icon.png";
+        java.net.URL url = getClass().getResource(imageName);
+        if (url == null) {
+            throw new RuntimeException("Unable to find picture " + imageName);
+        }
+        return Toolkit.getDefaultToolkit().getImage(url);
     }
     
     class SymWindow extends java.awt.event.WindowAdapter {

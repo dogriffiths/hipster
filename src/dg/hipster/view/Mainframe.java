@@ -39,16 +39,14 @@ import dg.hipster.Main;
 import dg.hipster.controller.MainframeController;
 import dg.hipster.model.Settings;
 import java.awt.BorderLayout;
+import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.ResourceBundle;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.KeyStroke;
 
 /**
  * Main window of the application.
@@ -89,6 +87,16 @@ public class Mainframe extends JFrame {
         ideaMap = new IdeaMap();
         this.getContentPane().add(getIdeaMap(), BorderLayout.CENTER);
         this.setJMenuBar(createMenu());
+        this.setIconImage(createIcon());
+    }
+    
+    private Image createIcon() {
+        String imageName = "/dg/hipster/resource/hipster_icon.png";
+        java.net.URL url = getClass().getResource(imageName);
+        if (url == null) {
+            throw new RuntimeException("Unable to find picture " + imageName);
+        }
+        return Toolkit.getDefaultToolkit().getImage(url);
     }
     
     private JMenuBar createMenu() {
