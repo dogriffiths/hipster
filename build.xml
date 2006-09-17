@@ -66,6 +66,19 @@
     nbproject/build-impl.xml file. 
 
     -->
+    
+    <target name="-pre-init">
+      <condition property="isMacOSX">
+        <and>
+          <os family="mac"/>
+          <os family="unix"/>
+        </and>
+      </condition>
+      <condition property="isWindows">
+        <os family="windows"/>
+      </condition>
+    </target>
+    
     <!--                    -->
     <!-- CHECK CODING STYLE -->
     <!--                    -->
@@ -188,10 +201,20 @@
     </target>
 
     <target name="-post-clean">
+        <delete>
+            <fileset dir="application">
+                <include name="**/*"/>
+            </fileset>
+        </delete>
         <delete dir="application/hIPster.app"/>
     </target>
 
-    <target name="-post-jar">
+    <target name="exe" depends="exeMac,exeWin"/>
+
+    <target name="exeInit" depends="jar" if="isMacOSX">
+    </target>
+    
+    <target name="exeMac" depends="exeInit" if="isMacOSX">
         <delete dir="application/hIPster.app"/>
         <mkdir dir="application/hIPster.app"/>
         <copy todir="application/hIPster.app/Contents">
@@ -203,4 +226,10 @@
             tofile="application/hIPster.app/Contents/Resources/hipster.jar"/>
         <chmod file="application/hIPster.app/Contents/MacOS/hIPster" perm="755"/>
     </target>
+    
+	<target name="exeWin" depends="exeInit" if="isWindows">
+		<taskdef name="launch4j" classname="net.sf.launch4j.ant.Launch4jTask"
+		classpath="lib/winapp/launch4j.jar:lib/winapp/xstream.jar" />
+		<launch4j configFile="lib/winapp/launch4jexe.xml" />
+	</target>
 </project>
