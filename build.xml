@@ -186,4 +186,21 @@
         <delete dir="instrument" />
         <delete file="cobertura.ser" />
     </target>
+
+    <target name="-post-jar">
+        <copy file="${dist.dir}/hipster.jar"
+            tofile="application/Contents/Resources/hipster.jar"/>
+        <delete dir="application/hIPster.app"/>
+        <mkdir dir="application/hIPster.app"/>
+        <mkdir dir="application/hIPster.app/Contents"/>
+        <copy todir="application/hIPster.app/Contents">
+          <fileset dir="application/Contents">
+            <exclude name="**/.svn"/>
+          </fileset>
+        </copy>
+        <exec dir="application/hIPster.app/Contents/MacOS/" 
+                executable="chmod" os="Mac OS X">
+            <arg line="755 hIPster"/>
+        </exec>
+    </target>
 </project>

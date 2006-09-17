@@ -142,7 +142,7 @@ public class IdeaView implements IdeaListener, MapComponent {
                 }
             }
         } else {
-            this.setLength(15 * idea.getText().length() + 10);
+            this.setLength(10 * idea.getText().length() + 20);
         }
         repaintRequired();
     }
@@ -207,7 +207,7 @@ public class IdeaView implements IdeaListener, MapComponent {
         this.idea = newIdea;
         subViews.clear();
         if (newIdea != null) {
-            this.setLength(15 * newIdea.getText().length() + 10);
+            this.setLength(10 * newIdea.getText().length() + 20);
             int subNum = newIdea.getSubIdeas().size();
             int i = 0;
             for (Idea subIdea: newIdea.getSubIdeas()) {

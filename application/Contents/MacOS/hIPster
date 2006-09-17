@@ -1,0 +1,10 @@
+#!/bin/sh
+PRG=$0
+
+progdir=`dirname "$PRG"`
+
+echo $progdir >> /tmp/1.txt
+
+cd "$progdir"
+
+java -classpath "../Resources/hipster.jar" -Xdock:icon="../Resources/hipster.icns" -Xdock:name="hIPster" -Dapple.laf.useScreenMenuBar=true dg.hipster.Main
