@@ -146,10 +146,12 @@ public class IdeaMap extends JComponent implements MapComponent {
     
     public void zoomIn() {
         zoom *= 1.5;
+        repaintRequired();
     }
     
     public void zoomOut() {
         zoom /= 1.5;
+        repaintRequired();
     }
     
     public void repaintRequired() {
