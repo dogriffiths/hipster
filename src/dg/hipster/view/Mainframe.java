@@ -47,6 +47,7 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.UIManager;
 
 /**
  * Main window of the application.
@@ -79,11 +80,16 @@ public class Mainframe extends JFrame {
         buildModel();
         controller = new MainframeController(this);
     }
-
+    
     /**
      * Lay the window out.
      */
     private void buildView() {
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         ideaMap = new IdeaMap();
         this.getContentPane().add(getIdeaMap(), BorderLayout.CENTER);
         this.setJMenuBar(createMenu());
