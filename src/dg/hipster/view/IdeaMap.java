@@ -49,14 +49,35 @@ import javax.swing.JComponent;
 import javax.swing.JTextField;
 
 /**
- *
+ * Main component for displaying the mind maps.
  * @author davidg
  */
 public class IdeaMap extends JComponent implements MapComponent {
+    /**
+     * Proportion that the image will be scaled in and out each
+     * time the {@link #zoomIn()} and {@link #zoomOut()} methods are called.
+     */
+    public final static double SCALE_FACTOR = 1.5;
+    /**
+     * Controller object for this idea map.
+     */
     private IdeaMapController controller;
+    /**
+     * Idea that will appear at the centre of the map.
+     */
     private IdeaView rootView;
+    /**
+     * Currently selected idea branch (if any).
+     */
     private IdeaView selected;
+    /**
+     * Text field that appears at the top of the component.
+     */
     private JTextField text;
+    /**
+     * Amount this map is scaled.
+     */
+    private double zoom = 1.0;
     
     /** Creates a new instance of Fred */
     public IdeaMap() {
@@ -66,10 +87,18 @@ public class IdeaMap extends JComponent implements MapComponent {
         controller = new IdeaMapController(this);
     }
     
+    /**
+     * Text field that appears at the top of the component.
+     * @return Text field that appears at the top of the component.
+     */
     public JTextField getTextField() {
         return this.text;
     }
     
+    /**
+     * Set the central idea of the map.
+     * @param idea Idea that will be displayed at the centre.
+     */
     public void setIdea(Idea idea) {
         this.rootView = new IdeaView(idea);
         this.rootView.setParent(this);
@@ -79,14 +108,31 @@ public class IdeaMap extends JComponent implements MapComponent {
         text.setEnabled(false);
     }
     
+    /**
+     * Currently selected idea branch (if any).
+     * @return Currently selected idea branch (if any).
+     */
     public Idea getSelected() {
         return this.selected.getIdea();
     }
     
+    /**
+     * Currently selected idea branch (if any).
+     * @param selectedIdea Currently selected idea branch (if any).
+     */
     public void setSelected(Idea selectedIdea) {
         setSelectedView(findIdeaViewFor(rootView, selectedIdea));
     }
     
+    /**
+     * Find the view (if any) that represents the given idea.
+     * Start the search at the given view, and search all of
+     * it's sub-views.
+     * @param parentView View to start the search at.
+     * @param idea idea we are looking for.
+     * @return idea-view representing the idea, or null
+     * if none are found.
+     */
     private IdeaView findIdeaViewFor(IdeaView parentView, Idea idea) {
         if (idea == null) {
             return null;
@@ -103,10 +149,18 @@ public class IdeaMap extends JComponent implements MapComponent {
         return null;
     }
     
+    /**
+     * Currently selected idea branch (if any).
+     * @return Currently selected idea branch (if any).
+     */
     public IdeaView getSelectedView() {
         return this.selected;
     }
     
+    /**
+     * Select the given view.
+     * @param newSelectedView View to select.
+     */
     public void setSelectedView(IdeaView newSelectedView) {
         if (this.selected != null) {
             this.selected.setSelected(false);
@@ -117,15 +171,27 @@ public class IdeaMap extends JComponent implements MapComponent {
         }
     }
     
+    /**
+     * The idea represented at the centre of this map.
+     * @return central idea.
+     */
     public Idea getIdea() {
         return this.rootView.getIdea();
     }
     
+    /**
+     * The idea-view at the centre of this map.
+     * @return idea-view at the centre of this map.
+     */
     public IdeaView getRootView() {
         return this.rootView;
     }
     
-    private double zoom = 1.0;
+    /**
+     * Paint the map part of the component (the text-field
+     * will paint itself).
+     * @param gOrig Graphics object to draw on.
+     */
     public void paintComponent(Graphics gOrig) {
         Graphics g = gOrig.create();
         ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING,
@@ -140,24 +206,40 @@ public class IdeaMap extends JComponent implements MapComponent {
         g.dispose();
     }
     
+    /**
+     * Amount this map is scaled.
+     * @return  Amount this map is scaled.
+     */
     public double getZoom() {
         return zoom;
     }
     
+    /**
+     * Scale this map up by {@link #SCALE_FACTOR}.
+     */
     public void zoomIn() {
-        zoom *= 1.5;
+        zoom *= SCALE_FACTOR;
         repaintRequired();
     }
     
+    /**
+     * Scale this map down by {@link #SCALE_FACTOR}.
+     */
     public void zoomOut() {
-        zoom /= 1.5;
+        zoom /= SCALE_FACTOR;
         repaintRequired();
     }
     
+    /**
+     * Call for a repaint of this map.
+     */
     public void repaintRequired() {
         controller.repaintRequired();
     }
     
+    /**
+     * Get the controller for this map.
+     */
     public IdeaMapController getController() {
         return this.controller;
     }
