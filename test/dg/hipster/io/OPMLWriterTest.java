@@ -1,0 +1,79 @@
+/*
+ * OPMLWriterTest.java
+ * JUnit based test
+ *
+ * Created on September 18, 2006, 4:32 PM
+ */
+
+package dg.hipster.io;
+
+import junit.framework.*;
+import dg.hipster.model.Idea;
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStreamWriter;
+
+/**
+ *
+ * @author davidg
+ */
+public class OPMLWriterTest extends TestCase {
+    
+    public OPMLWriterTest(String testName) {
+        super(testName);
+    }
+    
+    protected void setUp() throws Exception {
+    }
+    
+    protected void tearDown() throws Exception {
+    }
+    
+    public static Test suite() {
+        TestSuite suite = new TestSuite(OPMLWriterTest.class);
+        
+        return suite;
+    }
+    
+    /**
+     * Test of write method, of class dg.hipster.io.OPMLWriter.
+     */
+    public void testWrite() throws Exception {
+        System.out.println("write");
+        
+        Idea idea = new Idea("R&D");
+        Idea subIdea0WithQuotes = new Idea("\"Idea\"");
+        idea.add(subIdea0WithQuotes);
+        Idea subIdea1 = new Idea("Test");
+        idea.add(subIdea1);
+        
+        ByteArrayOutputStream out = new ByteArrayOutputStream(1024);
+        
+        OPMLWriter instance = new OPMLWriter(new OutputStreamWriter(out));
+        
+        instance.write(idea);
+        
+        String result = out.toString();
+        
+        System.out.println("result = " + result);
+        
+        String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+                + "<opml version=\"1.0\">"
+                + "<head>"
+                + "<title/>"
+                + "</head>"
+                + "<body>"
+                + "<outline text=\"R&amp;D\">"
+                + "<outline text=\"&quot;Idea&quot;\"/>"
+                + "<outline text=\"Test\"/>"
+                + "</outline>"
+                + "</body>"
+                + "</opml>";
+        
+        System.out.println("expected = " + expected);
+        System.out.println("result = " + result);
+        
+        // TODO review the generated test code and remove the default call to fail.
+        assertEquals("Wrong XML output", expected, result);
+    }
+    
+}

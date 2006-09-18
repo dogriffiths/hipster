@@ -38,12 +38,23 @@ package dg.hipster.io;
 import dg.hipster.model.Idea;
 import java.io.IOException;
 import java.io.Writer;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  *
  * @author davidg
  */
 public class OPMLWriter implements IdeaWriter {
+    private DocumentBuilder db;
     private Writer out;
     
     public OPMLWriter(Writer out) {
@@ -57,26 +68,49 @@ public class OPMLWriter implements IdeaWriter {
     }
     
     private void save(Idea idea) throws IOException {
-        out.write("<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n");
-        out.write("<opml version=\"1.0\">\n");
-        
-        out.write("     <head>\n");
-        out.write("          <title/>\n");
-        out.write("     </head>\n");
-        
-        out.write("     <body>\n");
-        
-        saveIdea(idea);
-        
-        out.write("     </body>\n");
-        out.write("</opml>\n");
+        try {
+            
+            db = DocumentBuilderFactory.newInstance(
+                    ).newDocumentBuilder();
+            
+            Document document = db.newDocument();
+            document.setXmlVersion("1.0");
+            Element opml = document.createElement("opml");
+            opml.setAttribute("version", "1.0");
+            document.appendChild(opml);
+            Element head = document.createElement("head");
+            opml.appendChild(head);
+            Element title = document.createElement("title");
+            head.appendChild(title);
+            Element body = document.createElement("body");
+            opml.appendChild(body);
+            appendIdea(document, body, idea);
+            
+            Transformer transformer = null;
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            try {
+                transformer = transformerFactory.newTransformer();
+            } catch (TransformerConfigurationException e) {
+                e.printStackTrace();
+            }
+            DOMSource source = new DOMSource(document);
+            StreamResult result = new StreamResult(out);
+            try{
+                transformer.transform(source,result);
+            } catch (TransformerException e){
+                e.printStackTrace();
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
     }
     
-    private void saveIdea(Idea idea) throws IOException {
-        out.write("<outline text=\"" + idea.getText() + "\">\n");
+    private void appendIdea(Document document, Element element, Idea idea) throws IOException {
+        Element ideaElement = document.createElement("outline");
+        ideaElement.setAttribute("text", idea.getText());
+        element.appendChild(ideaElement);
         for (Idea subIdea: idea.getSubIdeas()) {
-            saveIdea(subIdea);
+            appendIdea(document, ideaElement, subIdea);
         }
-        out.write("</outline>\n");
     }
 }

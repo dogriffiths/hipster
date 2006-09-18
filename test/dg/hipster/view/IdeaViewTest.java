@@ -52,8 +52,8 @@ public class IdeaViewTest extends TestCase {
         
         ideaView.setIdea(new Idea("fred"));
         
-        assertEquals("New idea should give length of 15 * text length + 10",
-                15.0 * 4 + 10,
+        assertEquals("New idea should give length of 10 * text length + 20",
+                10.0 * 4 + 20,
                 ideaView.getLength(), 0.0000001);
         
     }
