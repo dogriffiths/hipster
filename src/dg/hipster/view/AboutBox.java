@@ -67,7 +67,7 @@ public class AboutBox extends JFrame implements ActionListener {
             "dg/hipster/resource/strings");
     
     public AboutBox() {
-        super("");
+        super(resBundle.getString("aboutbox.title"));
         this.setResizable(false);
         SymWindow aSymWindow = new SymWindow();
         this.addWindowListener(aSymWindow);

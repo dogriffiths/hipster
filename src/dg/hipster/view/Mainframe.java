@@ -71,7 +71,7 @@ public class Mainframe extends JFrame {
     
     /** Creates a new instance of Mainframe */
     public Mainframe() {
-        setTitle(resBundle.getString("app.name"));
+        super(resBundle.getString("app.name"));
         
         Settings s = Settings.getInstance();
         setBounds(s.getWindowLeft(), s.getWindowTop(),
