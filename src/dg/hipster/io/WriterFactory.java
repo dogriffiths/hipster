@@ -43,17 +43,17 @@ import java.io.FileWriter;
  *
  * @author davidg
  */
-public class WriterFactory {
+public final class WriterFactory {
     private static WriterFactory instance = new WriterFactory();
-    
+
     /** Creates a new instance of ReaderFactory */
     private WriterFactory() {
     }
-    
+
     public static WriterFactory getInstance() {
         return instance;
     }
-    
+
     public void write(File f, Idea idea) throws ReaderException {
         try {
             IdeaWriter writer = null;

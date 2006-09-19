@@ -57,7 +57,7 @@ import javax.swing.JPanel;
  *
  * @author davidg
  */
-public class AboutBox extends JFrame implements ActionListener {
+public final class AboutBox extends JFrame implements ActionListener {
     protected JLabel titleLabel, aboutLabel[];
     protected static int labelCount = 8;
     protected static int aboutWidth = 500;
@@ -65,17 +65,18 @@ public class AboutBox extends JFrame implements ActionListener {
     protected Font titleFont, bodyFont;
     protected static ResourceBundle resBundle = ResourceBundle.getBundle(
             "dg/hipster/resource/strings");
-    
+
     public AboutBox() {
         super(resBundle.getString("aboutbox.title"));
         this.setResizable(false);
         SymWindow aSymWindow = new SymWindow();
         this.addWindowListener(aSymWindow);
-        
-        ImagePanel backPanel = new ImagePanel("/dg/hipster/resource/hipster_about.png");
-        
+
+        ImagePanel backPanel = new ImagePanel(
+                "/dg/hipster/resource/hipster_about.png");
+
         setContentPane(backPanel);
-        
+
         // Initialize useful fonts
         titleFont = new Font("Lucida Grande", Font.BOLD, 14);
         if (titleFont == null) {
@@ -85,7 +86,7 @@ public class AboutBox extends JFrame implements ActionListener {
         if (bodyFont == null) {
             bodyFont = new Font("SansSerif", Font.PLAIN, 10);
         }
-        
+
         int labCount = 0;
         aboutLabel = new JLabel[14];
         aboutLabel[labCount++] = new JLabel("");
@@ -100,7 +101,7 @@ public class AboutBox extends JFrame implements ActionListener {
         aboutLabel[labCount] = new JLabel(resBundle.getString("version")
         + padding);
         aboutLabel[labCount++].setFont(bodyFont);
-        
+
         GridLayout layout = new GridLayout(labCount, 1);
         backPanel.setLayout(layout);
         for (int i = 0; i<labCount; i++) {
@@ -108,18 +109,18 @@ public class AboutBox extends JFrame implements ActionListener {
             backPanel.add(aboutLabel[i]);
         }
         this.pack();
-        
+
         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
         GraphicsDevice screen = ge.getDefaultScreenDevice();
         Rectangle screenRect = screen.getDefaultConfiguration().getBounds();
-        int aboutLeft = (int)(screenRect.getWidth() - aboutWidth) / 2;
-        int aboutTop = (int)(screenRect.getHeight() - aboutHeight) / 2;
+        int aboutLeft = (int) (screenRect.getWidth() - aboutWidth) / 2;
+        int aboutTop = (int) (screenRect.getHeight() - aboutHeight) / 2;
         this.setLocation(aboutLeft, aboutTop);
         this.setSize(aboutWidth, aboutHeight);
-        
+
         this.setIconImage(createIcon());
     }
-    
+
     private Image createIcon() {
         String imageName = "/dg/hipster/resource/hipster_icon.png";
         java.net.URL url = getClass().getResource(imageName);
@@ -128,13 +129,13 @@ public class AboutBox extends JFrame implements ActionListener {
         }
         return Toolkit.getDefaultToolkit().getImage(url);
     }
-    
+
     class SymWindow extends java.awt.event.WindowAdapter {
         public void windowClosing(java.awt.event.WindowEvent event) {
             setVisible(false);
         }
     }
-    
+
     public void actionPerformed(ActionEvent newEvent) {
         setVisible(false);
     }
@@ -142,7 +143,7 @@ public class AboutBox extends JFrame implements ActionListener {
 
 class ImagePanel extends JPanel {
     private Image background;
-    
+
     ImagePanel(String imageName) {
         super();
         java.net.URL url = getClass().getResource(imageName);
@@ -152,7 +153,7 @@ class ImagePanel extends JPanel {
         background = Toolkit.getDefaultToolkit().getImage(url);
         loadImage(background);
     }
-    
+
     private void loadImage(Image image) {
         MediaTracker mediaTracker = new MediaTracker(this);
         mediaTracker.addImage(image, 0);
@@ -162,12 +163,12 @@ class ImagePanel extends JPanel {
             e.printStackTrace();
         }
     }
-    
+
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         g.drawImage(background, 0, 0, this);
     }
-    
+
     public Dimension getMinimumSize() {
         int w = background.getWidth(this);
         int h = background.getHeight(this);

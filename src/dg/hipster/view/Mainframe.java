@@ -54,13 +54,13 @@ import javax.swing.UIManager;
  *
  * @author davidg
  */
-public class Mainframe extends JFrame {
+public final class Mainframe extends JFrame {
     /**
      * Internationalization strings.
      */
     protected static ResourceBundle resBundle = ResourceBundle.getBundle(
             "dg/hipster/resource/strings");
-    
+
     /**
      * Main idea processor component.
      */
@@ -68,11 +68,11 @@ public class Mainframe extends JFrame {
     private MainframeController controller;
     private MenuManager menuMgr = new MenuManager();
     private String currentFile;
-    
+
     /** Creates a new instance of Mainframe */
     public Mainframe() {
         super(resBundle.getString("app.name"));
-        
+
         Settings s = Settings.getInstance();
         setBounds(s.getWindowLeft(), s.getWindowTop(),
                 s.getWindowWidth(), s.getWindowHeight());
@@ -80,7 +80,7 @@ public class Mainframe extends JFrame {
         buildModel();
         controller = new MainframeController(this);
     }
-    
+
     /**
      * Lay the window out.
      */
@@ -95,7 +95,7 @@ public class Mainframe extends JFrame {
         this.setJMenuBar(createMenu());
         this.setIconImage(createIcon());
     }
-    
+
     private Image createIcon() {
         String imageName = "/dg/hipster/resource/hipster_icon.png";
         java.net.URL url = getClass().getResource(imageName);
@@ -104,7 +104,7 @@ public class Mainframe extends JFrame {
         }
         return Toolkit.getDefaultToolkit().getImage(url);
     }
-    
+
     private JMenuBar createMenu() {
         JMenuBar menu = new JMenuBar();
         menuMgr.createMenus(menu, new Object[][]{
@@ -130,25 +130,25 @@ public class Mainframe extends JFrame {
         }
         return menu;
     }
-    
+
     public JMenu getMenu(String name) {
         return menuMgr.getMenu(name);
     }
-    
+
     public JMenuItem getItem(String name) {
         return menuMgr.getItem(name);
     }
-    
+
     /**
      * Set up the data.
      */
     private void buildModel() {
     }
-    
+
     public IdeaMap getIdeaMap() {
         return this.ideaMap;
     }
-    
+
     public void setCurrentFile(String filename) {
         this.currentFile = filename;
         if (currentFile != null) {
@@ -158,7 +158,7 @@ public class Mainframe extends JFrame {
             this.setTitle(resBundle.getString("app.name"));
         }
     }
-    
+
     public String getCurrentFile() {
         return this.currentFile;
     }

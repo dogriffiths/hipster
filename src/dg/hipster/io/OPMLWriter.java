@@ -53,26 +53,26 @@ import org.w3c.dom.Element;
  *
  * @author davidg
  */
-public class OPMLWriter implements IdeaWriter {
+public final class OPMLWriter implements IdeaWriter {
     private DocumentBuilder db;
     private Writer out;
-    
+
     public OPMLWriter(Writer out) {
         this.out = out;
     }
-    
+
     public void write(Idea idea) throws IOException {
         save(idea);
         out.flush();
         out.close();
     }
-    
+
     private void save(Idea idea) throws IOException {
         try {
-            
+
             db = DocumentBuilderFactory.newInstance(
                     ).newDocumentBuilder();
-            
+
             Document document = db.newDocument();
             document.setXmlVersion("1.0");
             Element opml = document.createElement("opml");
@@ -85,7 +85,7 @@ public class OPMLWriter implements IdeaWriter {
             Element body = document.createElement("body");
             opml.appendChild(body);
             appendIdea(document, body, idea);
-            
+
             Transformer transformer = null;
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             try {
@@ -104,7 +104,7 @@ public class OPMLWriter implements IdeaWriter {
             e.printStackTrace();
         }
     }
-    
+
     private void appendIdea(Document document, Element element, Idea idea) throws IOException {
         Element ideaElement = document.createElement("outline");
         ideaElement.setAttribute("text", idea.getText());

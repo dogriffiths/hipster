@@ -17,17 +17,17 @@ import java.io.FileInputStream;
  *
  * @author davidg
  */
-public class ReaderFactory {
+public final class ReaderFactory {
     private static ReaderFactory instance = new ReaderFactory();
-    
+
     /** Creates a new instance of ReaderFactory */
     private ReaderFactory() {
     }
-    
+
     public static ReaderFactory getInstance() {
         return instance;
     }
-    
+
     public Idea read(File f) throws ReaderException {
         try {
             IdeaReader reader = null;

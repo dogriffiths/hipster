@@ -16,5 +16,5 @@ import dg.hipster.model.Idea;
  * @author davidg
  */
 public interface IdeaReader {
-    public Idea getIdea();    
+    public Idea getIdea();
 }

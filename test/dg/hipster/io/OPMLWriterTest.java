@@ -38,8 +38,6 @@ public class OPMLWriterTest extends TestCase {
      * Test of write method, of class dg.hipster.io.OPMLWriter.
      */
     public void testWrite() throws Exception {
-        System.out.println("write");
-        
         Idea idea = new Idea("R&D");
         Idea subIdea0WithQuotes = new Idea("\"Idea\"");
         idea.add(subIdea0WithQuotes);

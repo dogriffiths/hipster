@@ -46,7 +46,7 @@ import java.util.prefs.Preferences;
  * by the getInstance() method.
  * @author davidg
  */
-public class Settings {
+public final class Settings {
     private static Preferences prefs = Preferences.userNodeForPackage(
             Settings.class);
     private final static String WINDOW_TOP = "windowTop";

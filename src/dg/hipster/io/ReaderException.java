@@ -13,10 +13,10 @@ package dg.hipster.io;
  *
  * @author davidg
  */
-public class ReaderException extends Exception {
+public final class ReaderException extends Exception {
     private String message;
     private Throwable cause;
-    
+
     /** Creates a new instance of ReaderException */
     public ReaderException(String aMessage, Throwable aCause) {
         this.message = aMessage;
@@ -30,5 +30,5 @@ public class ReaderException extends Exception {
     public Throwable getCause() {
         return cause;
     }
-    
+
 }

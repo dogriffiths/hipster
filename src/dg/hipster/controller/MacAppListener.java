@@ -45,7 +45,7 @@ import java.io.File;
  *
  * @author davidg
  */
-public class MacAppListener implements ApplicationListener {
+public final class MacAppListener implements ApplicationListener {
     static {
         Application application = Application.getApplication();
         application.addApplicationListener(new MacAppListener());

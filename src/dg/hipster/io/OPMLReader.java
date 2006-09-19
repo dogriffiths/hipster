@@ -48,7 +48,7 @@ import org.xml.sax.helpers.DefaultHandler;
  *
  * @author davidg
  */
-public class OPMLReader extends DefaultHandler implements IdeaReader {
+public final class OPMLReader extends DefaultHandler implements IdeaReader {
     private Idea idea;
     private Idea current;
     private Stack<Idea> stack = new Stack<Idea>();

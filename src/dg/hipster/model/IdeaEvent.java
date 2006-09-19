@@ -39,8 +39,7 @@ package dg.hipster.model;
  *
  * @author davidg
  */
-public
-        class IdeaEvent {
+public final class IdeaEvent {
     private Object source;
     private String command;
     private Object[] paras;

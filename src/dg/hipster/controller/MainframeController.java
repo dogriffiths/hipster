@@ -52,9 +52,9 @@ import java.io.IOException;
  *
  * @author davidg
  */
-public class MainframeController {
+public final class MainframeController {
     private Mainframe mainframe;
-    
+
     public MainframeController(Mainframe aMainframe) {
         this.mainframe = aMainframe;
         mainframe.getItem("new").addActionListener(new ActionListener() {
@@ -124,7 +124,7 @@ public class MainframeController {
             });
         }
     }
-    
+
     public void newDocument() {
         Idea idea = new Idea("New idea");
         IdeaMap ideaMap = mainframe.getIdeaMap();
@@ -132,15 +132,15 @@ public class MainframeController {
         ideaMap.getController().editIdeaView(ideaMap.getRootView());
         mainframe.setCurrentFile(null);
     }
-    
+
     public void openDocument() throws IOException, ReaderException {
         FileDialog chooser = new FileDialog(mainframe, "Open OPML file",
                 FileDialog.LOAD);
-        
+
         chooser.setVisible(true);
-        
+
         String filename = chooser.getFile();
-        
+
         if (filename != null) {
             String absPath = chooser.getDirectory() + chooser.getFile();
             ReaderFactory factory = ReaderFactory.getInstance();
@@ -150,7 +150,7 @@ public class MainframeController {
             mainframe.setCurrentFile(absPath);
         }
     }
-    
+
     public void saveAsDocument() throws IOException, ReaderException {
         String oldFile = mainframe.getCurrentFile();
         mainframe.setCurrentFile(null);
@@ -159,21 +159,21 @@ public class MainframeController {
             mainframe.setCurrentFile(oldFile);
         }
     }
-    
+
     public void saveDocument() throws IOException, ReaderException {
         if (mainframe.getCurrentFile() == null) {
             FileDialog chooser = new FileDialog(mainframe, "Save OPML file",
                     FileDialog.SAVE);
-            
+
             chooser.setVisible(true);
-            
+
             if (chooser.getFile() != null) {
                 mainframe.setCurrentFile(chooser.getDirectory()
                 + chooser.getFile());
             }
         }
-        
-        
+
+
         if (mainframe.getCurrentFile() != null) {
             IdeaMap ideaMap = mainframe.getIdeaMap();
             Idea idea = ideaMap.getIdea();
@@ -181,19 +181,19 @@ public class MainframeController {
                     mainframe.getCurrentFile()), idea);
         }
     }
-    
+
     public void zoomIn() {
         mainframe.getIdeaMap().zoomIn();
     }
-    
+
     public void zoomOut() {
         mainframe.getIdeaMap().zoomOut();
     }
-    
+
     public void fileExit() {
         System.exit(0);
     }
-    
+
     public void helpAbout() {
         Main.showAbout();
     }

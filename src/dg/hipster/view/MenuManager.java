@@ -49,27 +49,27 @@ import javax.swing.KeyStroke;
  * @author davidg
  */
 
-class MenuManager {
+final class MenuManager {
     /**
      * Internationalization strings.
      */
     protected static ResourceBundle resBundle = ResourceBundle.getBundle(
             "dg/hipster/resource/strings");
-    
+
     private Map<String, JMenu> menus = new HashMap<String, JMenu>();
     private Map<String, JMenuItem> menuItems = new HashMap<String, JMenuItem>();
-    
+
     MenuManager() {
-        
+
     }
-    
+
     void createMenus(final JMenuBar menu, Object[][] params) {
         for(Object[] p: params) {
-            String menuName = (String)p[0];
+            String menuName = (String) p[0];
             createMenu(menuName, menu, (Object[][])p[1]);
         }
     }
-    
+
     void createMenu(final String name, final JMenuBar menu, Object[][] params) {
         String text = resBundle.getString("menu." + name);
         JMenu aMenu = new JMenu(text);
@@ -77,19 +77,19 @@ class MenuManager {
         menu.add(aMenu);
         for (Object[] p: params) {
             if (p.length == 2) {
-                createItem((String)p[0], aMenu, (Integer)p[1]);
+                createItem((String) p[0], aMenu, (Integer) p[1]);
             } else if ("-".equals(p[0])) {
                 aMenu.addSeparator();
             } else {
-                createItem((String)p[0], aMenu);
+                createItem((String) p[0], aMenu);
             }
         }
     }
-    
+
     void createItem(String name, JMenu menu) {
         createItem(name, menu, 0);
     }
-    
+
     void createItem(String name, JMenu menu, Integer keyStroke) {
         String text = resBundle.getString("menu." + name);
         JMenuItem item = new JMenuItem(text);
@@ -100,11 +100,11 @@ class MenuManager {
         }
         menuItems.put(name, item);
     }
-    
+
     public JMenu getMenu(String name) {
         return menus.get(name);
     }
-    
+
     public JMenuItem getItem(String name) {
         return menuItems.get(name);
     }

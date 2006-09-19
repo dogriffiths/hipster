@@ -44,7 +44,7 @@ import java.util.Vector;
  *
  * @author davidg
  */
-public class Idea {
+public final class Idea {
     /**
      * Short text version of the idea. Used for the text
      * on idea maps.

@@ -47,7 +47,7 @@ import java.util.ResourceBundle;
  *
  * @author davidg
  */
-public class Main {
+public final class Main {
     private static Main main;
     private Mainframe frame;
     private AboutBox aboutBox = new AboutBox();
@@ -56,11 +56,11 @@ public class Main {
      */
     protected static ResourceBundle resBundle = ResourceBundle.getBundle(
             "dg/hipster/resource/strings");
-    
+
     static {
         System.setProperty("apple.laf.useScreenMenuBar", "true");
     }
-    
+
     /**
      * @param args the command line arguments
      */
@@ -70,14 +70,14 @@ public class Main {
         main.initControllers();
         main.setVisible(true);
     }
-    
+
     public Main() {
     }
-    
+
     private void initView() {
         frame = new Mainframe();
     }
-    
+
     private void initControllers() {
         if (isMac()) {
             try {
@@ -95,13 +95,13 @@ public class Main {
             });
         }
     }
-    
+
     public void setVisible(boolean visible) {
         if (frame != null) {
             frame.setVisible(visible);
         }
     }
-    
+
     /**
      * True if we are running on a Mac.
      * @return true if the current platform is a Mac, false otherwise
@@ -110,21 +110,21 @@ public class Main {
         String osName = System.getProperty("os.name");
         return ((osName != null) && (osName.indexOf("Mac") != -1));
     }
-    
+
     /**
      * Display the about box.
      */
     public static void showAbout() {
         main.aboutBox.setVisible(true);
     }
-    
+
     /**
      * Display the preferences dialog
      */
     public static void showPreferences() {
-        
+
     }
-    
+
     /**
      * Called when the application being closed down.
      */
