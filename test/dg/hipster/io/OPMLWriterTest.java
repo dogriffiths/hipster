@@ -54,8 +54,6 @@ public class OPMLWriterTest extends TestCase {
         
         String result = out.toString();
         
-        System.out.println("result = " + result);
-        
         String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
                 + "<opml version=\"1.0\">"
                 + "<head>"
@@ -68,9 +66,6 @@ public class OPMLWriterTest extends TestCase {
                 + "</outline>"
                 + "</body>"
                 + "</opml>";
-        
-        System.out.println("expected = " + expected);
-        System.out.println("result = " + result);
         
         // TODO review the generated test code and remove the default call to fail.
         assertEquals("Wrong XML output", expected, result);
