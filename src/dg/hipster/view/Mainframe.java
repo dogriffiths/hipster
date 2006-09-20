@@ -166,4 +166,9 @@ public final class Mainframe extends JFrame {
     public String getCurrentFile() {
         return this.currentFile;
     }
+    
+    public void setDirty(boolean dirty) {
+        this.getRootPane().putClientProperty("windowModified",
+                Boolean.valueOf(dirty));
+    }
 }
