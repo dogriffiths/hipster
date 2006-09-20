@@ -39,6 +39,9 @@ import com.apple.eawt.Application;
 import com.apple.eawt.ApplicationEvent;
 import com.apple.eawt.ApplicationListener;
 import dg.hipster.Main;
+import dg.hipster.io.ReaderException;
+import dg.hipster.io.ReaderFactory;
+import dg.hipster.view.GuiUtilities;
 import java.io.File;
 
 /**
@@ -50,6 +53,7 @@ public final class MacAppListener implements ApplicationListener {
         Application application = Application.getApplication();
         application.addApplicationListener(new MacAppListener());
         application.setEnabledPreferencesMenu(true);
+        application.setEnabledAboutMenu(true);
     }
 
 
@@ -57,20 +61,43 @@ public final class MacAppListener implements ApplicationListener {
     }
 
     public void handleAbout(ApplicationEvent event)  {
+//GuiUtilities.showDebug("handleAbout");
         Main.showAbout();
         event.setHandled(true);
     }
-    public void	handleOpenApplication(ApplicationEvent event) {}
+    public void	handleOpenApplication(ApplicationEvent event) {
+//GuiUtilities.showDebug("handleOpenApplication");
+//GuiUtilities.showDebug("filename = " + event.getFilename());
+    }
     public void	handleOpenFile(ApplicationEvent event) {
+//GuiUtilities.showDebug("handleOpenFile");
+//GuiUtilities.showDebug("filename = " + event.getFilename());
+        File f = new File(event.getFilename());
+        try {
+//GuiUtilities.showDebug("f = " + f);
+        IdeaDocument document = ReaderFactory.getInstance().read(f);
+//GuiUtilities.showDebug("document = " + document);
+        Main.getMainframe().setDocument(document);
+//GuiUtilities.showDebug("have set document");
+        } catch(ReaderException re) {
+            re.printStackTrace();
+            GuiUtilities.showError("error.read.file");
+        }
     }
     public void	handlePreferences(ApplicationEvent event) {
+//GuiUtilities.showDebug("handlePreferences");
         Main.showPreferences();
         event.setHandled(true);
     }
-    public void handlePrintFile(ApplicationEvent event) {}
+    public void handlePrintFile(ApplicationEvent event) {
+//GuiUtilities.showDebug("handlePrintFile");
+    }
     public void	handleQuit(ApplicationEvent event) {
+//GuiUtilities.showDebug("handleQuit");
         Main.handleQuit();
         event.setHandled(true);
     }
-    public void	handleReOpenApplication(ApplicationEvent event) {}
+    public void	handleReOpenApplication(ApplicationEvent event) {
+//GuiUtilities.showDebug("handleReOpenApplication");
+    }
 }

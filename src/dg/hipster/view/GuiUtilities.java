@@ -69,4 +69,11 @@ public class GuiUtilities {
     public static void showError(final String messageName) {
         showMessage(messageName, JOptionPane.ERROR_MESSAGE);
     }
+    
+    public static void showDebug(final String message) {
+        Mainframe mainframe = Main.getMainframe();
+        JOptionPane.showMessageDialog(mainframe.getContentPane(),
+                message, mainframe.getTitle(),
+                JOptionPane.INFORMATION_MESSAGE);
+    }    
 }

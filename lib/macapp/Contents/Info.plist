@@ -3,6 +3,22 @@
 <plist version="0.9">
 <dict>
 
+	<key>CFBundleDocumentTypes</key>
+		<array>
+			<dict>
+				<key>CFBundleTypeExtensions</key>
+				<array>
+					<string>opml</string>
+				</array>
+				<key>CFBundleTypeIconFile</key><string>hipster.icns</string>
+				<key>CFBundleTypeName</key><string>hIPster Idea Map</string>
+				<key>CFBundleTypeOSTypes</key>
+				<array>
+					<string>OPML</string>
+				</array>
+				<key>CFBundleTypeRole</key><string>Editor</string>
+			</dict>
+		</array>
 
 	<key>CFBundleDevelopmentRegion</key><string>English</string>
 	<key>CFBundleExecutable</key><string>hIPster</string>
