@@ -38,6 +38,7 @@ package dg.hipster.controller;
 import dg.hipster.model.*;
 import dg.hipster.view.IdeaMap;
 import dg.hipster.view.Mainframe;
+import java.io.File;
 
 /**
  *
@@ -46,33 +47,37 @@ import dg.hipster.view.Mainframe;
 public class IdeaDocument implements IdeaListener {
     private Mainframe mainframe;
     private IdeaMap ideaMap;
-    private String currentFile;
+    private Idea idea;
+    private File currentFile;
     private boolean dirty;
     
     public IdeaDocument() {
         
     }
     
-    public void setIdea(Idea idea) {
-        Idea oldIdea = this.ideaMap.getIdea();
-        if (oldIdea != null) {
-            oldIdea.removeIdeaListener(this);
+    public void setIdea(Idea newIdea) {
+        if (this.ideaMap != null) {
+            Idea oldIdea = this.ideaMap.getIdea();
+            if (oldIdea != null) {
+                oldIdea.removeIdeaListener(this);
+            }
+            this.ideaMap.setIdea(newIdea);
         }
-        this.ideaMap.setIdea(idea);
-        idea.addIdeaListener(this);
+        this.idea = newIdea;
+        newIdea.addIdeaListener(this);
     }
     
     public Idea getIdea() {
-        return this.ideaMap.getIdea();
+        return this.idea;
     }
     
-    public String getCurrentFile() {
+    public File getCurrentFile() {
         return currentFile;
     }
     
-    public void setCurrentFile(String currentFile) {
+    public void setCurrentFile(File currentFile) {
         this.currentFile = currentFile;
-        this.getMainframe().documentChanged();
+        notifyMainframe();
     }
     
     public Mainframe getMainframe() {
@@ -81,7 +86,7 @@ public class IdeaDocument implements IdeaListener {
     
     public void setMainframe(Mainframe mainframe) {
         this.mainframe = mainframe;
-        this.mainframe.documentChanged();
+        notifyMainframe();
     }
     
     public boolean isDirty() {
@@ -90,19 +95,26 @@ public class IdeaDocument implements IdeaListener {
     
     public void setDirty(boolean dirty) {
         this.dirty = dirty;
-        this.getMainframe().documentChanged();
+        notifyMainframe();
     }
     
     public void ideaChanged(IdeaEvent fe) {
         this.setDirty(true);
     }
-
+    
     public IdeaMap getIdeaMap() {
         return ideaMap;
     }
-
+    
     public void setIdeaMap(IdeaMap ideaMap) {
         this.ideaMap = ideaMap;
+        this.ideaMap.setIdea(this.idea);
+        notifyMainframe();
+    }
+    
+    private void notifyMainframe() {
+        if (this.mainframe != null) {
         this.mainframe.documentChanged();
+        }
     }
 }

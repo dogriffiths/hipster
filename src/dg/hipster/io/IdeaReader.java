@@ -9,12 +9,12 @@
 
 package dg.hipster.io;
 
-import dg.hipster.model.Idea;
+import dg.hipster.controller.IdeaDocument;
 
 /**
  *
  * @author davidg
  */
 public interface IdeaReader {
-    public Idea getIdea();
+    public IdeaDocument getDocument();
 }

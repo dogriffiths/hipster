@@ -35,6 +35,7 @@
 
 package dg.hipster.io;
 
+import dg.hipster.controller.IdeaDocument;
 import dg.hipster.model.Idea;
 import java.io.IOException;
 import java.io.Writer;
@@ -61,30 +62,31 @@ public final class OPMLWriter implements IdeaWriter {
         this.out = out;
     }
 
-    public void write(Idea idea) throws IOException {
-        save(idea);
+    public void write(IdeaDocument document) throws IOException {
+        save(document);
         out.flush();
         out.close();
     }
 
-    private void save(Idea idea) throws IOException {
+    private void save(final IdeaDocument document) throws IOException {
+        Idea idea = document.getIdea();
         try {
 
             db = DocumentBuilderFactory.newInstance(
                     ).newDocumentBuilder();
 
-            Document document = db.newDocument();
-            document.setXmlVersion("1.0");
-            Element opml = document.createElement("opml");
+            Document xmlDocument = db.newDocument();
+            xmlDocument.setXmlVersion("1.0");
+            Element opml = xmlDocument.createElement("opml");
             opml.setAttribute("version", "1.0");
-            document.appendChild(opml);
-            Element head = document.createElement("head");
+            xmlDocument.appendChild(opml);
+            Element head = xmlDocument.createElement("head");
             opml.appendChild(head);
-            Element title = document.createElement("title");
+            Element title = xmlDocument.createElement("title");
             head.appendChild(title);
-            Element body = document.createElement("body");
+            Element body = xmlDocument.createElement("body");
             opml.appendChild(body);
-            appendIdea(document, body, idea);
+            appendIdea(xmlDocument, body, idea);
 
             Transformer transformer = null;
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
@@ -93,7 +95,7 @@ public final class OPMLWriter implements IdeaWriter {
             } catch (TransformerConfigurationException e) {
                 e.printStackTrace();
             }
-            DOMSource source = new DOMSource(document);
+            DOMSource source = new DOMSource(xmlDocument);
             StreamResult result = new StreamResult(out);
             try{
                 transformer.transform(source,result);

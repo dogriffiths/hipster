@@ -9,7 +9,7 @@
 
 package dg.hipster.io;
 
-import dg.hipster.model.Idea;
+import dg.hipster.controller.IdeaDocument;
 import java.io.File;
 import java.io.FileInputStream;
 
@@ -28,14 +28,16 @@ public final class ReaderFactory {
         return instance;
     }
 
-    public Idea read(File f) throws ReaderException {
+    public IdeaDocument read(File f) throws ReaderException {
         try {
             IdeaReader reader = null;
             if (f.getName().toLowerCase().endsWith(".opml")) {
                 reader = new OPMLReader(new FileInputStream(f));
             }
             if (reader != null) {
-                return reader.getIdea();
+                IdeaDocument document = reader.getDocument();
+                document.setCurrentFile(f);
+                return document;
             }
         } catch (Exception e) {
             throw new ReaderException("Unable to read file " + f, e);

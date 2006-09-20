@@ -7,6 +7,7 @@
 
 package dg.hipster.io;
 
+import dg.hipster.controller.IdeaDocument;
 import junit.framework.*;
 import dg.hipster.model.Idea;
 import java.io.ByteArrayOutputStream;
@@ -48,7 +49,10 @@ public class OPMLWriterTest extends TestCase {
         
         OPMLWriter instance = new OPMLWriter(new OutputStreamWriter(out));
         
-        instance.write(idea);
+        IdeaDocument document = new IdeaDocument();
+        document.setIdea(idea);
+        
+        instance.write(document);
         
         String result = out.toString();
         

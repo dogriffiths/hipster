@@ -132,12 +132,11 @@ public final class MainframeController {
     }
     
     public void newDocument() {
-        IdeaDocument document = mainframe.getDocument();
+        IdeaDocument document = new IdeaDocument();
         Idea idea = new Idea("New idea");
-        IdeaMap ideaMap = document.getIdeaMap();
         document.setIdea(idea);
-        ideaMap.getController().editIdeaView(ideaMap.getRootView());
-        document.setCurrentFile(null);
+        mainframe.setDocument(document);
+        mainframe.editSelected();
     }
     
     public void openDocument() throws IOException, ReaderException {
@@ -151,16 +150,14 @@ public final class MainframeController {
         if (filename != null) {
             String absPath = chooser.getDirectory() + chooser.getFile();
             ReaderFactory factory = ReaderFactory.getInstance();
-            Idea idea = factory.read(new File(absPath));
-            IdeaDocument document = mainframe.getDocument();
-            document.setIdea(idea);
-            document.setCurrentFile(absPath);
+            IdeaDocument document = factory.read(new File(absPath));
+            mainframe.setDocument(document);
         }
     }
     
     public void saveAsDocument() throws IOException, ReaderException {
         IdeaDocument document = mainframe.getDocument();
-        String oldFile = document.getCurrentFile();
+        File oldFile = document.getCurrentFile();
         document.setCurrentFile(null);
         saveDocument();
         if (document.getCurrentFile() == null) {
@@ -177,18 +174,17 @@ public final class MainframeController {
             chooser.setVisible(true);
             
             if (chooser.getFile() != null) {
-                document.setCurrentFile(chooser.getDirectory()
-                + chooser.getFile());
+                document.setCurrentFile(new File(chooser.getDirectory()
+                + chooser.getFile()));
             }
         }
         
         
         if (document.getCurrentFile() != null) {
             Idea idea = document.getIdea();
-            WriterFactory.getInstance().write(new File(
-                    document.getCurrentFile()), idea);
+            WriterFactory.getInstance().write(document.getCurrentFile(),
+                    document);
         }
-        document.setDirty(false);
     }
     
     public void zoomIn() {

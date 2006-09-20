@@ -35,6 +35,7 @@
 
 package dg.hipster.io;
 
+import dg.hipster.controller.IdeaDocument;
 import dg.hipster.model.Idea;
 import java.io.InputStream;
 import java.util.Stack;
@@ -93,7 +94,9 @@ public final class OPMLReader extends DefaultHandler implements IdeaReader {
             throw new ReaderException("Unable to read OPML", e);
         }
     }
-    public Idea getIdea() {
-        return idea;
+    public IdeaDocument getDocument() {
+        IdeaDocument document = new IdeaDocument();
+        document.setIdea(idea);
+        return document;
     }
 }

@@ -35,7 +35,7 @@
 
 package dg.hipster.io;
 
-import dg.hipster.model.Idea;
+import dg.hipster.controller.IdeaDocument;
 import java.io.File;
 import java.io.FileWriter;
 
@@ -45,16 +45,16 @@ import java.io.FileWriter;
  */
 public final class WriterFactory {
     private static WriterFactory instance = new WriterFactory();
-
+    
     /** Creates a new instance of ReaderFactory */
     private WriterFactory() {
     }
-
+    
     public static WriterFactory getInstance() {
         return instance;
     }
-
-    public void write(File f, Idea idea) throws ReaderException {
+    
+    public void write(File f, IdeaDocument document) throws ReaderException {
         try {
             IdeaWriter writer = null;
             if (f.getName().toLowerCase().endsWith(".opml")) {
@@ -62,7 +62,9 @@ public final class WriterFactory {
             }
             if (writer != null) {
                 try {
-                    writer.write(idea);
+                    writer.write(document);
+                    document.setCurrentFile(f);
+                    document.setDirty(false);
                 } catch(Exception e) {
                     e.printStackTrace();
                 }

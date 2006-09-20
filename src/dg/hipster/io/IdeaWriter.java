@@ -9,12 +9,12 @@
 
 package dg.hipster.io;
 
-import dg.hipster.model.Idea;
+import dg.hipster.controller.IdeaDocument;
 
 /**
  *
  * @author davidg
  */
 public interface IdeaWriter {
-    public void write(Idea idea) throws Exception;
+    public void write(IdeaDocument ideaDocument) throws Exception;
 }

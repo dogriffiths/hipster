@@ -43,6 +43,7 @@ import java.awt.BorderLayout;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
+import java.io.File;
 import java.util.ResourceBundle;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -148,7 +149,11 @@ public final class Mainframe extends JFrame {
      * Set up the data.
      */
     private void buildModel() {
-        this.document = new IdeaDocument();
+        setDocument(new IdeaDocument());
+    }
+
+    public void setDocument(final IdeaDocument newDocument) {
+        this.document = newDocument;
         this.document.setMainframe(this);
         this.document.setIdeaMap(this.ideaMap);
     }
@@ -163,10 +168,10 @@ public final class Mainframe extends JFrame {
     }
     
     public void documentChanged() {
-        String currentFile = this.document.getCurrentFile();
+        File currentFile = this.document.getCurrentFile();
         if (currentFile != null) {
             this.setTitle(resBundle.getString("app.name") + " - "
-                    + currentFile);
+                    + currentFile.getAbsolutePath());
         } else {
             this.setTitle(resBundle.getString("app.name"));
         }        this.setDirty(this.document.isDirty());
@@ -178,5 +183,9 @@ public final class Mainframe extends JFrame {
     
     public void zoomOut() {
         ideaMap.zoomOut();
+    }
+    
+    public void editSelected() {
+        ideaMap.getController().editIdeaView(ideaMap.getRootView());
     }
 }
