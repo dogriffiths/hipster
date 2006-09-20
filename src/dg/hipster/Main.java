@@ -123,7 +123,9 @@ public final class Main {
      * Display the preferences dialog
      */
     public static void showPreferences() {
-        GuiUtilities.showMessage("Preferences dialog goes here");
+        GuiUtilities.showInfo("preferences.placeholder");
+        GuiUtilities.showWarning("preferences.placeholder");
+        GuiUtilities.showError("preferences.placeholder");
     }
     
     /**
