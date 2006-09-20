@@ -40,6 +40,7 @@ import dg.hipster.io.ReaderException;
 import dg.hipster.io.ReaderFactory;
 import dg.hipster.io.WriterFactory;
 import dg.hipster.model.Idea;
+import dg.hipster.controller.IdeaDocument;
 import dg.hipster.view.IdeaMap;
 import dg.hipster.view.Mainframe;
 import java.awt.FileDialog;
@@ -54,7 +55,7 @@ import java.io.IOException;
  */
 public final class MainframeController {
     private Mainframe mainframe;
-
+    
     public MainframeController(Mainframe aMainframe) {
         this.mainframe = aMainframe;
         mainframe.getItem("new").addActionListener(new ActionListener() {
@@ -129,80 +130,83 @@ public final class MainframeController {
             });
         }
     }
-
+    
     public void newDocument() {
+        IdeaDocument document = mainframe.getDocument();
         Idea idea = new Idea("New idea");
-        IdeaMap ideaMap = mainframe.getIdeaMap();
-        ideaMap.setIdea(idea);
+        IdeaMap ideaMap = document.getIdeaMap();
+        document.setIdea(idea);
         ideaMap.getController().editIdeaView(ideaMap.getRootView());
-        mainframe.setCurrentFile(null);
+        document.setCurrentFile(null);
     }
-
+    
     public void openDocument() throws IOException, ReaderException {
         FileDialog chooser = new FileDialog(mainframe, "Open OPML file",
                 FileDialog.LOAD);
-
+        
         chooser.setVisible(true);
-
+        
         String filename = chooser.getFile();
-
+        
         if (filename != null) {
             String absPath = chooser.getDirectory() + chooser.getFile();
             ReaderFactory factory = ReaderFactory.getInstance();
             Idea idea = factory.read(new File(absPath));
-            IdeaMap ideaMap = mainframe.getIdeaMap();
-            ideaMap.setIdea(idea);
-            mainframe.setCurrentFile(absPath);
+            IdeaDocument document = mainframe.getDocument();
+            document.setIdea(idea);
+            document.setCurrentFile(absPath);
         }
     }
-
+    
     public void saveAsDocument() throws IOException, ReaderException {
-        String oldFile = mainframe.getCurrentFile();
-        mainframe.setCurrentFile(null);
+        IdeaDocument document = mainframe.getDocument();
+        String oldFile = document.getCurrentFile();
+        document.setCurrentFile(null);
         saveDocument();
-        if (mainframe.getCurrentFile() == null) {
-            mainframe.setCurrentFile(oldFile);
+        if (document.getCurrentFile() == null) {
+            document.setCurrentFile(oldFile);
         }
     }
-
+    
     public void saveDocument() throws IOException, ReaderException {
-        if (mainframe.getCurrentFile() == null) {
+        IdeaDocument document = mainframe.getDocument();
+        if (document.getCurrentFile() == null) {
             FileDialog chooser = new FileDialog(mainframe, "Save OPML file",
                     FileDialog.SAVE);
-
+            
             chooser.setVisible(true);
-
+            
             if (chooser.getFile() != null) {
-                mainframe.setCurrentFile(chooser.getDirectory()
+                document.setCurrentFile(chooser.getDirectory()
                 + chooser.getFile());
             }
         }
-
-
-        if (mainframe.getCurrentFile() != null) {
-            IdeaMap ideaMap = mainframe.getIdeaMap();
-            Idea idea = ideaMap.getIdea();
+        
+        
+        if (document.getCurrentFile() != null) {
+            Idea idea = document.getIdea();
             WriterFactory.getInstance().write(new File(
-                    mainframe.getCurrentFile()), idea);
+                    document.getCurrentFile()), idea);
         }
+        document.setDirty(false);
     }
-
+    
     public void zoomIn() {
-        mainframe.getIdeaMap().zoomIn();
+        mainframe.zoomIn();
     }
-
+    
     public void zoomOut() {
-        mainframe.getIdeaMap().zoomOut();
+        mainframe.zoomOut();
     }
-
+    
     public void fileExit() {
         System.exit(0);
     }
-
+    
     public void editPreferences() {
         Main.showPreferences();
     }
-
+    
     public void helpAbout() {
         Main.showAbout();
     }

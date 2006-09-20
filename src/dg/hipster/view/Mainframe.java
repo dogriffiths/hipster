@@ -37,6 +37,7 @@ package dg.hipster.view;
 
 import dg.hipster.Main;
 import dg.hipster.controller.MainframeController;
+import dg.hipster.controller.IdeaDocument;
 import dg.hipster.model.Settings;
 import java.awt.BorderLayout;
 import java.awt.Image;
@@ -64,10 +65,10 @@ public final class Mainframe extends JFrame {
     /**
      * Main idea processor component.
      */
-    private IdeaMap ideaMap;
     private MainframeController controller;
     private MenuManager menuMgr = new MenuManager();
-    private String currentFile;
+    private IdeaMap ideaMap;
+    private IdeaDocument document;
 
     /** Creates a new instance of Mainframe */
     public Mainframe() {
@@ -91,7 +92,7 @@ public final class Mainframe extends JFrame {
             e.printStackTrace();
         }
         ideaMap = new IdeaMap();
-        this.getContentPane().add(getIdeaMap(), BorderLayout.CENTER);
+        this.getContentPane().add(ideaMap, BorderLayout.CENTER);
         this.setJMenuBar(createMenu());
         this.setIconImage(createIcon());
     }
@@ -147,28 +148,35 @@ public final class Mainframe extends JFrame {
      * Set up the data.
      */
     private void buildModel() {
+        this.document = new IdeaDocument();
+        this.document.setMainframe(this);
+        this.document.setIdeaMap(this.ideaMap);
     }
 
-    public IdeaMap getIdeaMap() {
-        return this.ideaMap;
-    }
-
-    public void setCurrentFile(String filename) {
-        this.currentFile = filename;
-        if (currentFile != null) {
-            this.setTitle(resBundle.getString("app.name") + " - "
-                    + currentFile);
-        } else {
-            this.setTitle(resBundle.getString("app.name"));
-        }
-    }
-
-    public String getCurrentFile() {
-        return this.currentFile;
+    public IdeaDocument getDocument() {
+        return this.document;
     }
     
     public void setDirty(boolean dirty) {
         this.getRootPane().putClientProperty("windowModified",
                 Boolean.valueOf(dirty));
+    }
+    
+    public void documentChanged() {
+        String currentFile = this.document.getCurrentFile();
+        if (currentFile != null) {
+            this.setTitle(resBundle.getString("app.name") + " - "
+                    + currentFile);
+        } else {
+            this.setTitle(resBundle.getString("app.name"));
+        }        this.setDirty(this.document.isDirty());
+    }
+    
+    public void zoomIn() {
+        ideaMap.zoomIn();
+    }
+    
+    public void zoomOut() {
+        ideaMap.zoomOut();
     }
 }
