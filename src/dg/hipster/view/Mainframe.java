@@ -115,6 +115,8 @@ public final class Mainframe extends JFrame {
                  {"save", KeyEvent.VK_S},
                  {"saveAs"}
              }},
+            {"edit", new Object[][] {
+             }},
              {"view", new Object[][]{
                   {"zoomIn", KeyEvent.VK_PLUS},
                   {"zoomOut", KeyEvent.VK_MINUS}
@@ -124,6 +126,8 @@ public final class Mainframe extends JFrame {
             JMenu fileMenu = getMenu("file");
             fileMenu.addSeparator();
             menuMgr.createItem("exit", fileMenu);
+            JMenu editMenu = getMenu("edit");
+            menuMgr.createItem("preferences", editMenu);
             menuMgr.createMenu("help", menu, new Object[][]{
                 {"about"}
             });

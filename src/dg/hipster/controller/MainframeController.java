@@ -112,6 +112,11 @@ public final class MainframeController {
             }
         });
         if (!Main.isMac()) {
+            mainframe.getItem("preferences").addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    editPreferences();
+                }
+            });
             mainframe.getItem("exit").addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     fileExit();
@@ -192,6 +197,10 @@ public final class MainframeController {
 
     public void fileExit() {
         System.exit(0);
+    }
+
+    public void editPreferences() {
+        Main.showPreferences();
     }
 
     public void helpAbout() {

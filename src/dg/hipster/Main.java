@@ -37,6 +37,7 @@ package dg.hipster;
 
 import dg.hipster.model.Settings;
 import dg.hipster.view.AboutBox;
+import dg.hipster.view.GuiUtilities;
 import dg.hipster.view.Mainframe;
 import java.awt.Rectangle;
 import java.awt.event.WindowAdapter;
@@ -56,11 +57,11 @@ public final class Main {
      */
     protected static ResourceBundle resBundle = ResourceBundle.getBundle(
             "dg/hipster/resource/strings");
-
+    
     static {
         System.setProperty("apple.laf.useScreenMenuBar", "true");
     }
-
+    
     /**
      * @param args the command line arguments
      */
@@ -70,14 +71,14 @@ public final class Main {
         main.initControllers();
         main.setVisible(true);
     }
-
+    
     public Main() {
     }
-
+    
     private void initView() {
         frame = new Mainframe();
     }
-
+    
     private void initControllers() {
         if (isMac()) {
             try {
@@ -95,13 +96,13 @@ public final class Main {
             });
         }
     }
-
+    
     public void setVisible(boolean visible) {
         if (frame != null) {
             frame.setVisible(visible);
         }
     }
-
+    
     /**
      * True if we are running on a Mac.
      * @return true if the current platform is a Mac, false otherwise
@@ -110,21 +111,21 @@ public final class Main {
         String osName = System.getProperty("os.name");
         return ((osName != null) && (osName.indexOf("Mac") != -1));
     }
-
+    
     /**
      * Display the about box.
      */
     public static void showAbout() {
         main.aboutBox.setVisible(true);
     }
-
+    
     /**
      * Display the preferences dialog
      */
     public static void showPreferences() {
-
+        GuiUtilities.showMessage("Preferences dialog goes here");
     }
-
+    
     /**
      * Called when the application being closed down.
      */
@@ -134,5 +135,12 @@ public final class Main {
         Settings.getInstance().setWindowTop(bounds.y);
         Settings.getInstance().setWindowWidth(bounds.width);
         Settings.getInstance().setWindowHeight(bounds.height);
+    }
+    
+    /**
+     * Get the main application frme.
+     */
+    public static Mainframe getMainframe() {
+        return main.frame;
     }
 }
