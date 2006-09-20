@@ -124,8 +124,6 @@ public final class Main {
      */
     public static void showPreferences() {
         GuiUtilities.showInfo("preferences.placeholder");
-        GuiUtilities.showWarning("preferences.placeholder");
-        GuiUtilities.showError("preferences.placeholder");
     }
     
     /**
