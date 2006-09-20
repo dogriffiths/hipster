@@ -103,6 +103,24 @@ public final class MainframeController {
                 }
             }
         });
+        mainframe.getItem("insertChild").addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                try {
+                    mainframe.getDocument().getIdeaMap().getController().insertChild();
+                } catch(Throwable t) {
+                    t.printStackTrace();
+                }
+            }
+        });
+        mainframe.getItem("insertSibling").addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                try {
+                    mainframe.getDocument().getIdeaMap().getController().insertIdea();
+                } catch(Throwable t) {
+                    t.printStackTrace();
+                }
+            }
+        });
         mainframe.getItem("zoomOut").addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 try {

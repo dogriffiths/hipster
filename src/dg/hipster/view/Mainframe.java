@@ -118,6 +118,8 @@ public final class Mainframe extends JFrame {
                  {"saveAs"}
              }},
             {"edit", new Object[][] {
+                 {"insertChild"},
+                 {"insertSibling"},
              }},
              {"view", new Object[][]{
                   {"zoomIn", KeyEvent.VK_PLUS},

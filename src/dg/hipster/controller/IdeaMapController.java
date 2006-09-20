@@ -428,7 +428,7 @@ public final class IdeaMapController implements ActionListener, KeyListener,
     }
 
     int newCount = 0;
-    private void insertIdea() {
+    public void insertIdea() {
         final IdeaView selected = this.ideaMap.getSelectedView();
         if (selected == null) {
             return;
@@ -463,7 +463,7 @@ public final class IdeaMapController implements ActionListener, KeyListener,
         ideaMap.getTextField().setText(selected.getIdea().getText());
     }
 
-    private void insertChild() {
+    public void insertChild() {
         final IdeaView selected = this.ideaMap.getSelectedView();
         if (selected == null) {
             return;
