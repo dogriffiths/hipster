@@ -35,6 +35,10 @@
 
 package dg.hipster;
 
+import dg.hipster.controller.IdeaDocument;
+import dg.hipster.controller.MacAppListener;
+import dg.hipster.io.ReaderException;
+import dg.hipster.io.ReaderFactory;
 import dg.hipster.model.Settings;
 import dg.hipster.view.AboutBox;
 import dg.hipster.view.GuiUtilities;
@@ -42,6 +46,7 @@ import dg.hipster.view.Mainframe;
 import java.awt.Rectangle;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
 import java.util.ResourceBundle;
 
 /**
@@ -69,17 +74,19 @@ public final class Main {
         main = new Main();
         main.initView();
         main.initControllers();
+        IdeaDocument document = new IdeaDocument();
+        if (args.length > 0) {
+            try {
+                document = ReaderFactory.getInstance().read(new File(args[0]));
+            } catch(ReaderException re) {
+                GuiUtilities.showDebug(re.getMessage());
+            }
+        }
+        getMainframe().setDocument(document);
         main.setVisible(true);
     }
     
     public Main() {
-    }
-    
-    private void initView() {
-        frame = new Mainframe();
-    }
-    
-    private void initControllers() {
         if (isMac()) {
             try {
                 Class.forName("dg.hipster.controller.MacAppListener");
@@ -87,6 +94,13 @@ public final class Main {
                 cnfe.printStackTrace();
             }
         }
+    }
+    
+    private void initView() {
+        frame = new Mainframe();
+    }
+    
+    private void initControllers() {
         if (frame != null) {
             frame.addWindowListener(new WindowAdapter() {
                 public void windowClosing(WindowEvent e) {

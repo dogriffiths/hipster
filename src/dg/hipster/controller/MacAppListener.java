@@ -55,49 +55,37 @@ public final class MacAppListener implements ApplicationListener {
         application.setEnabledPreferencesMenu(true);
         application.setEnabledAboutMenu(true);
     }
-
-
+    
+    
     public MacAppListener() {
     }
-
+    
     public void handleAbout(ApplicationEvent event)  {
-//GuiUtilities.showDebug("handleAbout");
         Main.showAbout();
         event.setHandled(true);
     }
     public void	handleOpenApplication(ApplicationEvent event) {
-//GuiUtilities.showDebug("handleOpenApplication");
-//GuiUtilities.showDebug("filename = " + event.getFilename());
     }
     public void	handleOpenFile(ApplicationEvent event) {
-//GuiUtilities.showDebug("handleOpenFile");
-//GuiUtilities.showDebug("filename = " + event.getFilename());
         File f = new File(event.getFilename());
         try {
-//GuiUtilities.showDebug("f = " + f);
-        IdeaDocument document = ReaderFactory.getInstance().read(f);
-//GuiUtilities.showDebug("document = " + document);
-        Main.getMainframe().setDocument(document);
-//GuiUtilities.showDebug("have set document");
+            IdeaDocument document = ReaderFactory.getInstance().read(f);
+            Main.getMainframe().setDocument(document);
         } catch(ReaderException re) {
             re.printStackTrace();
-            GuiUtilities.showError("error.read.file");
         }
+        event.setHandled(true);
     }
     public void	handlePreferences(ApplicationEvent event) {
-//GuiUtilities.showDebug("handlePreferences");
         Main.showPreferences();
         event.setHandled(true);
     }
     public void handlePrintFile(ApplicationEvent event) {
-//GuiUtilities.showDebug("handlePrintFile");
     }
     public void	handleQuit(ApplicationEvent event) {
-//GuiUtilities.showDebug("handleQuit");
         Main.handleQuit();
         event.setHandled(true);
     }
     public void	handleReOpenApplication(ApplicationEvent event) {
-//GuiUtilities.showDebug("handleReOpenApplication");
     }
 }

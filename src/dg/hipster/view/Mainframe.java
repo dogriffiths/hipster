@@ -149,7 +149,6 @@ public final class Mainframe extends JFrame {
      * Set up the data.
      */
     private void buildModel() {
-        setDocument(new IdeaDocument());
     }
 
     public void setDocument(final IdeaDocument newDocument) {
