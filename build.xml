@@ -68,15 +68,15 @@
     -->
     
     <target name="-pre-init">
-      <condition property="isMacOSX">
-        <and>
-          <os family="mac"/>
-          <os family="unix"/>
-        </and>
-      </condition>
-      <condition property="isWindows">
-        <os family="windows"/>
-      </condition>
+        <condition property="isMacOSX">
+            <and>
+                <os family="mac"/>
+                <os family="unix"/>
+            </and>
+        </condition>
+        <condition property="isWindows">
+            <os family="windows"/>
+        </condition>
     </target>
     
     <!--                    -->
@@ -163,7 +163,7 @@
             <excludeClasses regex=".*\.Test.*" />
             <fileset dir="build/classes">
                 <include name="*/**" />
-<!--                <include name="hipster.jar" /> -->
+                <!--                <include name="hipster.jar" /> -->
             </fileset>
         </cobertura-instrument>
 
@@ -215,42 +215,41 @@
     </target>
     
     <target name="exeMac" depends="exeInit" if="isMacOSX">
-    <taskdef name="jarbundler"
-             classpath="lib/jarbundler-1.9.jar" 
-             classname="net.sourceforge.jarbundler.JarBundler"/>
+        <taskdef name="jarbundler"
+        classpath="lib/jarbundler-1.9.jar:lib/xercesimpl.jar" 
+        classname="net.sourceforge.jarbundler.JarBundler"/>
 
-    <jarbundler dir="${basedir}" verbose="true" showPlist="false"
-                name="application/hIPster"
-                shortname="hIPster"
-                signature="????"
-                stubfile="application/hIPster"
-                mainclass="dg.hipster.Main"
-                jar="dist/hipster.jar"
-                icon="etc/hipster.icns"
-                jvmversion="1.5+"
-                version="0.1"
-                infostring="Idea Processor"
-                bundleid="dg.hipster" > 
+        <jarbundler dir="${basedir}" verbose="true" showPlist="false"
+            name="application/hIPster"
+            shortname="hIPster"
+            signature="????"
+            mainclass="dg.hipster.Main"
+            jar="dist/hipster.jar"
+            icon="etc/hipster.icns"
+            jvmversion="1.5+"
+            version="0.1"
+            infostring="Idea Processor"
+            bundleid="dg.hipster" > 
 
 
-      <!-- Associate document types with this application -->
-      <documenttype name="hIPster Idea Map"
-                    extensions="opml" 
-                    iconFile="etc/hipster.icns"
-                    role="Editor"/>
-    </jarbundler>
+            <!-- Associate document types with this application -->
+            <documenttype name="hIPster Idea Map"
+            extensions="opml" 
+            iconFile="etc/hipster.icns"
+            role="Editor"/>
+        </jarbundler>
         <exec dir="etc" 
-                executable="/bin/zsh" os="Mac OS X">
+            executable="/bin/zsh" os="Mac OS X">
             <arg line="mkdmg.sh ${basedir}/application/hIPster.app ${basedir}/dist hipster"/>
         </exec>
     
     </target>
     
-	<target name="exeWin" depends="exeInit" if="isWindows">
-		<taskdef name="launch4j" classname="net.sf.launch4j.ant.Launch4jTask"
-		classpath="lib/winapp/launch4j.jar:lib/winapp/xstream.jar" />
-		<launch4j configFile="lib/winapp/launch4jexe.xml" />
+    <target name="exeWin" depends="exeInit" if="isWindows">
+        <taskdef name="launch4j" classname="net.sf.launch4j.ant.Launch4jTask"
+        classpath="lib/winapp/launch4j.jar:lib/winapp/xstream.jar" />
+        <launch4j configFile="lib/winapp/launch4jexe.xml" />
         <zip destfile="dist/hipster-win.zip" basedir="application" includes="hIPster.exe"
         excludes="**/.svn"/>
-	</target>
+    </target>
 </project>
