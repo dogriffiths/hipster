@@ -215,20 +215,35 @@
     </target>
     
     <target name="exeMac" depends="exeInit" if="isMacOSX">
-        <delete dir="application/hIPster.app"/>
-        <mkdir dir="application/hIPster.app"/>
-        <copy todir="application/hIPster.app/Contents">
-          <fileset dir="lib/macapp/Contents">
-            <exclude name="**/.svn"/>
-          </fileset>
-        </copy>
-        <copy file="${dist.dir}/hipster.jar"
-            tofile="application/hIPster.app/Contents/Resources/hipster.jar"/>
-        <chmod file="application/hIPster.app/Contents/MacOS/hIPster" perm="755"/>
-        <exec dir="lib/macapp/bin" 
+    <taskdef name="jarbundler"
+             classpath="lib/jarbundler-1.9.jar" 
+             classname="net.sourceforge.jarbundler.JarBundler"/>
+
+    <jarbundler dir="${basedir}" verbose="true" showPlist="false"
+                name="application/hIPster"
+                shortname="hIPster"
+                signature="????"
+                stubfile="application/hIPster"
+                mainclass="dg.hipster.Main"
+                jar="dist/hipster.jar"
+                icon="etc/hipster.icns"
+                jvmversion="1.5+"
+                version="0.1"
+                infostring="Idea Processor"
+                bundleid="dg.hipster" > 
+
+
+      <!-- Associate document types with this application -->
+      <documenttype name="hIPster Idea Map"
+                    extensions="opml" 
+                    iconFile="etc/hipster.icns"
+                    role="Editor"/>
+    </jarbundler>
+        <exec dir="etc" 
                 executable="/bin/zsh" os="Mac OS X">
             <arg line="mkdmg.sh ${basedir}/application/hIPster.app ${basedir}/dist hipster"/>
         </exec>
+    
     </target>
     
 	<target name="exeWin" depends="exeInit" if="isWindows">
