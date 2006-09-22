@@ -62,7 +62,7 @@ public final class Mainframe extends JFrame {
      */
     protected static ResourceBundle resBundle = ResourceBundle.getBundle(
             "dg/hipster/resource/strings");
-
+    
     /**
      * Main idea processor component.
      */
@@ -70,11 +70,15 @@ public final class Mainframe extends JFrame {
     private MenuManager menuMgr = new MenuManager();
     private IdeaMap ideaMap;
     private IdeaDocument document;
-
+    
     /** Creates a new instance of Mainframe */
     public Mainframe() {
         super(resBundle.getString("app.name"));
-
+        
+        if (Main.isMac()) {
+            this.setTitle(resBundle.getString("untitled"));
+        }
+        
         Settings s = Settings.getInstance();
         setBounds(s.getWindowLeft(), s.getWindowTop(),
                 s.getWindowWidth(), s.getWindowHeight());
@@ -82,7 +86,7 @@ public final class Mainframe extends JFrame {
         buildModel();
         controller = new MainframeController(this);
     }
-
+    
     /**
      * Lay the window out.
      */
@@ -97,7 +101,7 @@ public final class Mainframe extends JFrame {
         this.setJMenuBar(createMenu());
         this.setIconImage(createIcon());
     }
-
+    
     private Image createIcon() {
         String imageName = "/dg/hipster/resource/hipster_icon.png";
         java.net.URL url = getClass().getResource(imageName);
@@ -106,7 +110,7 @@ public final class Mainframe extends JFrame {
         }
         return Toolkit.getDefaultToolkit().getImage(url);
     }
-
+    
     private JMenuBar createMenu() {
         JMenuBar menu = new JMenuBar();
         menuMgr.createMenus(menu, new Object[][]{
@@ -117,14 +121,14 @@ public final class Mainframe extends JFrame {
                  {"save", KeyEvent.VK_S},
                  {"saveAs"}
              }},
-            {"edit", new Object[][] {
-                 {"insertChild"},
-                 {"insertSibling"},
-             }},
-             {"view", new Object[][]{
-                  {"zoomIn", KeyEvent.VK_PLUS},
-                  {"zoomOut", KeyEvent.VK_MINUS}
-              }}
+             {"edit", new Object[][] {
+                  {"insertChild"},
+                  {"insertSibling"},
+              }},
+              {"view", new Object[][]{
+                   {"zoomIn", KeyEvent.VK_PLUS},
+                   {"zoomOut", KeyEvent.VK_MINUS}
+               }}
         });
         if (!Main.isMac()) {
             JMenu fileMenu = getMenu("file");
@@ -138,27 +142,27 @@ public final class Mainframe extends JFrame {
         }
         return menu;
     }
-
+    
     public JMenu getMenu(String name) {
         return menuMgr.getMenu(name);
     }
-
+    
     public JMenuItem getItem(String name) {
         return menuMgr.getItem(name);
     }
-
+    
     /**
      * Set up the data.
      */
     private void buildModel() {
     }
-
+    
     public void setDocument(final IdeaDocument newDocument) {
         this.document = newDocument;
         this.document.setMainframe(this);
         this.document.setIdeaMap(this.ideaMap);
     }
-
+    
     public IdeaDocument getDocument() {
         return this.document;
     }
@@ -171,11 +175,20 @@ public final class Mainframe extends JFrame {
     public void documentChanged() {
         File currentFile = this.document.getCurrentFile();
         if (currentFile != null) {
-            this.setTitle(resBundle.getString("app.name") + " - "
-                    + currentFile.getAbsolutePath());
+            if (Main.isMac()) {
+                this.setTitle(currentFile.getAbsolutePath());
+            } else {
+                this.setTitle(resBundle.getString("app.name") + " - "
+                        + currentFile.getAbsolutePath());
+            }
         } else {
-            this.setTitle(resBundle.getString("app.name"));
-        }        this.setDirty(this.document.isDirty());
+            if (Main.isMac()) {
+                this.setTitle(resBundle.getString("untitled"));
+            } else {
+                this.setTitle(resBundle.getString("app.name"));
+            }
+        }
+        this.setDirty(this.document.isDirty());
     }
     
     public void zoomIn() {
