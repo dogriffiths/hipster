@@ -216,7 +216,7 @@
     
     <target name="exeMac" depends="exeInit" if="isMacOSX">
         <taskdef name="jarbundler"
-        classpath="lib/jarbundler-1.9.jar:lib/xercesimpl.jar" 
+        classpath="platforms/macosx/jarbundler-1.9.jar:platforms/macosx/xercesimpl.jar" 
         classname="net.sourceforge.jarbundler.JarBundler"/>
 
         <jarbundler dir="${basedir}" verbose="true" showPlist="false"
@@ -235,10 +235,10 @@
             <!-- Associate document types with this application -->
             <documenttype name="hIPster Idea Map"
             extensions="opml" 
-            iconFile="etc/hipster.icns"
+            iconFile="platforms/macosx/hipster.icns"
             role="Editor"/>
         </jarbundler>
-        <exec dir="etc" 
+        <exec dir="platforms/macosx" 
             executable="/bin/zsh" os="Mac OS X">
             <arg line="mkdmg.sh ${basedir}/application/hIPster.app ${basedir}/dist hipster"/>
         </exec>
@@ -247,8 +247,8 @@
     
     <target name="exeWin" depends="exeInit" if="isWindows">
         <taskdef name="launch4j" classname="net.sf.launch4j.ant.Launch4jTask"
-        classpath="lib/winapp/launch4j.jar:lib/winapp/xstream.jar" />
-        <launch4j configFile="lib/winapp/launch4jexe.xml" />
+        classpath="platforms/windows/launch4j.jar:platforms/windows/xstream.jar" />
+        <launch4j configFile="platforms/windows/launch4jexe.xml" />
         <zip destfile="dist/hipster-win.zip" basedir="application" includes="hIPster.exe"
         excludes="**/.svn"/>
     </target>

@@ -65,6 +65,9 @@ public final class MacAppListener implements ApplicationListener {
         event.setHandled(true);
     }
     public void	handleOpenApplication(ApplicationEvent event) {
+        if (event.getFilename() != null) {
+            handleOpenFile(event);
+        }
     }
     public void	handleOpenFile(ApplicationEvent event) {
         File f = new File(event.getFilename());
