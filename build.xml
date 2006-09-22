@@ -214,7 +214,27 @@
     <target name="exeInit" depends="jar" if="isMacOSX">
     </target>
     
-    <target name="exeMac" depends="exeInit" if="isMacOSX">
+    <target name="jni"  description="Create HelpBook JNI Library">
+        <mkdir dir="build"/>
+        <exec executable="cc">
+            <arg line="-c"/>
+            <arg line="-I/System/Library/Frameworks/JavaVM.framework/Headers"/>
+            <arg line="-o build/HelpBookJNI.o"/> 
+            <arg value="platforms/macosx/obj-c/HelpBookJNI.m"/>
+        </exec>
+ 
+        <exec executable="cc">
+            <arg line="-dynamiclib"/>
+            <arg line="-framework JavaVM"/>
+            <arg line="-framework Cocoa"/>
+            <arg line="-o build/libHelpBookJNI.jnilib"/>
+            <arg value="build/HelpBookJNI.o"/>   
+        </exec>
+   
+        <delete file="build/HelpBookJNI.o" quiet="true"/>  
+    </target>
+
+    <target name="exeMac" depends="exeInit,jni" if="isMacOSX">
         <taskdef name="jarbundler"
         classpath="platforms/macosx/jarbundler-1.9.jar:platforms/macosx/xercesimpl.jar" 
         classname="net.sourceforge.jarbundler.JarBundler"/>
@@ -230,7 +250,9 @@
             jvmversion="1.5+"
             version="0.1"
             infostring="Idea Processor"
-            bundleid="dg.hipster" > 
+            bundleid="dg.hipster"
+            helpbookfolder="HelpBook"
+            helpbookname="hIPster Help" > 
 
 
             <!-- Associate document types with this application -->
@@ -238,6 +260,17 @@
             extensions="opml" 
             iconFile="platforms/macosx/hipster-doc.icns"
             role="Editor"/>
+            <javafilelist dir="${basedir}/build" files="libHelpBookJNI.jnilib"/>
+
+
+            <!-- Copy the HelpBooks to the language specific folders            -->
+            <!--  English will use the foldername and book name from the Bundle -->
+            <!--  German or 'de' will use the custom folder name and book name  -->
+     
+            <HelpBook locale="English">
+                <fileset dir="etc/help/English" />
+                <fileset dir="etc/help/common" />
+            </HelpBook>
         </jarbundler>
         <exec dir="platforms/macosx" 
             executable="/bin/zsh" os="Mac OS X">

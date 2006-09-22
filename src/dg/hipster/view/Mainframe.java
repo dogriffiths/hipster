@@ -43,7 +43,6 @@ import java.awt.BorderLayout;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
-import java.io.File;
 import java.util.ResourceBundle;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -74,11 +73,6 @@ public final class Mainframe extends JFrame {
     /** Creates a new instance of Mainframe */
     public Mainframe() {
         super();
-//        super(resBundle.getString("app.name"));
-//        
-//        if (Main.isMac()) {
-//            this.setTitle(resBundle.getString("untitled"));
-//        }
         
         Settings s = Settings.getInstance();
         setBounds(s.getWindowLeft(), s.getWindowTop(),
@@ -130,6 +124,8 @@ public final class Mainframe extends JFrame {
               {"view", new Object[][]{
                    {"zoomIn", KeyEvent.VK_PLUS},
                    {"zoomOut", KeyEvent.VK_MINUS}
+               }},
+              {"help", new Object[][]{
                }}
         });
         if (!Main.isMac()) {
@@ -138,9 +134,11 @@ public final class Mainframe extends JFrame {
             menuMgr.createItem("exit", fileMenu);
             JMenu editMenu = getMenu("edit");
             menuMgr.createItem("preferences", editMenu);
-            menuMgr.createMenu("help", menu, new Object[][]{
-                {"about"}
-            });
+            JMenu helpMenu = getMenu("help");
+            menuMgr.createItem("about", helpMenu);
+        } else {
+            JMenu helpMenu = getMenu("help");
+            menuMgr.createItem("manual", helpMenu);
         }
         return menu;
     }

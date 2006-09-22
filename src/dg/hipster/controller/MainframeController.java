@@ -47,6 +47,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.ResourceBundle;
 
 /**
@@ -152,6 +153,12 @@ public final class MainframeController {
                     helpAbout();
                 }
             });
+        } else {
+            mainframe.getItem("manual").addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    helpManual();
+                }
+            });
         }
     }
     
@@ -243,5 +250,22 @@ public final class MainframeController {
     
     public void helpAbout() {
         Main.showAbout();
+    }
+    
+    public void helpManual() {
+        if (Main.isMac()) {
+            System.out.println("calling the manual");
+            try {
+                Class HelpBook = Class.forName("dg.hipster.HelpBook");
+                System.out.println("HelpBook = " + HelpBook);
+                Method launchHelpViewer = HelpBook.getMethod(
+                        "launchHelpViewer");
+                System.out.println("launchHelpViewer = " + launchHelpViewer);
+                launchHelpViewer.invoke(new Integer(10));
+                System.out.println("has invoked");
+            } catch(Exception cnfe) {
+                cnfe.printStackTrace();
+            }
+        }
     }
 }
