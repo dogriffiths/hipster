@@ -1,0 +1,4 @@
+Special thanks to:
+
+Yvon Thoraval for the mkdmg.sh script
+Greg Guerin and Will Gilbert for their help packaging the application for the Mac.
