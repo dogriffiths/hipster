@@ -222,6 +222,7 @@
         <jarbundler dir="${basedir}" verbose="true" showPlist="false"
             name="application/hIPster"
             shortname="hIPster"
+            stubfile="hIPster"
             signature="????"
             mainclass="dg.hipster.Main"
             jar="dist/hipster.jar"
