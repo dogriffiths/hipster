@@ -40,20 +40,26 @@ import dg.hipster.io.ReaderException;
 import dg.hipster.io.ReaderFactory;
 import dg.hipster.io.WriterFactory;
 import dg.hipster.model.Idea;
-import dg.hipster.controller.IdeaDocument;
-import dg.hipster.view.IdeaMap;
 import dg.hipster.view.Mainframe;
 import java.awt.FileDialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
+import java.util.ResourceBundle;
 
 /**
  *
  * @author davidg
  */
 public final class MainframeController {
+    /**
+     * Internationalization strings.
+     */
+    protected static ResourceBundle resBundle = ResourceBundle.getBundle(
+            "dg/hipster/resource/strings");
+    
     private Mainframe mainframe;
     
     public MainframeController(Mainframe aMainframe) {
@@ -151,15 +157,23 @@ public final class MainframeController {
     
     public void newDocument() {
         IdeaDocument document = new IdeaDocument();
-        Idea idea = new Idea("New idea");
-        document.setIdea(idea);
+//        Idea idea = new Idea("New idea");
+//        document.setIdea(idea);
         mainframe.setDocument(document);
-        mainframe.editSelected();
+//        mainframe.editSelected();
     }
     
     public void openDocument() throws IOException, ReaderException {
-        FileDialog chooser = new FileDialog(mainframe, "Open OPML file",
+        FileDialog chooser = new FileDialog(mainframe,
+                resBundle.getString("open.opml.file"),
                 FileDialog.LOAD);
+        
+        chooser.setFilenameFilter(new FilenameFilter(){
+            public boolean accept(File directory, String file) {
+                String filename = file.toUpperCase();
+                return filename.endsWith(".OPML");
+            }
+        });
         
         chooser.setVisible(true);
         
@@ -175,33 +189,39 @@ public final class MainframeController {
     
     public void saveAsDocument() throws IOException, ReaderException {
         IdeaDocument document = mainframe.getDocument();
-        File oldFile = document.getCurrentFile();
-        document.setCurrentFile(null);
-        saveDocument();
-        if (document.getCurrentFile() == null) {
-            document.setCurrentFile(oldFile);
-        }
+        saveDocument(document, null);
     }
     
     public void saveDocument() throws IOException, ReaderException {
-        IdeaDocument document = mainframe.getDocument();
-        if (document.getCurrentFile() == null) {
-            FileDialog chooser = new FileDialog(mainframe, "Save OPML file",
+        IdeaDocument document = this.mainframe.getDocument();
+        saveDocument(document, document.getCurrentFile());
+    }
+    
+    public void saveDocument(IdeaDocument document, File f)
+    throws IOException, ReaderException {
+        File file = f;
+        if (file == null) {
+            FileDialog chooser = new FileDialog(mainframe,
+                    resBundle.getString("save.opml.file"),
                     FileDialog.SAVE);
+            String filename = document.getTitle();
+            if (!filename.toUpperCase().endsWith(".OPML")) {
+                filename += ".opml";
+            }
+            int pos = filename.lastIndexOf(File.separatorChar);
+            chooser.setFile(filename.substring(pos + 1));
             
             chooser.setVisible(true);
             
             if (chooser.getFile() != null) {
-                document.setCurrentFile(new File(chooser.getDirectory()
-                + chooser.getFile()));
+                file = new File(chooser.getDirectory() + chooser.getFile());
             }
         }
         
         
-        if (document.getCurrentFile() != null) {
+        if (file != null) {
             Idea idea = document.getIdea();
-            WriterFactory.getInstance().write(document.getCurrentFile(),
-                    document);
+            WriterFactory.getInstance().write(file, document);
         }
     }
     

@@ -73,11 +73,12 @@ public final class Mainframe extends JFrame {
     
     /** Creates a new instance of Mainframe */
     public Mainframe() {
-        super(resBundle.getString("app.name"));
-        
-        if (Main.isMac()) {
-            this.setTitle(resBundle.getString("untitled"));
-        }
+        super();
+//        super(resBundle.getString("app.name"));
+//        
+//        if (Main.isMac()) {
+//            this.setTitle(resBundle.getString("untitled"));
+//        }
         
         Settings s = Settings.getInstance();
         setBounds(s.getWindowLeft(), s.getWindowTop(),
@@ -85,6 +86,7 @@ public final class Mainframe extends JFrame {
         buildView();
         buildModel();
         controller = new MainframeController(this);
+        setDocument(new IdeaDocument());
     }
     
     /**
@@ -96,7 +98,7 @@ public final class Mainframe extends JFrame {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        ideaMap = new IdeaMap();
+        this.ideaMap = new IdeaMap();
         this.getContentPane().add(ideaMap, BorderLayout.CENTER);
         this.setJMenuBar(createMenu());
         this.setIconImage(createIcon());
@@ -161,6 +163,7 @@ public final class Mainframe extends JFrame {
         this.document = newDocument;
         this.document.setMainframe(this);
         this.document.setIdeaMap(this.ideaMap);
+        this.editSelected();
     }
     
     public IdeaDocument getDocument() {
@@ -173,20 +176,11 @@ public final class Mainframe extends JFrame {
     }
     
     public void documentChanged() {
-        File currentFile = this.document.getCurrentFile();
-        if (currentFile != null) {
-            if (Main.isMac()) {
-                this.setTitle(currentFile.getAbsolutePath());
-            } else {
-                this.setTitle(resBundle.getString("app.name") + " - "
-                        + currentFile.getAbsolutePath());
-            }
+        if (Main.isMac()) {
+            this.setTitle(this.document.getTitle());
         } else {
-            if (Main.isMac()) {
-                this.setTitle(resBundle.getString("untitled"));
-            } else {
-                this.setTitle(resBundle.getString("app.name"));
-            }
+            this.setTitle(resBundle.getString("app.name") + " - "
+                    + this.document.getTitle());
         }
         this.setDirty(this.document.isDirty());
     }
