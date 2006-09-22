@@ -214,7 +214,7 @@
     <target name="exeInit" depends="jar" if="isMacOSX">
     </target>
     
-    <target name="jni"  description="Create HelpBook JNI Library">
+    <target name="jni"  description="Create HelpBook JNI Library" if="isMacOSX">
         <mkdir dir="build"/>
         <exec executable="cc">
             <arg line="-c"/>
