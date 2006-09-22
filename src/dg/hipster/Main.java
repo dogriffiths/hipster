@@ -87,13 +87,6 @@ public final class Main {
     }
     
     public Main() {
-        if (isMac()) {
-            try {
-                Class.forName("dg.hipster.controller.MacAppListener");
-            } catch(ClassNotFoundException cnfe) {
-                cnfe.printStackTrace();
-            }
-        }
     }
     
     private void initView() {
@@ -108,6 +101,13 @@ public final class Main {
                     System.exit(0);
                 }
             });
+        }
+        if (isMac()) {
+            try {
+                Class.forName("dg.hipster.controller.MacAppListener");
+            } catch(ClassNotFoundException cnfe) {
+                cnfe.printStackTrace();
+            }
         }
     }
     
