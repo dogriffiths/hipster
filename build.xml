@@ -225,7 +225,7 @@
             signature="????"
             mainclass="dg.hipster.Main"
             jar="dist/hipster.jar"
-            icon="etc/hipster.icns"
+            icon="platforms/macosx/hipster.icns"
             jvmversion="1.5+"
             version="0.1"
             infostring="Idea Processor"
@@ -235,7 +235,7 @@
             <!-- Associate document types with this application -->
             <documenttype name="hIPster Idea Map"
             extensions="opml" 
-            iconFile="platforms/macosx/hipster.icns"
+            iconFile="platforms/macosx/hipster-doc.icns"
             role="Editor"/>
         </jarbundler>
         <exec dir="platforms/macosx" 
