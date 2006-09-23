@@ -137,6 +137,7 @@ public final class Mainframe extends JFrame {
             JMenu editMenu = getMenu("edit");
             menuMgr.createItem("preferences", editMenu);
             JMenu helpMenu = getMenu("help");
+            menuMgr.createItem("manual", helpMenu, KeyEvent.VK_F1);
             menuMgr.createItem("about", helpMenu);
         } else {
             JMenu helpMenu = getMenu("help");

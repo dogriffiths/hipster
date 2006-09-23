@@ -139,6 +139,11 @@ public final class MainframeController implements FocusListener {
                 }
             }
         });
+        mainframe.getItem("manual").addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                helpManual();
+            }
+        });
         if (!Main.isMac()) {
             mainframe.getItem("preferences").addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
@@ -155,20 +160,14 @@ public final class MainframeController implements FocusListener {
                     helpAbout();
                 }
             });
-        } else {
-            mainframe.getItem("manual").addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    helpManual();
-                }
-            });
         }
         mainframe.addFocusListener(this);
     }
     
-
+    
     public void focusGained(final FocusEvent evt) {
     }
-
+    
     public void focusLost(final FocusEvent evt) {
         mainframe.unEditSelected();
     }
@@ -271,6 +270,32 @@ public final class MainframeController implements FocusListener {
             } catch(Exception cnfe) {
                 cnfe.printStackTrace();
             }
+        } else if (Main.isWindows()) {
+            String pwd = System.getProperty("user.dir");
+            String manualIndex = pwd + File.separatorChar + "manual"
+                    + File.separatorChar + "English" + File.separatorChar
+                    + "index.html";
+            showUrlInWindows((new File(manualIndex)).toString());
+        }
+    }
+    
+    private void showUrlInWindows(String u) {
+        System.out.println("u = " + u);
+        
+        if (u.indexOf('@') != -1) {
+            u = "mailto:" + u;
+        } else if (u.startsWith("http")) {
+        } else if (u.substring(1, 2).indexOf(':') != -1) {
+        } else {
+            u = "http://" + u;
+        }
+        
+        try {
+            Process process = null;
+            
+            process = Runtime.getRuntime().exec("explorer " + u);
+        } catch (java.io.IOException ioe) {
+            ioe.printStackTrace();
         }
     }
 }

@@ -128,6 +128,15 @@ public final class Main {
     }
     
     /**
+     * True if we are running on Windows.
+     * @return true if the current platform is Windows, false otherwise
+     */
+    public static boolean isWindows() {
+        String osName = System.getProperty("os.name");
+        return ((osName != null) && (osName.indexOf("Windows") != -1));
+    }
+    
+    /**
      * Display the about box.
      */
     public static void showAbout() {
