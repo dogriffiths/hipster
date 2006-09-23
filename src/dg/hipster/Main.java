@@ -114,6 +114,7 @@ public final class Main {
     public void setVisible(boolean visible) {
         if (frame != null) {
             frame.setVisible(visible);
+            frame.editSelected();
         }
     }
     
