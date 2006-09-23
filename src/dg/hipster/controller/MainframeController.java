@@ -44,6 +44,8 @@ import dg.hipster.view.Mainframe;
 import java.awt.FileDialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -54,7 +56,7 @@ import java.util.ResourceBundle;
  *
  * @author davidg
  */
-public final class MainframeController {
+public final class MainframeController implements FocusListener {
     /**
      * Internationalization strings.
      */
@@ -160,14 +162,20 @@ public final class MainframeController {
                 }
             });
         }
+        mainframe.addFocusListener(this);
+    }
+    
+
+    public void focusGained(final FocusEvent evt) {
+    }
+
+    public void focusLost(final FocusEvent evt) {
+        mainframe.unEditSelected();
     }
     
     public void newDocument() {
         IdeaDocument document = new IdeaDocument();
-//        Idea idea = new Idea("New idea");
-//        document.setIdea(idea);
         mainframe.setDocument(document);
-//        mainframe.editSelected();
     }
     
     public void openDocument() throws IOException, ReaderException {

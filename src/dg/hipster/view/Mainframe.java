@@ -194,4 +194,8 @@ public final class Mainframe extends JFrame {
     public void editSelected() {
         ideaMap.getController().editIdeaView(ideaMap.getRootView());
     }
+    
+    public void unEditSelected() {
+        ideaMap.getController().unEditIdeaView(ideaMap.getRootView());
+    }
 }

@@ -455,6 +455,7 @@ public final class IdeaMapController implements ActionListener, KeyListener,
     public void unEditIdeaView(final IdeaView ideaView) {
         ideaView.getIdea().setText(ideaMap.getTextField().getText());
         ideaView.setEditing(false);
+        ideaMap.getTextField().select(0, 0);
         ideaMap.getTextField().setEnabled(false);
     }
 
