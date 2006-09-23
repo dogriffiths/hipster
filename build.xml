@@ -249,10 +249,6 @@
     </target>
     
     <target name="exeWin" depends="exeInit" if="isWindows">
-        <taskdef name="launch4j" classname="net.sf.launch4j.ant.Launch4jTask"
-        classpath="platforms/windows/launch4j.jar:platforms/windows/xstream.jar" />
-        <launch4j configFile="platforms/windows/launch4jexe.xml" />
-        <zip destfile="dist/hipster-win.zip" basedir="application" includes="hIPster.exe"
-        excludes="**/.svn"/>
+        <ant antfile="platforms/windows/build.xml" target="exeWin"/>
     </target>
 </project>
