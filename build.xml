@@ -241,7 +241,7 @@
 
     <target name="exe" depends="exeMac,exeWin"/>
 
-    <target name="exeInit" depends="jar" if="isMacOSX">
+    <target name="exeInit" depends="jar">
     </target>
     
     <target name="exeMac" depends="exeInit" if="isMacOSX">
