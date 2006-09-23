@@ -265,12 +265,9 @@ public final class MainframeController implements FocusListener {
             System.out.println("calling the manual");
             try {
                 Class HelpBook = Class.forName("dg.hipster.HelpBook");
-                System.out.println("HelpBook = " + HelpBook);
                 Method launchHelpViewer = HelpBook.getMethod(
                         "launchHelpViewer");
-                System.out.println("launchHelpViewer = " + launchHelpViewer);
                 launchHelpViewer.invoke(new Integer(10));
-                System.out.println("has invoked");
             } catch(Exception cnfe) {
                 cnfe.printStackTrace();
             }

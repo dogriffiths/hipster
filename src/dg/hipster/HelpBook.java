@@ -43,9 +43,7 @@ package dg.hipster;
  */
 public class HelpBook {
     static {
-        System.out.println("loading library");
         System.loadLibrary("HelpBookJNI");
-        System.out.println("library loaded... apparently...");
     }
     
     public static native void launchHelpViewer();

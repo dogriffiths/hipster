@@ -39,6 +39,8 @@
     <target name="jni"  description="Create HelpBook JNI Library" if="isMacOSX">
         <mkdir dir="build"/>
         <exec executable="cc">
+            <arg line="-arch ppc"/>
+            <arg line="-arch i386"/>
             <arg line="-c"/>
             <arg line="-I/System/Library/Frameworks/JavaVM.framework/Headers"/>
             <arg line="-o build/HelpBookJNI.o"/> 
@@ -46,6 +48,8 @@
         </exec>
  
         <exec executable="cc">
+            <arg line="-arch i386"/>
+            <arg line="-arch ppc"/>
             <arg line="-dynamiclib"/>
             <arg line="-framework JavaVM"/>
             <arg line="-framework Cocoa"/>
