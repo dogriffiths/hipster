@@ -42,12 +42,14 @@ import dg.hipster.model.Settings;
 import java.awt.BorderLayout;
 import java.awt.Image;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.ResourceBundle;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 
 /**
@@ -125,8 +127,8 @@ public final class Mainframe extends JFrame {
                    {"zoomIn", KeyEvent.VK_PLUS},
                    {"zoomOut", KeyEvent.VK_MINUS}
                }},
-              {"help", new Object[][]{
-               }}
+               {"help", new Object[][]{
+                }}
         });
         if (!Main.isMac()) {
             JMenu fileMenu = getMenu("file");
@@ -138,7 +140,10 @@ public final class Mainframe extends JFrame {
             menuMgr.createItem("about", helpMenu);
         } else {
             JMenu helpMenu = getMenu("help");
-            menuMgr.createItem("manual", helpMenu);
+            menuMgr.createItem("manual", helpMenu, KeyStroke.getKeyStroke(
+                    KeyEvent.VK_SLASH,
+                    ActionEvent.SHIFT_MASK
+                    + Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         }
         return menu;
     }

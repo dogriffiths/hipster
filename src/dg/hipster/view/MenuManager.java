@@ -91,12 +91,20 @@ final class MenuManager {
     }
 
     void createItem(String name, JMenu menu, Integer keyStroke) {
+        KeyStroke ks = null;
+        if (keyStroke != 0) {
+            ks = KeyStroke.getKeyStroke(keyStroke,
+                    Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
+        }
+        createItem(name, menu, ks);
+    }
+
+    void createItem(String name, JMenu menu, KeyStroke keyStroke) {
         String text = resBundle.getString("menu." + name);
         JMenuItem item = new JMenuItem(text);
         menu.add(item);
-        if (keyStroke != 0) {
-            item.setAccelerator(KeyStroke.getKeyStroke(keyStroke,
-                    Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        if (keyStroke != null) {
+            item.setAccelerator(keyStroke);
         }
         menuItems.put(name, item);
     }
