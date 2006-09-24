@@ -53,9 +53,6 @@ public class IdeaDocument extends AbstractModel implements IdeaListener {
     protected static ResourceBundle resBundle = ResourceBundle.getBundle(
             "dg/hipster/resource/strings");
     
-    private IdeaMap ideaMap;
-    
-    
     private Idea idea;
     private File currentFile;
     private boolean dirty;
@@ -67,15 +64,15 @@ public class IdeaDocument extends AbstractModel implements IdeaListener {
     }
     
     public void setIdea(Idea newIdea) {
-        if (this.ideaMap != null) {
-            Idea oldIdea = this.ideaMap.getIdea();
-            if (oldIdea != null) {
-                oldIdea.removeIdeaListener(this);
-            }
-            this.ideaMap.setIdea(newIdea);
+        Idea oldIdea = this.idea;
+        if (oldIdea != null) {
+            oldIdea.removeIdeaListener(this);
         }
         this.idea = newIdea;
-        newIdea.addIdeaListener(this);
+        if (this.idea != null) {
+            newIdea.addIdeaListener(this);
+        }
+        firePropertyChange("idea", oldIdea, this.idea);
     }
     
     public Idea getIdea() {
@@ -105,17 +102,6 @@ public class IdeaDocument extends AbstractModel implements IdeaListener {
         boolean oldDirty = this.dirty;
         this.dirty = dirty;
         firePropertyChange("title", oldDirty, this.dirty);
-    }
-    
-    public IdeaMap getIdeaMap() {
-        return ideaMap;
-    }
-    
-    public void setIdeaMap(IdeaMap ideaMap) {
-        IdeaMap oldIdeaMap = this.ideaMap;
-        this.ideaMap = ideaMap;
-        this.ideaMap.setIdea(this.idea);
-        firePropertyChange("title", oldIdeaMap, this.ideaMap);
     }
     
     public String getTitle() {

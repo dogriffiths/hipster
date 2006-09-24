@@ -169,7 +169,7 @@ public final class Mainframe extends JFrame implements PropertyChangeListener {
     public void setDocument(final IdeaDocument newDocument) {
         this.document = newDocument;
         this.document.addPropertyChangeListener(this);
-        this.document.setIdeaMap(this.ideaMap);
+        this.ideaMap.setIdea(this.document.getIdea());
         this.editSelected();
     }
     
@@ -189,6 +189,9 @@ public final class Mainframe extends JFrame implements PropertyChangeListener {
             } else {
                 this.setTitle(resBundle.getString("app.name") + " - "
                         + this.document.getTitle());
+            }
+            if ("idea".equals(evt.getPropertyName())) {
+                this.ideaMap.setIdea(this.document.getIdea());
             }
             this.setDirty(this.document.isDirty());
         }
