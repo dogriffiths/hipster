@@ -33,9 +33,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-package dg.hipster.controller;
+package dg.hipster.model;
 
-import dg.hipster.model.*;
 import dg.hipster.view.IdeaMap;
 import dg.hipster.view.Mainframe;
 import dg.inx.AbstractModel;
