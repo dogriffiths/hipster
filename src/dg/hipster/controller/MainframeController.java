@@ -42,6 +42,7 @@ import dg.hipster.io.WriterFactory;
 import dg.hipster.model.Idea;
 import dg.hipster.model.IdeaDocument;
 import dg.hipster.view.Mainframe;
+import dg.inx.Controller;
 import java.awt.FileDialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -68,99 +69,20 @@ public final class MainframeController implements FocusListener {
     
     public MainframeController(Mainframe aMainframe) {
         this.mainframe = aMainframe;
-        mainframe.getItem("new").addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent evt) {
-                try {
-                    newDocument();
-                } catch(Throwable t) {
-                    t.printStackTrace();
-                }
-            }
-        });
-        mainframe.getItem("open").addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent evt) {
-                try {
-                    openDocument();
-                } catch(Throwable t) {
-                    t.printStackTrace();
-                }
-            }
-        });
-        mainframe.getItem("save").addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent evt) {
-                try {
-                    saveDocument();
-                } catch(Throwable t) {
-                    t.printStackTrace();
-                }
-            }
-        });
-        mainframe.getItem("saveAs").addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent evt) {
-                try {
-                    saveAsDocument();
-                } catch(Throwable t) {
-                    t.printStackTrace();
-                }
-            }
-        });
-        mainframe.getItem("zoomIn").addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent evt) {
-                try {
-                    zoomIn();
-                } catch(Throwable t) {
-                    t.printStackTrace();
-                }
-            }
-        });
-        mainframe.getItem("insertChild").addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent evt) {
-                try {
-                    mainframe.getIdeaMap().getController().insertChild();
-                } catch(Throwable t) {
-                    t.printStackTrace();
-                }
-            }
-        });
-        mainframe.getItem("insertSibling").addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent evt) {
-                try {
-                    mainframe.getIdeaMap().getController().insertIdea();
-                } catch(Throwable t) {
-                    t.printStackTrace();
-                }
-            }
-        });
-        mainframe.getItem("zoomOut").addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent evt) {
-                try {
-                    zoomOut();
-                } catch(Throwable t) {
-                    t.printStackTrace();
-                }
-            }
-        });
-        mainframe.getItem("manual").addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                helpManual();
-            }
-        });
+        Controller menuController = new Controller(null);
+        menuController.bindMethod(this, "newDocument", mainframe.getItem("new"));
+        menuController.bindMethod(this, "openDocument", mainframe.getItem("open"));
+        menuController.bindMethod(this, "saveDocument", mainframe.getItem("save"));
+        menuController.bindMethod(this, "saveAsDocument", mainframe.getItem("saveAs"));
+        menuController.bindMethod(this, "zoomIn", mainframe.getItem("zoomIn"));
+        menuController.bindMethod(this, "zoomOut", mainframe.getItem("zoomOut"));
+        menuController.bindMethod(this, "helpManual", mainframe.getItem("manual"));
+        menuController.bindMethod(this, "insertChild", mainframe.getItem("insertChild"));
+        menuController.bindMethod(this, "insertSibling", mainframe.getItem("insertSibling"));
         if (!Main.isMac()) {
-            mainframe.getItem("preferences").addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    editPreferences();
-                }
-            });
-            mainframe.getItem("exit").addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    fileExit();
-                }
-            });
-            mainframe.getItem("about").addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    helpAbout();
-                }
-            });
+            menuController.bindMethod(this, "editPreferences", mainframe.getItem("preferences"));
+            menuController.bindMethod(this, "fileExit", mainframe.getItem("exit"));
+            menuController.bindMethod(this, "helpAbout", mainframe.getItem("about"));
         }
         mainframe.addFocusListener(this);
     }
@@ -298,5 +220,13 @@ public final class MainframeController implements FocusListener {
         } catch (java.io.IOException ioe) {
             ioe.printStackTrace();
         }
+    }
+    
+    public void insertChild() {
+        mainframe.getIdeaMap().getController().insertChild();
+    }
+    
+    public void insertSibling() {
+        mainframe.getIdeaMap().getController().insertIdea();
     }
 }

@@ -91,7 +91,7 @@ public class IdeaDocument extends AbstractModel implements IdeaListener {
         } else {
             this.setTitle(newCurrentFile.getAbsolutePath());
         }
-        firePropertyChange("title", oldFile, this.currentFile);
+        firePropertyChange("currentFile", oldFile, this.currentFile);
     }
     
     public boolean isDirty() {
@@ -101,7 +101,7 @@ public class IdeaDocument extends AbstractModel implements IdeaListener {
     public void setDirty(boolean dirty) {
         boolean oldDirty = this.dirty;
         this.dirty = dirty;
-        firePropertyChange("title", oldDirty, this.dirty);
+        firePropertyChange("dirty", oldDirty, this.dirty);
     }
     
     public String getTitle() {

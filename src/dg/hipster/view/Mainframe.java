@@ -172,6 +172,7 @@ public final class Mainframe extends JFrame implements PropertyChangeListener {
         this.ideaMap.setIdea(this.document.getIdea());
         this.editSelected();
         this.setDirty(this.document.isDirty());
+        this.setTitle(this.document.getTitle());
     }
     
     public IdeaDocument getDocument() {

@@ -274,4 +274,24 @@ public class Controller {
                 )
                 );
     }
+  /**
+   *  If object source generates an action-event, then call the given method in
+   *  the target object. NB: source must contain an "addActionListener" method
+   *  for this to work.
+   */
+  public void bindMethod(Object target, String methodName, Object source) {
+    Class clazz = source.getClass();
+    try {
+      Method method = clazz.getMethod("addActionListener",
+          new Class[]{ActionListener.class});
+      ActionListener actionListener = (ActionListener)EventHandler.create(
+        ActionListener.class,
+        target,
+        methodName
+      );
+      method.invoke(source, new Object[]{actionListener});
+    } catch(Exception e) {
+      e.printStackTrace();
+    }
+  }
 }
