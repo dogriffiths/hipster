@@ -44,6 +44,8 @@ import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ResourceBundle;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -57,7 +59,7 @@ import javax.swing.UIManager;
  *
  * @author davidg
  */
-public final class Mainframe extends JFrame {
+public final class Mainframe extends JFrame implements PropertyChangeListener {
     /**
      * Internationalization strings.
      */
@@ -166,7 +168,8 @@ public final class Mainframe extends JFrame {
     
     public void setDocument(final IdeaDocument newDocument) {
         this.document = newDocument;
-        this.document.setMainframe(this);
+//        this.document.setMainframe(this);
+        this.document.addPropertyChangeListener(this);
         this.document.setIdeaMap(this.ideaMap);
         this.editSelected();
     }
@@ -180,14 +183,16 @@ public final class Mainframe extends JFrame {
                 Boolean.valueOf(dirty));
     }
     
-    public void documentChanged() {
-        if (Main.isMac()) {
-            this.setTitle(this.document.getTitle());
-        } else {
-            this.setTitle(resBundle.getString("app.name") + " - "
-                    + this.document.getTitle());
+    public void propertyChange(PropertyChangeEvent evt) {
+        if (evt.getSource() == this.document) {
+            if (Main.isMac()) {
+                this.setTitle(this.document.getTitle());
+            } else {
+                this.setTitle(resBundle.getString("app.name") + " - "
+                        + this.document.getTitle());
+            }
+            this.setDirty(this.document.isDirty());
         }
-        this.setDirty(this.document.isDirty());
     }
     
     public void zoomIn() {
