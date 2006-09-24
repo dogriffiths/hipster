@@ -42,6 +42,7 @@ import dg.hipster.io.WriterFactory;
 import dg.hipster.model.Idea;
 import dg.hipster.model.IdeaDocument;
 import dg.hipster.model.Settings;
+import dg.inx.MenuManager;
 import java.awt.BorderLayout;
 import java.awt.FileDialog;
 import java.awt.Image;
