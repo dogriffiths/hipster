@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    Document   : mainframeMenu.xml
+    Created on : September 24, 2006, 4:21 PM
+    Author     : davidg
+    Description:
+        Mainframe menu bar.
+-->
+
+<menuBar>
+    <menu textName="file">
+        <item textName="new" action="newDocument" key="N"/>
+        <item textName="-"/>
+        <item textName="open" action="openDocument" key="O"/>
+        <item textName="save" action="saveDocument" key="S"/>
+        <item textName="saveAs" action="saveAsDocument"/>
+    </menu>
+    <menu textName="edit">
+        <item textName="insertChild" action="insertChild"/>
+        <item textName="insertSibling" action="insertSibling"/>
+    </menu>
+    <menu textName="view">
+        <item textName="zoomIn" action="zoomIn" key="PLUS"/>
+        <item textName="zoomOut" action="zoomOut" key="MINUS"/>
+    </menu>
+    <menu textName="help">
+    </menu>
+</menuBar>

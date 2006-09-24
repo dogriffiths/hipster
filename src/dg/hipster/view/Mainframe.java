@@ -42,7 +42,7 @@ import dg.hipster.io.WriterFactory;
 import dg.hipster.model.Idea;
 import dg.hipster.model.IdeaDocument;
 import dg.hipster.model.Settings;
-import dg.inx.MenuManager;
+import dg.inx.XMLMenuBar;
 import java.awt.BorderLayout;
 import java.awt.FileDialog;
 import java.awt.Image;
@@ -81,7 +81,7 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
     /**
      * Main idea processor component.
      */
-    private MenuManager menuMgr = new MenuManager(this);
+    private XMLMenuBar menuMgr;
     private IdeaMap ideaMap;
     private IdeaDocument document;
     
@@ -122,26 +122,8 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
     }
     
     private JMenuBar createMenu() {
-        JMenuBar menu = new JMenuBar();
-        menuMgr.createMenus(menu, new Object[][]{
-            {"file", new Object[][] {
-                 {"new", "newDocument", KeyEvent.VK_N},
-                 {"-"},
-                 {"open", "openDocument", KeyEvent.VK_O},
-                 {"save", "saveDocument", KeyEvent.VK_S},
-                 {"saveAs", "saveAsDocument"}
-             }},
-             {"edit", new Object[][] {
-                  {"insertChild", "insertChild"},
-                  {"insertSibling", "insertSibling"},
-              }},
-              {"view", new Object[][]{
-                   {"zoomIn", "zoomIn", KeyEvent.VK_PLUS},
-                   {"zoomOut", "zoomOut", KeyEvent.VK_MINUS}
-               }},
-               {"help", new Object[][]{
-                }}
-        });
+        menuMgr = new XMLMenuBar(this,
+                "/dg/hipster/view/mainframeMenu.xml", resBundle);
         if (!Main.isMac()) {
             JMenu fileMenu = getMenu("file");
             fileMenu.addSeparator();
@@ -160,14 +142,14 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
                     ActionEvent.SHIFT_MASK
                     + Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         }
-        return menu;
+        return menuMgr;
     }
     
-    public JMenu getMenu(String name) {
+    private JMenu getMenu(String name) {
         return menuMgr.getMenu(name);
     }
     
-    public JMenuItem getItem(String name) {
+    private JMenuItem getItem(String name) {
         return menuMgr.getItem(name);
     }
     
@@ -309,7 +291,6 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
     
     public void helpManual() {
         if (Main.isMac()) {
-            System.out.println("calling the manual");
             try {
                 Class HelpBook = Class.forName("dg.hipster.HelpBook");
                 Method launchHelpViewer = HelpBook.getMethod(
@@ -328,7 +309,6 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
     }
     
     private void showUrlInWindows(String u) {
-        System.out.println("u = " + u);
         
         if (u.indexOf('@') != -1) {
             u = "mailto:" + u;

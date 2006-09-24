@@ -1,5 +1,5 @@
 /*
- * MenuManager.java
+ * XMLMenuBar.java
  *
  * Created on September 15, 2006, 9:33 PM
  *
@@ -36,6 +36,10 @@
 package dg.inx;
 
 import java.awt.Toolkit;
+import java.awt.event.KeyEvent;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -43,36 +47,99 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
+import javax.xml.parsers.DocumentBuilderFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  *
  * @author davidg
  */
 
-public final class MenuManager {
+public final class XMLMenuBar extends JMenuBar {
     /**
      * Internationalization strings.
      */
-    protected static ResourceBundle resBundle = ResourceBundle.getBundle(
-            "dg/hipster/resource/strings");
-
+    private ResourceBundle resBundle;
+    
     private Map<String, JMenu> menus = new HashMap<String, JMenu>();
     private Map<String, JMenuItem> menuItems = new HashMap<String, JMenuItem>();
     private Controller controller;
     private Object backingBean;
-
-    public MenuManager(Object aBean) {
+//    private JMenuBar menuBar;
+    
+    public XMLMenuBar(Object aBean, String viewXML, ResourceBundle resBundle) {
+        super();
         this.backingBean = aBean;
         controller = new Controller(null);
+        this.resBundle = resBundle;
+        
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        InputStream in = null;
+        try {
+            in = XMLMenuBar.class.getResourceAsStream(viewXML);
+            Document document = factory.newDocumentBuilder().parse(in);
+            
+            Element docMenuBar = (Element)document.getElementsByTagName(
+                    "menuBar").item(0);
+            
+            //menuBar = new JMenuBar();
+            
+            NodeList menuList = docMenuBar.getElementsByTagName("menu");
+            for (int i = 0; i < menuList.getLength(); i++) {
+                Element menuElement = (Element)menuList.item(i);
+                String menuName = menuElement.getTagName();
+                String menuTextName = menuElement.getAttribute("textName");
+                String menuText = resBundle.getString("menu." + menuTextName);
+                JMenu aMenu = new JMenu(menuText);
+                menus.put(menuTextName, aMenu);
+                add(aMenu);
+                NodeList itemList = menuElement.getChildNodes();
+                int col = 0;
+                for (int j = 0; j < itemList.getLength(); j++) {
+                    Node itemNode = (Node)itemList.item(j);
+                    if (itemNode instanceof Element) {
+                        Element itemElement = (Element)itemNode;
+                        String itemName = itemElement.getTagName();
+                        String itemTextName = itemElement.getAttribute("textName");
+                        String action = itemElement.getAttribute("action");
+                        int keyStroke = 0;
+                        String key = itemElement.getAttribute("key");
+                        if ((key != null) && (key.length() > 0)) {
+                            Class keyEventClass = KeyEvent.class;
+                            Field ks = keyEventClass.getDeclaredField("VK_" + key);
+                            keyStroke = ks.getInt(new Integer(0));
+                        }
+                        createItem(itemTextName, aMenu, action, keyStroke);
+                    }
+                }
+            }
+            
+        } catch(Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (in != null) {
+                try {
+                    in.close();
+                } catch(IOException ioe) {
+                }
+            }
+        }
     }
-
+    
+    public JMenuBar getMenuBar() {
+        return this;
+    }
+    
     public void createMenus(final JMenuBar menu, Object[][] params) {
         for(Object[] p: params) {
             String menuName = (String) p[0];
             createMenu(menuName, menu, (Object[][])p[1]);
         }
     }
-
+    
     public void createMenu(final String name, final JMenuBar menu, Object[][] params) {
         String text = resBundle.getString("menu." + name);
         JMenu aMenu = new JMenu(text);
@@ -88,11 +155,11 @@ public final class MenuManager {
             }
         }
     }
-
+    
     public void createItem(String name, JMenu menu, String action) {
         createItem(name, menu, action, 0);
     }
-
+    
     public void createItem(String name, JMenu menu, String action, Integer keyStroke) {
         KeyStroke ks = null;
         if (keyStroke != 0) {
@@ -101,9 +168,15 @@ public final class MenuManager {
         }
         createItem(name, menu, action, ks);
     }
-
+    
     public void createItem(String name, JMenu menu, String action, KeyStroke keyStroke) {
-        String text = resBundle.getString("menu." + name);
+        String text = "-";
+        if (!"-".equals(name)) {
+            text = resBundle.getString("menu." + name);
+        } else {
+            menu.addSeparator();
+            return;
+        }
         JMenuItem item = new JMenuItem(text);
         menu.add(item);
         if (keyStroke != null) {
@@ -112,11 +185,11 @@ public final class MenuManager {
         menuItems.put(name, item);
         controller.bindMethod(backingBean, action, item);
     }
-
+    
     public JMenu getMenu(String name) {
         return menus.get(name);
     }
-
+    
     public JMenuItem getItem(String name) {
         return menuItems.get(name);
     }
