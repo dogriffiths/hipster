@@ -81,7 +81,6 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
     /**
      * Main idea processor component.
      */
-    private XMLMenuBar menuMgr;
     private IdeaMap ideaMap;
     private IdeaDocument document;
     
@@ -122,20 +121,20 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
     }
     
     private JMenuBar createMenu() {
-        menuMgr = new XMLMenuBar(this,
+        XMLMenuBar menuMgr = new XMLMenuBar(this,
                 "/dg/hipster/view/mainframeMenu.xml", resBundle);
         if (!Main.isMac()) {
-            JMenu fileMenu = getMenu("file");
+            JMenu fileMenu = menuMgr.getMenu("file");
             fileMenu.addSeparator();
             menuMgr.createItem("exit", fileMenu, "fileExit");
-            JMenu editMenu = getMenu("edit");
+            JMenu editMenu = menuMgr.getMenu("edit");
             menuMgr.createItem("preferences", editMenu, "editPreferences");
-            JMenu helpMenu = getMenu("help");
+            JMenu helpMenu = menuMgr.getMenu("help");
             menuMgr.createItem("manual", helpMenu, "helpManual",
                     KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0));
             menuMgr.createItem("about", helpMenu, "helpAbout");
         } else {
-            JMenu helpMenu = getMenu("help");
+            JMenu helpMenu = menuMgr.getMenu("help");
             menuMgr.createItem("manual", helpMenu, "helpManual",
                     KeyStroke.getKeyStroke(
                     KeyEvent.VK_SLASH,
@@ -143,14 +142,6 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
                     + Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         }
         return menuMgr;
-    }
-    
-    private JMenu getMenu(String name) {
-        return menuMgr.getMenu(name);
-    }
-    
-    private JMenuItem getItem(String name) {
-        return menuMgr.getItem(name);
     }
     
     /**
