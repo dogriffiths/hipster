@@ -35,6 +35,7 @@
 
 package dg.hipster.view;
 
+import dg.inx.Controller;
 import java.awt.Toolkit;
 import java.util.HashMap;
 import java.util.Map;
@@ -58,9 +59,12 @@ final class MenuManager {
 
     private Map<String, JMenu> menus = new HashMap<String, JMenu>();
     private Map<String, JMenuItem> menuItems = new HashMap<String, JMenuItem>();
+    private Controller controller;
+    private Object backingBean;
 
-    MenuManager() {
-
+    MenuManager(Object aBean) {
+        this.backingBean = aBean;
+        controller = new Controller(null);
     }
 
     void createMenus(final JMenuBar menu, Object[][] params) {
@@ -76,30 +80,41 @@ final class MenuManager {
         menus.put(name, aMenu);
         menu.add(aMenu);
         for (Object[] p: params) {
-            if (p.length == 2) {
-                createItem((String) p[0], aMenu, (Integer) p[1]);
+            if (p.length == 3) {
+                createItem((String) p[0], aMenu, (String) p[1], (Integer) p[2]);
             } else if ("-".equals(p[0])) {
                 aMenu.addSeparator();
             } else {
-                createItem((String) p[0], aMenu);
+                createItem((String) p[0], aMenu, (String) p[1]);
             }
         }
     }
 
-    void createItem(String name, JMenu menu) {
-        createItem(name, menu, 0);
+    void createItem(String name, JMenu menu, String action) {
+        createItem(name, menu, action, 0);
     }
 
-    void createItem(String name, JMenu menu, Integer keyStroke) {
+    void createItem(String name, JMenu menu, String action, Integer keyStroke) {
         KeyStroke ks = null;
         if (keyStroke != 0) {
             ks = KeyStroke.getKeyStroke(keyStroke,
                     Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
         }
-        createItem(name, menu, ks);
+        createItem(name, menu, action, ks);
     }
 
-    void createItem(String name, JMenu menu, KeyStroke keyStroke) {
+//    void createItem(String name, JMenu menu, KeyStroke keyStroke) {
+//        String text = resBundle.getString("menu." + name);
+//        JMenuItem item = new JMenuItem(text);
+//        menu.add(item);
+//        if (keyStroke != null) {
+//            item.setAccelerator(keyStroke);
+//        }
+//        menuItems.put(name, item);
+//        
+//    }
+//
+    void createItem(String name, JMenu menu, String action, KeyStroke keyStroke) {
         String text = resBundle.getString("menu." + name);
         JMenuItem item = new JMenuItem(text);
         menu.add(item);
@@ -107,6 +122,7 @@ final class MenuManager {
             item.setAccelerator(keyStroke);
         }
         menuItems.put(name, item);
+        controller.bindMethod(backingBean, action, item);
     }
 
     public JMenu getMenu(String name) {
