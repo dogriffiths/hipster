@@ -60,6 +60,7 @@ public class IdeaDocument extends AbstractModel implements IdeaListener {
     public IdeaDocument() {
         this.setCurrentFile(null);
         this.setIdea(new Idea(this.getTitle()));
+        this.setDirty(false);
     }
     
     public void setIdea(Idea newIdea) {
