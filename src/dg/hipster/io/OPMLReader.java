@@ -35,7 +35,7 @@
 
 package dg.hipster.io;
 
-import dg.hipster.controller.IdeaDocument;
+import dg.hipster.model.IdeaDocument;
 import dg.hipster.model.Idea;
 import java.io.InputStream;
 import java.util.Stack;

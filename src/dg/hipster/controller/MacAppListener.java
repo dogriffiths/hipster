@@ -41,6 +41,7 @@ import com.apple.eawt.ApplicationListener;
 import dg.hipster.Main;
 import dg.hipster.io.ReaderException;
 import dg.hipster.io.ReaderFactory;
+import dg.hipster.model.IdeaDocument;
 import dg.hipster.view.GuiUtilities;
 import java.io.File;
 

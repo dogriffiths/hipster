@@ -7,7 +7,7 @@
 
 package dg.hipster.io;
 
-import dg.hipster.controller.IdeaDocument;
+import dg.hipster.model.IdeaDocument;
 import junit.framework.*;
 import dg.hipster.model.Idea;
 import java.io.ByteArrayOutputStream;

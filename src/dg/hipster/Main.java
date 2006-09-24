@@ -35,7 +35,7 @@
 
 package dg.hipster;
 
-import dg.hipster.controller.IdeaDocument;
+import dg.hipster.model.IdeaDocument;
 import dg.hipster.controller.MacAppListener;
 import dg.hipster.io.ReaderException;
 import dg.hipster.io.ReaderFactory;

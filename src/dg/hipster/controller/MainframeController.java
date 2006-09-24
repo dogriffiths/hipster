@@ -40,6 +40,7 @@ import dg.hipster.io.ReaderException;
 import dg.hipster.io.ReaderFactory;
 import dg.hipster.io.WriterFactory;
 import dg.hipster.model.Idea;
+import dg.hipster.model.IdeaDocument;
 import dg.hipster.view.Mainframe;
 import java.awt.FileDialog;
 import java.awt.event.ActionEvent;
@@ -115,7 +116,7 @@ public final class MainframeController implements FocusListener {
         mainframe.getItem("insertChild").addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 try {
-                    mainframe.getDocument().getIdeaMap().getController().insertChild();
+                    mainframe.getIdeaMap().getController().insertChild();
                 } catch(Throwable t) {
                     t.printStackTrace();
                 }
@@ -124,7 +125,7 @@ public final class MainframeController implements FocusListener {
         mainframe.getItem("insertSibling").addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 try {
-                    mainframe.getDocument().getIdeaMap().getController().insertIdea();
+                    mainframe.getIdeaMap().getController().insertIdea();
                 } catch(Throwable t) {
                     t.printStackTrace();
                 }

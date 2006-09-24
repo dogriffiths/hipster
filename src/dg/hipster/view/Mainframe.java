@@ -37,7 +37,7 @@ package dg.hipster.view;
 
 import dg.hipster.Main;
 import dg.hipster.controller.MainframeController;
-import dg.hipster.controller.IdeaDocument;
+import dg.hipster.model.IdeaDocument;
 import dg.hipster.model.Settings;
 import java.awt.BorderLayout;
 import java.awt.Image;
@@ -180,6 +180,10 @@ public final class Mainframe extends JFrame implements PropertyChangeListener {
     public void setDirty(boolean dirty) {
         this.getRootPane().putClientProperty("windowModified",
                 Boolean.valueOf(dirty));
+    }
+    
+    public IdeaMap getIdeaMap() {
+        return this.ideaMap;
     }
     
     public void propertyChange(PropertyChangeEvent evt) {

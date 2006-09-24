@@ -35,7 +35,7 @@
 
 package dg.hipster.io;
 
-import dg.hipster.controller.IdeaDocument;
+import dg.hipster.model.IdeaDocument;
 import java.io.File;
 import java.io.FileWriter;
 
