@@ -94,7 +94,7 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
                 s.getWindowWidth(), s.getWindowHeight());
         buildView();
         buildModel();
-        setDocument(new IdeaDocument());
+        newDocument();
     }
     
     /**
@@ -155,7 +155,6 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
         this.document = newDocument;
         this.document.addPropertyChangeListener(this);
         this.updateIdeaMapWithDocument();
-        this.editSelected();
     }
     
     public IdeaDocument getDocument() {
@@ -205,8 +204,8 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
     }
     
     public void newDocument() {
-        IdeaDocument document = new IdeaDocument();
-        this.setDocument(document);
+        this.setDocument(new IdeaDocument());
+        this.editSelected();
     }
     
     public void openDocument() throws IOException, ReaderException {
