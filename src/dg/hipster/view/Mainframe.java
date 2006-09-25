@@ -35,6 +35,7 @@
 
 package dg.hipster.view;
 
+import dg.hipster.BrowserLauncher;
 import dg.hipster.Main;
 import dg.hipster.io.ReaderException;
 import dg.hipster.io.ReaderFactory;
@@ -57,11 +58,11 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.net.MalformedURLException;
 import java.util.ResourceBundle;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 
@@ -153,10 +154,11 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
     public void setDocument(final IdeaDocument newDocument) {
         this.document = newDocument;
         this.document.addPropertyChangeListener(this);
-        this.ideaMap.setIdea(this.document.getIdea());
+//        this.ideaMap.setIdea(this.document.getIdea());
+//        this.setDirty(this.document.isDirty());
+//        this.setTitle(this.document.getTitle());
+        this.updateIdeaMapWithDocument();
         this.editSelected();
-        this.setDirty(this.document.isDirty());
-        this.setTitle(this.document.getTitle());
     }
     
     public IdeaDocument getDocument() {
@@ -174,17 +176,19 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
     
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getSource() == this.document) {
-            if (Main.isMac()) {
-                this.setTitle(this.document.getTitle());
-            } else {
-                this.setTitle(resBundle.getString("app.name") + " - "
-                        + this.document.getTitle());
-            }
-            if ("idea".equals(evt.getPropertyName())) {
-                this.ideaMap.setIdea(this.document.getIdea());
-            }
-            this.setDirty(this.document.isDirty());
+            this.updateIdeaMapWithDocument();
         }
+    }
+    
+    private void updateIdeaMapWithDocument() {
+        if (Main.isMac()) {
+            this.setTitle(this.document.getTitle());
+        } else {
+            this.setTitle(resBundle.getString("app.name") + " - "
+                    + this.document.getTitle());
+        }
+        this.ideaMap.setIdea(this.document.getIdea());
+        this.setDirty(this.document.isDirty());
     }
     
     public void zoomIn() {
@@ -290,7 +294,7 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
             } catch(Exception cnfe) {
                 cnfe.printStackTrace();
             }
-        } else if (Main.isWindows()) {
+        } else {
             String pwd = System.getProperty("user.dir");
             String manualIndex = pwd + File.separatorChar + "manual"
                     + File.separatorChar + "English" + File.separatorChar
@@ -300,20 +304,21 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
     }
     
     private void showUrlInWindows(String u) {
-        
-        if (u.indexOf('@') != -1) {
-            u = "mailto:" + u;
-        } else if (u.startsWith("http")) {
-        } else if (u.substring(1, 2).indexOf(':') != -1) {
-        } else {
-            u = "http://" + u;
-        }
-        
         try {
-            Process process = null;
-            
-            process = Runtime.getRuntime().exec("explorer " + u);
-        } catch (java.io.IOException ioe) {
+            BrowserLauncher.openURL((new File(u)).toURL().toString());
+        } catch(MalformedURLException mfue) {
+            mfue.printStackTrace();
+        } catch(IOException ioe) {
+            ioe.printStackTrace();
+        }
+    }
+    
+    public void homePage() {
+        try {
+            BrowserLauncher.openURL("http://code.google.com/p/hipster/");
+        } catch(MalformedURLException mfue) {
+            mfue.printStackTrace();
+        } catch(IOException ioe) {
             ioe.printStackTrace();
         }
     }

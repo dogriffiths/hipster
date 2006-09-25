@@ -25,5 +25,6 @@
         <item textName="zoomOut" action="zoomOut" key="MINUS"/>
     </menu>
     <menu textName="help">
+        <item textName="homePage" action="homePage"/>
     </menu>
 </menuBar>

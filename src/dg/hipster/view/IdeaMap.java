@@ -94,16 +94,18 @@ public final class IdeaMap extends JComponent implements MapComponent {
     }
     
     /**
-     * Set the central idea of the map.
-     * @param idea Idea that will be displayed at the centre.
+     * Set the central newIdea of the map.
+     * 
+     * @param newIdea Idea that will be displayed at the centre.
      */
-    public void setIdea(Idea idea) {
-        if (idea != null) {
-            this.rootView = new IdeaView(idea);
+    public void setIdea(Idea newIdea) {
+        Idea oldIdea = getIdea();
+        if ((newIdea != null) && (!newIdea.equals(oldIdea))) {
+            this.rootView = new IdeaView(newIdea);
             this.rootView.setParent(this);
             rootView.setSelected(true);
             this.selected = rootView;
-            text.setText(idea.getText());
+            text.setText(newIdea.getText());
             text.setEnabled(false);
         }
     }

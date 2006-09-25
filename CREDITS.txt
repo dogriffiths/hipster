@@ -1,4 +1,15 @@
 Special thanks to:
 
-Yvon Thoraval for the mkdmg.sh script
-Greg Guerin and Will Gilbert for their help packaging the application for the Mac.
+  Yvon Thoraval for the mkdmg.sh script
+  Greg Guerin and Will Gilbert for their help packaging the application for the
+  Mac.
+
+BrowserLauncher:
+Author: Eric Albert
+        (<a href="mailto:ejalbert@cs.stanford.edu">ejalbert@cs.stanford.edu</a>)
+Credits:
+  Steven Spencer, JavaWorld magazine
+  (http://www.javaworld.com/javaworld/javatips/jw-javatip66.html)
+Thanks also to:
+  Ron B. Yeh, Eric Shapiro, Ben Engber, Paul Teitlebaum, Andrea Cantatore,
+  Larry Barowski, Trevor Bedzek, Frank Miedrich, and Ron Rabakukk
