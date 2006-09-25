@@ -116,5 +116,8 @@ public class IdeaDocument extends AbstractModel implements IdeaListener {
     
     public void ideaChanged(IdeaEvent fe) {
         this.setDirty(true);
+        if (this.currentFile == null) {
+            setTitle(this.getIdea().getText());
+        }
     }
 }

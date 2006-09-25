@@ -154,9 +154,6 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
     public void setDocument(final IdeaDocument newDocument) {
         this.document = newDocument;
         this.document.addPropertyChangeListener(this);
-//        this.ideaMap.setIdea(this.document.getIdea());
-//        this.setDirty(this.document.isDirty());
-//        this.setTitle(this.document.getTitle());
         this.updateIdeaMapWithDocument();
         this.editSelected();
     }
@@ -249,7 +246,7 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
         File file = f;
         if (file == null) {
             FileDialog chooser = new FileDialog(this,
-                    resBundle.getString("save.opml.file"),
+                    document.getTitle() + ".opml",
                     FileDialog.SAVE);
             String filename = document.getTitle();
             if (!filename.toUpperCase().endsWith(".OPML")) {
