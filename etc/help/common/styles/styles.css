@@ -23,11 +23,11 @@ h2 {
 	font-weight: 300; 
 	margin-top: 16px 
 }
-h4      { 
+h3,h4      { 
 	color: #000; 
-	font-size: 8pt; 
+	font-size: 9pt; 
 	font-family: "Lucida Grande", Arial, sans-serif; 
-	font-weight: 300; 
+	font-weight: 400; 
 	margin-top: 21px 
 }
 p,li { 
