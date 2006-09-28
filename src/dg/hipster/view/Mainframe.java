@@ -122,27 +122,27 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
     }
     
     private JMenuBar createMenu() {
-        XMLMenuBar menuMgr = new XMLMenuBar(this,
+        XMLMenuBar menuBar = new XMLMenuBar(this,
                 "/dg/hipster/view/mainframeMenu.xml", resBundle);
         if (!Main.isMac()) {
-            JMenu fileMenu = menuMgr.getMenu("file");
+            JMenu fileMenu = menuBar.getMenu("file");
             fileMenu.addSeparator();
-            menuMgr.createItem("exit", fileMenu, "fileExit");
-            JMenu editMenu = menuMgr.getMenu("edit");
-            menuMgr.createItem("preferences", editMenu, "editPreferences");
-            JMenu helpMenu = menuMgr.getMenu("help");
-            menuMgr.createItem("manual", helpMenu, "helpManual",
+            menuBar.createItem("exit", fileMenu, "fileExit");
+            JMenu editMenu = menuBar.getMenu("edit");
+            menuBar.createItem("preferences", editMenu, "editPreferences");
+            JMenu helpMenu = menuBar.getMenu("help");
+            menuBar.createItem("manual", helpMenu, "helpManual",
                     KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0));
-            menuMgr.createItem("about", helpMenu, "helpAbout");
+            menuBar.createItem("about", helpMenu, "helpAbout");
         } else {
-            JMenu helpMenu = menuMgr.getMenu("help");
-            menuMgr.createItem("manual", helpMenu, "helpManual",
+            JMenu helpMenu = menuBar.getMenu("help");
+            menuBar.createItem("manual", helpMenu, "helpManual",
                     KeyStroke.getKeyStroke(
                     KeyEvent.VK_SLASH,
                     ActionEvent.SHIFT_MASK
                     + Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         }
-        return menuMgr;
+        return menuBar;
     }
     
     /**
