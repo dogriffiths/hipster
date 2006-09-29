@@ -55,6 +55,10 @@ public final class Idea {
      */
     private Vector<Idea> subIdeas = new Vector<Idea>();
     /**
+     * List of sub-ideas.
+     */
+    private Vector<Idea> links = new Vector<Idea>();
+    /**
      * List of objects that are observing this idea.
      */
     private List<IdeaListener> listeners = new Vector<IdeaListener>();
@@ -161,6 +165,53 @@ public final class Idea {
     public void setText(String text) {
         this.text = text;
         notify("CHANGED");
+    }
+    
+    /**
+     * Add a one-way link to another idea.
+     *@param other idea to link to.
+     */
+    public void addLink(Idea other) {
+        if (!this.equals(other)) {
+            links.add(other);
+        }
+    }
+    
+    /**
+     * Add a two-way link to another idea.
+     *@param other idea to link to.
+     */
+    public void addBiLink(Idea other) {
+        if (other == null) {
+            return;
+        }
+        this.addLink(other);
+        other.addLink(this);
+    }
+    
+    /**
+     * Remove a link to another idea.
+     *@param other idea to link to.
+     */
+    public void removeLink(Idea other) {
+        if (other == null) {
+            return;
+        }
+        if (links.contains(other)) {
+            System.out.println("removing " + other + " from " + this);
+            links.remove(other);
+        }
+        if (other.links.contains(this)) {
+            System.out.println("removing0 " + this + " from " + other);
+            other.links.remove(this);
+        }
+    }
+    
+    /**
+     * Get the list of links that this idea is connected to.
+     */
+    public List<Idea> getLinks() {
+        return (List<Idea>)links.clone();
     }
 
     /**

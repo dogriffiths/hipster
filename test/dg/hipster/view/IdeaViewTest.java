@@ -160,94 +160,32 @@ public class IdeaViewTest extends TestCase {
         assertEquals("18 Should let me set angle", -3.0, ideaView.getAngle());
     }
     
-//    /**
-//     * Test of ideaChanged method, of class dg.hipster.view.IdeaView.
-//     */
-//    public void testIdeaChanged() {
-//        System.out.println("ideaChanged");
-//
-//        IdeaEvent fe = null;
-//        IdeaView instance = null;
-//
-//        instance.ideaChanged(fe);
-//
-//        // TODO review the generated test code and remove the default call to fail.
-//        fail("The test case is a prototype.");
-//    }
-//
-//    /**
-//     * Test of add method, of class dg.hipster.view.IdeaView.
-//     */
-//    public void testAdd() {
-//        System.out.println("add");
-//
-//        IdeaView subView = null;
-//        IdeaView instance = null;
-//
-//        instance.add(subView);
-//
-//        // TODO review the generated test code and remove the default call to fail.
-//        fail("The test case is a prototype.");
-//    }
-//
-//    /**
-//     * Test of remove method, of class dg.hipster.view.IdeaView.
-//     */
-//    public void testRemove() {
-//        System.out.println("remove");
-//
-//        IdeaView subView = null;
-//        IdeaView instance = null;
-//
-//        instance.remove(subView);
-//
-//        // TODO review the generated test code and remove the default call to fail.
-//        fail("The test case is a prototype.");
-//    }
-//
-//    /**
-//     * Test of getV method, of class dg.hipster.view.IdeaView.
-//     */
-//    public void testGetV() {
-//        System.out.println("getV");
-//
-//        IdeaView instance = null;
-//
-//        double expResult = 0.0;
-//        double result = instance.getV();
-//        assertEquals(expResult, result);
-//
-//        // TODO review the generated test code and remove the default call to fail.
-//        fail("The test case is a prototype.");
-//    }
-//
-//    /**
-//     * Test of setV method, of class dg.hipster.view.IdeaView.
-//     */
-//    public void testSetV() {
-//        System.out.println("setV");
-//
-//        double v = 0.0;
-//        IdeaView instance = null;
-//
-//        instance.setV(v);
-//
-//        // TODO review the generated test code and remove the default call to fail.
-//        fail("The test case is a prototype.");
-//    }
-//
-//    /**
-//     * Test of paint method, of class dg.hipster.view.IdeaView.
-//     */
-//    public void testPaint() {
-//        System.out.println("paint");
-//
-//        Graphics g = null;
-//        IdeaView instance = null;
-//
-//        instance.paint(g);
-//
-//        // TODO review the generated test code and remove the default call to fail.
-//        fail("The test case is a prototype.");
-//    }
+    public void testGetViewFor() {
+        Idea idea0 = new Idea("idea0");
+        IdeaView ideaView0 = new IdeaView(idea0);
+        assertEquals("Couldn't view when it was itself", ideaView0, ideaView0.getViewFor(idea0));
+        Idea idea1 = new Idea("idea1");
+        assertEquals("Falsely found a view", null, ideaView0.getViewFor(idea1));
+        idea0.add(idea1);
+        IdeaView ideaView1 = ideaView0.getSubViews().get(0);
+        assertEquals("Found the wrong view", ideaView1, ideaView0.getViewFor(idea1));
+        Idea idea2 = new Idea("idea2");
+        idea1.add(idea2);
+        IdeaView ideaView2 = ideaView1.getSubViews().get(0);
+        assertEquals("Found the wrong grand child view", ideaView2, ideaView0.getViewFor(idea2));
+    }
+    
+    public void testGetRootView() {
+        Idea idea0 = new Idea("idea0");
+        IdeaView ideaView0 = new IdeaView(idea0);
+        Idea idea1 = new Idea("idea1");
+        idea0.add(idea1);
+        IdeaView ideaView1 = ideaView0.getSubViews().get(0);
+        Idea idea2 = new Idea("idea2");
+        idea1.add(idea2);
+        IdeaView ideaView2 = ideaView1.getSubViews().get(0);
+        assertEquals("ideaView0's root should be ideaView0", ideaView0, ideaView0.getRootView());
+        assertEquals("ideaView1's root should be ideaView0", ideaView0, ideaView1.getRootView());
+        assertEquals("ideaView2's root should be ideaView0", ideaView0, ideaView2.getRootView());
+    }
 }
