@@ -311,98 +311,115 @@ public final class IdeaView implements IdeaListener, MapComponent {
     private void paint(final Graphics g, final Point c2,
             final IdeaView aView, final double initAngle,
             final int depth, final IdeaMap map) {
+        paintBranches(g, c2, aView, initAngle, depth, map);
+        if (aView.isRoot()) {
+            paintRoot(g, aView, c2, map);
+        }
+    }
+
+    private void paintBranches(final Graphics g, final Point c2,
+            final IdeaView aView, final double initAngle,
+            final int depth,
+            final IdeaMap map) {
         List<IdeaView> views = aView.getSubViews();
         IdeaView rootView = this.getRootView();
         synchronized(views) {
             for (IdeaView view: views) {
-                Point c = new Point(c2.x, c2.y);
-                double a = view.getAngle() + initAngle;
-                view.realAngle = a;
-                double len = view.getLength();
-                Point2D p = new Point2D.Double(Math.sin(a) * len,
-                        Math.cos(a) * len);
-                if (aView.isRoot()) {
-                    c.x += (int) (Math.sin(a) * ROOT_RADIUS_X);
-                    c.y -= (int) (Math.cos(a) * ROOT_RADIUS_Y);
-                }
-                Point s = getView(c, p);
-                paint(g, s, view, a, depth + 1, map);
-                Color colour = COLOURS[depth % COLOURS.length];
-                if (view.isSelected()) {
-                    colour = invert(colour);
-                }
-                Color upper = colour.brighter().brighter();
-                Color lower = colour.darker().darker();
-                view.fromPoint = c;
-                view.toPoint = s;
-                Stroke oldStroke = ((Graphics2D)g).getStroke();
-                float strokeWidth = 20.0f - (depth * 2);
-                if (strokeWidth < 10.0f) {
-                    strokeWidth = 10.0f;
-                }
-                Stroke stroke = new BasicStroke(strokeWidth,
-                        BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL);
-                ((Graphics2D)g).setStroke(stroke);
-                view.thickness = strokeWidth;
-                g.setColor(lower);
-                g.drawLine(c.x, c.y + 1, s.x, s.y + 1);
-                g.setColor(upper);
-                g.drawLine(c.x, c.y - 1, s.x, s.y - 1);
-                g.setColor(colour);
-                g.drawLine(c.x, c.y, s.x, s.y);
-                Point2D start0 = s;
-                Point2D end0 = c;
-                Point2D mid0 = new Point2D.Double(
-                        (start0.getX() + end0.getX()) / 2,
-                        (start0.getY() + end0.getY()) / 2
-                        );
-                for (Idea link: view.getIdea().getLinks()) {
-                    IdeaView linkView = rootView.getViewFor(link);
-                    if (linkView != null) {
-                        Point2D start1 = linkView.getFromPoint();
-                        Point2D end1 = linkView.getEndPoint();
-                        if ((start1 != null) && (end1 != null)
-                        && (start0 != null) && (end0 != null)) {
-                            Point2D mid1 = new Point2D.Double(
-                                    (start1.getX() + end1.getX()) / 2,
-                                    (start1.getY() + end1.getY()) / 2
-                                    );
-                            g.setColor(Color.GRAY);
-                            g.drawLine((int)mid0.getX(), (int)mid0.getY(),
-                                    (int)mid1.getX(), (int)mid1.getY());
-                        }
-                    }
-                }
-                ((Graphics2D)g).setStroke(oldStroke);
-                if (view.isSelected()) {
-                    g.setColor(Color.WHITE);
-                } else {
-                    g.setColor(Color.BLACK);
-                }
-                Point midp = new Point((c.x + s.x) / 2, (c.y + s.y) / 2);
-                double textAngle = (Math.PI / 2.0) - a;
-                drawString((Graphics2D)g, view.getIdea().getText(), midp, 4,
-                        textAngle, view.isEditing(), map);
+                paintBranch(g, c2, view, initAngle, depth, map, rootView, aView);
             }
         }
+    }
+
+    private void paintBranch(final Graphics g, final Point c2,
+            final IdeaView view, final double initAngle, final int depth,
+            final IdeaMap map, final IdeaView rootView, final IdeaView aView) {
+        Point c = new Point(c2.x, c2.y);
+        double a = view.getAngle() + initAngle;
+        view.realAngle = a;
+        double len = view.getLength();
+        Point2D p = new Point2D.Double(Math.sin(a) * len,
+                Math.cos(a) * len);
         if (aView.isRoot()) {
-            Color colour = Color.WHITE;
-            if (aView.isSelected()) {
-                colour = invert(colour);
-            }
-            g.setColor(colour);
-            g.fillOval(-ROOT_RADIUS_X, -ROOT_RADIUS_Y, ROOT_RADIUS_X * 2,
-                    ROOT_RADIUS_Y * 2);
-            colour = Color.BLACK;
-            if (aView.isSelected()) {
-                colour = invert(colour);
-            }
-            g.setColor(colour);
-            g.drawOval(-ROOT_RADIUS_X, -ROOT_RADIUS_Y, ROOT_RADIUS_X * 2,
-                    ROOT_RADIUS_Y * 2);
-            drawString((Graphics2D)g, getIdea().getText(), c2, 4,
-                    getAngle(), aView.isEditing(), map);
+            c.x += (int) (Math.sin(a) * ROOT_RADIUS_X);
+            c.y -= (int) (Math.cos(a) * ROOT_RADIUS_Y);
         }
+        Point s = getView(c, p);
+        paintBranches(g, s, view, a, depth + 1, map);
+        Color colour = COLOURS[depth % COLOURS.length];
+        if (view.isSelected()) {
+            colour = invert(colour);
+        }
+        Color upper = colour.brighter().brighter();
+        Color lower = colour.darker().darker();
+        view.fromPoint = c;
+        view.toPoint = s;
+        Stroke oldStroke = ((Graphics2D)g).getStroke();
+        float strokeWidth = 20.0f - (depth * 2);
+        if (strokeWidth < 10.0f) {
+            strokeWidth = 10.0f;
+        }
+        Stroke stroke = new BasicStroke(strokeWidth,
+                BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL);
+        ((Graphics2D)g).setStroke(stroke);
+        view.thickness = strokeWidth;
+        g.setColor(lower);
+        g.drawLine(c.x, c.y + 1, s.x, s.y + 1);
+        g.setColor(upper);
+        g.drawLine(c.x, c.y - 1, s.x, s.y - 1);
+        g.setColor(colour);
+        g.drawLine(c.x, c.y, s.x, s.y);
+        Point2D start0 = s;
+        Point2D end0 = c;
+        Point2D mid0 = new Point2D.Double(
+                (start0.getX() + end0.getX()) / 2,
+                (start0.getY() + end0.getY()) / 2
+                );
+        for (Idea link: view.getIdea().getLinks()) {
+            IdeaView linkView = rootView.getViewFor(link);
+            if (linkView != null) {
+                Point2D start1 = linkView.getFromPoint();
+                Point2D end1 = linkView.getEndPoint();
+                if ((start1 != null) && (end1 != null)
+                && (start0 != null) && (end0 != null)) {
+                    Point2D mid1 = new Point2D.Double(
+                            (start1.getX() + end1.getX()) / 2,
+                            (start1.getY() + end1.getY()) / 2
+                            );
+                    g.setColor(Color.GRAY);
+                    g.drawLine((int)mid0.getX(), (int)mid0.getY(),
+                            (int)mid1.getX(), (int)mid1.getY());
+                }
+            }
+        }
+        ((Graphics2D)g).setStroke(oldStroke);
+        if (view.isSelected()) {
+            g.setColor(Color.WHITE);
+        } else {
+            g.setColor(Color.BLACK);
+        }
+        Point midp = new Point((c.x + s.x) / 2, (c.y + s.y) / 2);
+        double textAngle = (Math.PI / 2.0) - a;
+        drawString((Graphics2D)g, view.getIdea().getText(), midp, 4,
+                textAngle, view.isEditing(), map);
+    }
+
+    private void paintRoot(final Graphics g, final IdeaView aView, final Point c2, final IdeaMap map) {
+        Color colour = Color.WHITE;
+        if (aView.isSelected()) {
+            colour = invert(colour);
+        }
+        g.setColor(colour);
+        g.fillOval(-ROOT_RADIUS_X, -ROOT_RADIUS_Y, ROOT_RADIUS_X * 2,
+                ROOT_RADIUS_Y * 2);
+        colour = Color.BLACK;
+        if (aView.isSelected()) {
+            colour = invert(colour);
+        }
+        g.setColor(colour);
+        g.drawOval(-ROOT_RADIUS_X, -ROOT_RADIUS_Y, ROOT_RADIUS_X * 2,
+                ROOT_RADIUS_Y * 2);
+        drawString((Graphics2D)g, getIdea().getText(), c2, 4,
+                getAngle(), aView.isEditing(), map);
     }
     
     private static Color invert(Color colour) {
