@@ -63,7 +63,7 @@ public final class IdeaMap extends JComponent implements MapComponent {
     /**
      * Idea that will appear at the centre of the map.
      */
-    private IdeaView rootView;
+    private CentreView rootView;
     /**
      * Currently selected idea branch (if any).
      */
@@ -95,13 +95,13 @@ public final class IdeaMap extends JComponent implements MapComponent {
     
     /**
      * Set the central newIdea of the map.
-     * 
+     *
      * @param newIdea Idea that will be displayed at the centre.
      */
     public void setIdea(Idea newIdea) {
         Idea oldIdea = getIdea();
         if ((newIdea != null) && (!newIdea.equals(oldIdea))) {
-            this.rootView = new IdeaView(newIdea);
+            this.rootView = new CentreView(newIdea);
             this.rootView.setParent(this);
             rootView.setSelected(true);
             this.selected = rootView;

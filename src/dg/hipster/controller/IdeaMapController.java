@@ -36,6 +36,7 @@
 package dg.hipster.controller;
 
 import dg.hipster.model.Idea;
+import dg.hipster.view.BranchView;
 import dg.hipster.view.IdeaMap;
 import dg.hipster.view.IdeaView;
 import dg.hipster.view.MapComponent;
@@ -176,28 +177,33 @@ public final class IdeaMapController implements ActionListener, KeyListener,
             if (current == null) {
                 return;
             }
-            Dimension size = this.ideaMap.getSize();
-            double x = evt.getX() - (size.width / 2);
-            double y = evt.getY() - (size.height / 2);
-            double z = ideaMap.getZoom();
-            x /= z;
-            y /= z;
-            Point2D p = new Point2D.Double(x, y);
-            Point2D fromPoint = current.getFromPoint();
-            double angle = getAngleBetween(fromPoint, p);
-            MapComponent parent = current.getParent();
-            if (parent instanceof IdeaView) {
-                IdeaView parentView = (IdeaView) parent;
-                angle = angle - parentView.getRealAngle();
+            if (current instanceof BranchView) {
+                BranchView branch = (BranchView)current;
+                Dimension size = this.ideaMap.getSize();
+                double x = evt.getX() - (size.width / 2);
+                double y = evt.getY() - (size.height / 2);
+                double z = ideaMap.getZoom();
+                x /= z;
+                y /= z;
+                Point2D p = new Point2D.Double(x, y);
+                Point2D fromPoint = branch.getFromPoint();
+                double angle = getAngleBetween(fromPoint, p);
+                MapComponent parent = current.getParent();
+                if (parent instanceof IdeaView) {
+                    IdeaView parentView = (IdeaView) parent;
+                    angle = angle - parentView.getRealAngle();
+                }
+                current.setAngle(angle);
             }
-            current.setAngle(angle);
         } else {
             IdeaView selectedView = ideaMap.getSelectedView();
-            if (selectedView != null) {
+            if ((selectedView != null)
+            && (selectedView instanceof BranchView)) {
+                BranchView branch = (BranchView)selectedView;
                 Graphics2D g = (Graphics2D)ideaMap.getGraphics();
                 g.setColor(Color.GRAY);
                 Dimension size = ideaMap.getSize();
-                Point2D p = selectedView.getMidPoint();
+                Point2D p = branch.getMidPoint();
                 int x = (int)p.getX() + (size.width / 2);
                 int y = (int)p.getY() + (size.height / 2);
                 Stroke oldStroke = g.getStroke();
@@ -417,7 +423,7 @@ public final class IdeaMapController implements ActionListener, KeyListener,
     
     private Map<Point2D, IdeaView> endPoints(final IdeaView ideaView) {
         Map<Point2D, IdeaView> results = new HashMap<Point2D, IdeaView>();
-        List<IdeaView> subViews = ideaView.getSubViews();
+        List<BranchView> subViews = ideaView.getSubViews();
         // Add all the sub-views
         results.put(ideaView.getEndPoint(), ideaView);
         for(IdeaView subView: subViews) {
@@ -532,7 +538,7 @@ public final class IdeaMapController implements ActionListener, KeyListener,
     }
     
     private Vertex endForce(final IdeaView parentView, final Position p) {
-        final List<IdeaView> views = parentView.getSubViews();
+        final List<BranchView> views = parentView.getSubViews();
         if (views.size() == 0) {
             return new Vertex(0.0, 0.0);
         }
@@ -563,7 +569,7 @@ public final class IdeaMapController implements ActionListener, KeyListener,
     }
     
     private void adjustAngles(final IdeaView parentView) {
-        final List<IdeaView> views = parentView.getSubViews();
+        final List<BranchView> views = parentView.getSubViews();
         for (int i = 0; i < views.size(); i++) {
             IdeaView previousView = null;
             IdeaView nextView = null;
@@ -584,7 +590,7 @@ public final class IdeaMapController implements ActionListener, KeyListener,
     private double getNewAngle(final IdeaView parentView,
             final IdeaView previousView, final IdeaView view,
             final IdeaView nextView) {
-        final List<IdeaView> views = parentView.getSubViews();
+        final List<BranchView> views = parentView.getSubViews();
         final double v = view.getV();
         double minDiffAngle = Math.PI / 2 / views.size();
         
@@ -669,7 +675,7 @@ public final class IdeaMapController implements ActionListener, KeyListener,
     
     private void createParticles(final IdeaView parentView,
             final Position start) {
-        List<IdeaView> views = parentView.getSubViews();
+        List<BranchView> views = parentView.getSubViews();
         particles.add(ORIGIN);
         for(IdeaView view: views) {
             Vertex location = getParticle(view, start);
