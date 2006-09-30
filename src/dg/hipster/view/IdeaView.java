@@ -305,31 +305,37 @@ public final class IdeaView implements IdeaListener, MapComponent {
     }
     
     public void paint(Graphics g, IdeaMap map) {
-        paint(g, new Point(0, 0), this, getAngle(), 0, map);
+        paintBranches(g, new Point(0, 0), this, getAngle(), 0, map, this);
+        Color colour = Color.WHITE;
+        if (this.isSelected()) {
+            colour = invert(colour);
+        }
+        g.setColor(colour);
+        g.fillOval(-ROOT_RADIUS_X, -ROOT_RADIUS_Y, ROOT_RADIUS_X * 2,
+                ROOT_RADIUS_Y * 2);
+        colour = Color.BLACK;
+        if (this.isSelected()) {
+            colour = invert(colour);
+        }
+        g.setColor(colour);
+        g.drawOval(-ROOT_RADIUS_X, -ROOT_RADIUS_Y, ROOT_RADIUS_X * 2,
+                ROOT_RADIUS_Y * 2);
+        drawString((Graphics2D)g, getIdea().getText(), new Point(0, 0), 4,
+                getAngle(), this.isEditing(), map);
     }
     
-    private void paint(final Graphics g, final Point c2,
-            final IdeaView aView, final double initAngle,
-            final int depth, final IdeaMap map) {
-        paintBranches(g, c2, aView, initAngle, depth, map);
-        if (aView.isRoot()) {
-            this.paintRoot(g, c2, map);
-        }
-    }
-
     private void paintBranches(final Graphics g, final Point c2,
             final IdeaView aView, final double initAngle,
             final int depth,
-            final IdeaMap map) {
+            final IdeaMap map, final IdeaView rootView) {
         List<IdeaView> views = aView.getSubViews();
-        IdeaView rootView = this.getRootView();
         synchronized(views) {
             for (IdeaView view: views) {
                 view.paintBranch(g, c2, initAngle, depth, map, rootView, aView);
             }
         }
     }
-
+    
     private void paintBranch(final Graphics g, final Point c2,
             final double initAngle, final int depth,
             final IdeaMap map, final IdeaView rootView, final IdeaView aView) {
@@ -344,7 +350,7 @@ public final class IdeaView implements IdeaListener, MapComponent {
             c.y -= (int) (Math.cos(a) * ROOT_RADIUS_Y);
         }
         Point s = getView(c, p);
-        paintBranches(g, s, this, a, depth + 1, map);
+        paintBranches(g, s, this, a, depth + 1, map, rootView);
         Color colour = COLOURS[depth % COLOURS.length];
         if (this.isSelected()) {
             colour = invert(colour);
@@ -401,25 +407,6 @@ public final class IdeaView implements IdeaListener, MapComponent {
         double textAngle = (Math.PI / 2.0) - a;
         drawString((Graphics2D)g, this.getIdea().getText(), midp, 4,
                 textAngle, this.isEditing(), map);
-    }
-
-    private void paintRoot(final Graphics g, final Point c2, final IdeaMap map) {
-        Color colour = Color.WHITE;
-        if (this.isSelected()) {
-            colour = invert(colour);
-        }
-        g.setColor(colour);
-        g.fillOval(-ROOT_RADIUS_X, -ROOT_RADIUS_Y, ROOT_RADIUS_X * 2,
-                ROOT_RADIUS_Y * 2);
-        colour = Color.BLACK;
-        if (this.isSelected()) {
-            colour = invert(colour);
-        }
-        g.setColor(colour);
-        g.drawOval(-ROOT_RADIUS_X, -ROOT_RADIUS_Y, ROOT_RADIUS_X * 2,
-                ROOT_RADIUS_Y * 2);
-        drawString((Graphics2D)g, getIdea().getText(), c2, 4,
-                getAngle(), this.isEditing(), map);
     }
     
     private static Color invert(Color colour) {
