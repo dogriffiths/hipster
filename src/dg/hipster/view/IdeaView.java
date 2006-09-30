@@ -59,7 +59,6 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
     private double v;
     Vector<BranchView> subViews = new Vector<BranchView>();
     private Idea idea;
-    private boolean root;
     private boolean selected;
     private boolean editing;
     MapComponent parent;
@@ -70,11 +69,6 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
     }
     
     public IdeaView(Idea anIdea) {
-        this(anIdea, true);
-    }
-    
-    IdeaView(Idea anIdea, boolean whetherIsRoot) {
-        root = whetherIsRoot;
         setIdea(anIdea);
     }
     
@@ -206,7 +200,7 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
                 double divAngle = 2 * Math.PI / subNum;
                 double mult = i * divAngle;
                 double subAngle = mult - (divAngle * (subNum - 1) / 2.0);
-                if (!root) {
+                if (!(this instanceof CentreView)) {
                     subAngle /= 2.0;
                 }
                 subView.setAngle(subAngle);
@@ -305,7 +299,7 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
      * Get the root view - that is the ancestor without an ancestor.
      */
     public IdeaView getRootView() {
-        if (this.isRoot()) {
+        if (this instanceof CentreView) {
             return this;
         }
         IdeaView parentView = (IdeaView)this.getParent();
@@ -361,10 +355,6 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
                 );
     }
     
-    public boolean isRoot() {
-        return root;
-    }
-    
     public void repaintRequired() {
         if (parent != null) {
             parent.repaintRequired();
@@ -385,7 +375,7 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
         double angle = 0.0;
         IdeaView aView = this;
         ArrayList<IdeaView> views = new ArrayList<IdeaView>();
-        while(!aView.isRoot()) {
+        while(!(aView instanceof CentreView)) {
             MapComponent parent = aView.getParent();
             if (!(parent instanceof IdeaView)) {
                 break;

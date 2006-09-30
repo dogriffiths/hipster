@@ -61,7 +61,7 @@ public class BranchView extends IdeaView {
     }
     
     public BranchView(Idea anIdea) {
-        super(anIdea, false);
+        super(anIdea);
     }
     
     void paint(final Graphics g, final Point c2,
@@ -73,7 +73,7 @@ public class BranchView extends IdeaView {
         double len = this.getLength();
         Point2D p = new Point2D.Double(Math.sin(a) * len,
                 Math.cos(a) * len);
-        if (aView.isRoot()) {
+        if (aView instanceof CentreView) {
             c.x += (int) (Math.sin(a) * rootView.ROOT_RADIUS_X);
             c.y -= (int) (Math.cos(a) * rootView.ROOT_RADIUS_Y);
         }

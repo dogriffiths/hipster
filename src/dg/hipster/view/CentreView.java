@@ -56,7 +56,7 @@ public class CentreView extends IdeaView {
     }
     
     public CentreView(Idea anIdea) {
-        super(anIdea, true);
+        super(anIdea);
     }
     
     public void paint(Graphics g, IdeaMap map) {

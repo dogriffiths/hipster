@@ -77,11 +77,11 @@ public class IdeaViewTest extends TestCase {
         ideaView.setIdea(ideaParent);
         assertEquals("1a should have set idea correctly", ideaParent,
                 ideaView.getIdea());
-        assertTrue("1b first idea should be root", ideaView.isRoot());
+        assertTrue("1b first idea should be root", ideaView instanceof CentreView);
         List<IdeaView> subViews = ideaView.getSubViews();
         assertEquals("2 Should be one sub-view", 1, subViews.size());
         IdeaView subView0 = subViews.get(0);
-        assertFalse("2a second idea should not be root", subView0.isRoot());
+        assertFalse("2a second idea should not be root", !(subView0 instanceof CentreView));
         assertEquals("3 First idea should have angle 0", 0.0, subView0.getAngle(),
                 0.0000001);
         
