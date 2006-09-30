@@ -43,7 +43,7 @@ import java.awt.Point;
 import java.awt.geom.Point2D;
 
 /**
- *
+ * Central view in a mind-map.
  * @author davidg
  */
 public class CentreView extends IdeaView {
