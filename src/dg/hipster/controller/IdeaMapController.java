@@ -73,6 +73,7 @@ public final class IdeaMapController implements ActionListener, KeyListener,
     private IdeaMap ideaMap;
     private Timer ticker = new Timer(50, this);
     long timeChanged = 0;
+    private IdeaView draggedIdea;
     
     /** Creates a new instance of IdeaMapController */
     public IdeaMapController(final IdeaMap newIdeaMap) {
@@ -129,6 +130,7 @@ public final class IdeaMapController implements ActionListener, KeyListener,
             IdeaView hit = this.ideaMap.getRootView().getViewAt(p);
             if (hit != null) {
                 this.ideaMap.setSelectedView(hit);
+                draggedIdea = hit;
                 ideaMap.getTextField().setText(hit.getIdea().getText());
                 if (evt.getClickCount() == 2) {
                     editIdeaView(hit);
@@ -157,6 +159,7 @@ public final class IdeaMapController implements ActionListener, KeyListener,
                 }
             }
         }
+        draggedIdea = null;
     }
     
     public void mouseExited(final MouseEvent evt) {
@@ -193,7 +196,16 @@ public final class IdeaMapController implements ActionListener, KeyListener,
                     IdeaView parentView = (IdeaView) parent;
                     angle = angle - parentView.getRealAngle();
                 }
-                current.getIdea().setAngle(angle);
+                while (angle < -Math.PI) {
+                    angle += 2 * Math.PI;
+                }
+                while (angle > Math.PI) {
+                    angle -= 2 * Math.PI;
+                }
+                double oldAngle = current.getIdea().getAngle();
+                if (Math.abs(oldAngle - angle) < Math.PI) {
+                    current.getIdea().setAngle(angle);
+                }
             }
         } else {
             IdeaView selectedView = ideaMap.getSelectedView();
@@ -592,7 +604,9 @@ public final class IdeaMapController implements ActionListener, KeyListener,
             }
             double newAngle = getNewAngle(parentView, previousView, view,
                     nextView);
-            view.getIdea().setAngle(newAngle);
+            if (view != draggedIdea) {
+                view.getIdea().setAngle(newAngle);
+            }
             adjustAngles(view);
         }
     }
@@ -623,8 +637,9 @@ public final class IdeaMapController implements ActionListener, KeyListener,
             }
         } else {
             double previousAngle = -Math.PI;
-            if (previousAngle > newAngle - minDiffAngle) {
-                newAngle = previousAngle + minDiffAngle;
+            double md = Math.PI / 20;
+            if (previousAngle > newAngle - md) {
+                newAngle = previousAngle + md;
                 double previousV = 0.0;
                 double diffV = v - previousV;
                 if (diffV > 0) {
@@ -651,8 +666,9 @@ public final class IdeaMapController implements ActionListener, KeyListener,
             }
         } else {
             double nextAngle = Math.PI;
-            if (nextAngle < newAngle + minDiffAngle) {
-                newAngle = nextAngle - minDiffAngle;
+            double md = Math.PI / 20;
+            if (nextAngle < newAngle + md) {
+                newAngle = nextAngle - md;
                 double nextV = 0.0;
                 double diffV = 0.0;
                 if (diffV > 0) {
