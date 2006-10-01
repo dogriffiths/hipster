@@ -507,6 +507,16 @@ public final class IdeaMapController implements ActionListener, KeyListener,
         ideaMap.getTextField().setEnabled(false);
     }
     
+    public void startAdjust() {
+        this.ticker.start();
+    }
+    
+    public void stopAdjust() {
+        this.ticker.stop();
+        this.maxSpeed = 0.0;
+        ideaMap.repaint();
+    }
+    
     private void selectIdeaView(final IdeaView selected) {
         this.ideaMap.setSelectedView(selected);
         ideaMap.getTextField().setText(selected.getIdea().getText());

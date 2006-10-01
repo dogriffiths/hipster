@@ -229,6 +229,11 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
             ReaderFactory factory = ReaderFactory.getInstance();
             IdeaDocument document = factory.read(new File(absPath));
             this.setDocument(document);
+            if (!document.isNeedsAdjustment()) {
+                ideaMap.getController().stopAdjust();
+            } else {
+                ideaMap.repaintRequired();
+            }
         }
     }
     

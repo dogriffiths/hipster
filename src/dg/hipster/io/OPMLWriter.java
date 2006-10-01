@@ -110,6 +110,7 @@ public final class OPMLWriter implements IdeaWriter {
     private void appendIdea(Document document, Element element, Idea idea) throws IOException {
         Element ideaElement = document.createElement("outline");
         ideaElement.setAttribute("text", idea.getText());
+        ideaElement.setAttribute("angle", "" + idea.getAngle());
         element.appendChild(ideaElement);
         for (Idea subIdea: idea.getSubIdeas()) {
             appendIdea(document, ideaElement, subIdea);

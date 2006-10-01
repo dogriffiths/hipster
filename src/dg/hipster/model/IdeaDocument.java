@@ -56,6 +56,7 @@ public class IdeaDocument extends AbstractModel implements IdeaListener {
     private File currentFile;
     private boolean dirty;
     private String title;
+    private boolean needsAdjustment;
     
     public IdeaDocument() {
         this.setCurrentFile(null);
@@ -119,5 +120,13 @@ public class IdeaDocument extends AbstractModel implements IdeaListener {
         if (this.currentFile == null) {
             setTitle(this.getIdea().getText());
         }
+    }
+    
+    public void setNeedsAdjustment(boolean adjustment) {
+        this.needsAdjustment = adjustment;
+    }
+    
+    public boolean isNeedsAdjustment() {
+        return this.needsAdjustment;
     }
 }

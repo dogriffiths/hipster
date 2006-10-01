@@ -62,9 +62,9 @@ public class OPMLWriterTest extends TestCase {
                 + "<title/>"
                 + "</head>"
                 + "<body>"
-                + "<outline text=\"R&amp;D\">"
-                + "<outline text=\"&quot;Idea&quot;\"/>"
-                + "<outline text=\"Test\"/>"
+                + "<outline angle=\"0.0\" text=\"R&amp;D\">"
+                + "<outline angle=\"0.0\" text=\"&quot;Idea&quot;\"/>"
+                + "<outline angle=\"0.0\" text=\"Test\"/>"
                 + "</outline>"
                 + "</body>"
                 + "</opml>";

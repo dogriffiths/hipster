@@ -52,6 +52,7 @@ import org.xml.sax.helpers.DefaultHandler;
 public final class OPMLReader extends DefaultHandler implements IdeaReader {
     private Idea idea;
     private Idea current;
+    private boolean anglesRead = false;
     private Stack<Idea> stack = new Stack<Idea>();
     public void startElement(String namespaceURI,
             String sName, // simple name (localName)
@@ -62,6 +63,11 @@ public final class OPMLReader extends DefaultHandler implements IdeaReader {
             if (attrs != null) {
                 String text = attrs.getValue("text");
                 Idea i = new Idea(text);
+                String angleString = attrs.getValue("angle");
+                if ((angleString != null) && (angleString.length() > 0)) {
+                    i.setAngle(Double.valueOf(angleString));
+                    anglesRead = true;
+                }
                 if (idea == null) {
                     idea = i;
                 } else {
@@ -97,6 +103,7 @@ public final class OPMLReader extends DefaultHandler implements IdeaReader {
     public IdeaDocument getDocument() {
         IdeaDocument document = new IdeaDocument();
         document.setIdea(idea);
+        document.setNeedsAdjustment(!anglesRead);
         return document;
     }
 }

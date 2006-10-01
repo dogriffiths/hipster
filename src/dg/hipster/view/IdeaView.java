@@ -177,7 +177,7 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
                 if (!(this instanceof CentreView)) {
                     subAngle /= 2.0;
                 }
-                subView.getIdea().setAngle(subAngle);
+                //subView.getIdea().setAngle(subAngle);
                 add(subView);
                 i++;
             }
@@ -204,6 +204,7 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
     public void setEditing(boolean isEditing) {
         this.editing = isEditing;
         repaintRequired();
+        
     }
     
     public boolean isEditing() {

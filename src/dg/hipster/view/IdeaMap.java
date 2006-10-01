@@ -243,6 +243,13 @@ public final class IdeaMap extends JComponent implements MapComponent {
     }
     
     /**
+     * Call for a repaint of this map.
+     */
+    public void startAdjust() {
+        controller.startAdjust();
+    }
+    
+    /**
      * Get the controller for this map.
      */
     public IdeaMapController getController() {
