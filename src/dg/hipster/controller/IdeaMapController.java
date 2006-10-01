@@ -37,6 +37,7 @@ package dg.hipster.controller;
 
 import dg.hipster.model.Idea;
 import dg.hipster.view.BranchView;
+import dg.hipster.view.CentreView;
 import dg.hipster.view.IdeaMap;
 import dg.hipster.view.IdeaView;
 import dg.hipster.view.MapComponent;
@@ -188,10 +189,15 @@ public final class IdeaMapController implements ActionListener, KeyListener,
                 double z = ideaMap.getZoom();
                 x /= z;
                 y /= z;
-                Point2D p = new Point2D.Double(x, y);
                 Point2D fromPoint = branch.getFromPoint();
-                double angle = getAngleBetween(fromPoint, p);
                 MapComponent parent = current.getParent();
+                if (parent instanceof CentreView) {
+                    CentreView centre = (CentreView)parent;
+                    x = x * centre.ROOT_RADIUS_Y / centre.ROOT_RADIUS_X;
+                    fromPoint = new Point2D.Double(0, 0);
+                }
+                Point2D p = new Point2D.Double(x, y);
+                double angle = getAngleBetween(fromPoint, p);
                 if (parent instanceof IdeaView) {
                     IdeaView parentView = (IdeaView) parent;
                     angle = angle - parentView.getRealAngle();

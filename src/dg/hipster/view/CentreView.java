@@ -47,8 +47,8 @@ import java.awt.geom.Point2D;
  * @author davidg
  */
 public class CentreView extends IdeaView {
-    static int ROOT_RADIUS_X = 70;
-    static int ROOT_RADIUS_Y = 40;
+    public static int ROOT_RADIUS_X = 70;
+    public static int ROOT_RADIUS_Y = 40;
     
     /** Creates a new instance of CentreView */
     public CentreView() {
