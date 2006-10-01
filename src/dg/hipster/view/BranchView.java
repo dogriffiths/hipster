@@ -68,9 +68,9 @@ public class BranchView extends IdeaView {
             final double initAngle, final int depth,
             final IdeaMap map, final CentreView rootView, final IdeaView aView) {
         Point c = new Point(c2.x, c2.y);
-        double a = this.getAngle() + initAngle;
+        double a = this.getIdea().getAngle() + initAngle;
         setRealAngle(a);
-        double len = this.getLength();
+        double len = this.getIdea().getLength();
         Point2D p = new Point2D.Double(Math.sin(a) * len,
                 Math.cos(a) * len);
         if (aView instanceof CentreView) {

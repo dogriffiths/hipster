@@ -7,6 +7,10 @@
 
 package dg.hipster.model;
 
+import dg.hipster.view.BranchView;
+import dg.hipster.view.CentreView;
+import dg.hipster.view.IdeaView;
+import java.util.List;
 import junit.framework.*;
 
 /**
@@ -152,7 +156,7 @@ public class IdeaTest extends TestCase {
                 subIdea2, listener1.ie.getParas()[0]);
         
     }
-
+    
     /**
      * Test of getSubIdeas method, of class dg.hipster.model.Idea.
      */
@@ -176,7 +180,7 @@ public class IdeaTest extends TestCase {
                 idea.getSubIdeas().size());
         
     }
-
+    
     /**
      * Test of getText method, of class dg.hipster.model.Idea.
      */
@@ -219,5 +223,119 @@ public class IdeaTest extends TestCase {
         idea.add(subIdea1);
         assertEquals("Should include subs", "testRoot[subIdea0[], subIdea1[]]",
                 idea.toString());
+    }
+    
+    /**
+     * Test of length getters and setters, of class dg.hipster.view.IdeaView.
+     */
+    public void testGetSetLength() {
+        Idea idea = new Idea();
+        assertEquals("New idea should give length of 0.0", 0.0,
+                idea.getLength(), 0.0000001);
+        
+        idea.setLength(100.0);
+        assertEquals("Should allow me to set length", 100.0,
+                idea.getLength(), 0.0000001);
+        
+//        idea = new Idea("fred");
+//        
+//        assertEquals("New idea should give length of 10 * text length + 20",
+//                10.0 * 4 + 20,
+//                idea.getLength(), 0.0000001);
+        
+    }
+    
+    /**
+     * Test of angle setters and getters, of class dg.hipster.view.IdeaView.
+     */
+    public void testGetSetAngle() {
+        Idea idea = new Idea();
+        
+        assertEquals("0 Angle should be zero by default", 0.0,
+                idea.getAngle(), 0.0000001);
+        
+        idea.setAngle(Math.PI);
+        assertEquals("1 Angle should be reset to Pi", Math.PI,
+                idea.getAngle(), 0.0000001);
+        
+        Idea ideaParent = new Idea("parent");
+        Idea ideaChild0 = new Idea("Child 0");
+        ideaParent.add(ideaChild0);
+        idea = ideaParent;
+        List<Idea> subIdeas = idea.getSubIdeas();
+        assertEquals("2 Should be one sub-idea", 1, subIdeas.size());
+        Idea subIdea0 = subIdeas.get(0);
+        assertEquals("3 First idea should have angle 0", 0.0, subIdea0.getAngle(),
+                0.0000001);
+        
+        Idea ideaChild1 = new Idea("Child 1");
+        ideaParent.add(ideaChild1);
+        subIdeas = idea.getSubIdeas();
+        assertEquals("4 Should be one sub-idea", 2, subIdeas.size());
+        Idea subIdea1 = subIdeas.get(1);
+//        assertEquals("5 Second idea should have angle Pi/2", Math.PI / 2,
+//                subIdea1.getAngle(), 0.0000001);
+//        
+//        // Reset back to idea
+//        idea = ideaParent;
+//        subIdeas = idea.getSubIdeas();
+//        assertEquals("6 Should be two sub-ideas", 2, subIdeas.size());
+//        subIdea0 = subIdeas.get(0);
+//        subIdea1 = subIdeas.get(1);
+//        assertEquals("7 First idea should have angle -Pi/2", -Math.PI / 2,
+//                subIdea0.getAngle(), 0.0000001);
+//        assertEquals("8 Second idea should have angle Pi/2", Math.PI / 2,
+//                subIdea1.getAngle(), 0.0000001);
+//        
+//        // Now add a third
+//        Idea ideaChild2 = new Idea("Child 2");
+//        ideaParent.add(ideaChild2);
+//        
+//        // Reset back to idea
+//        idea = ideaParent;
+//        subIdeas = idea.getSubIdeas();
+//        assertEquals("9 Should be three sub-ideas", 3, subIdeas.size());
+//        subIdea0 = subIdeas.get(0);
+//        subIdea1 = subIdeas.get(1);
+//        Idea subIdea2 = subIdeas.get(2);
+//        assertEquals("10 First idea should have angle -2*Pi/3", -2 * Math.PI / 3,
+//                subIdea0.getAngle(), 0.0000001);
+//        assertEquals("11 Second idea should have angle 0", 0.0,
+//                subIdea1.getAngle(), 0.0000001);
+//        assertEquals("12 Third idea should have angle 2*Pi/3", 2 * Math.PI / 3,
+//                subIdea2.getAngle(), 0.0000001);
+//        
+//        // Add a grandchild
+//        Idea ideaGrandChild0 = new Idea("Grand child 0");
+//        ideaChild2.add(ideaGrandChild0);
+//        
+//        // Reset back to idea
+//        idea = ideaParent;
+//        subIdea2 = idea.getSubIdeas().get(2);
+//        subIdeas = subIdea2.getSubIdeas();
+//        assertEquals("13 Should be one sub-view", 1, subIdeas.size());
+//        Idea grandSubIdea0 = subIdeas.get(0);
+//        assertEquals("14 First grand-idea should have angle 0", 0.0,
+//                grandSubIdea0.getAngle(), 0.0000001);
+//        
+//        Idea grandChild1 = new Idea("Grand child 1");
+//        ideaChild2.add(grandChild1);
+//        Idea grandChild2 = new Idea("Grand child 2");
+//        ideaChild2.add(grandChild2);
+//        
+//        Idea greatGrandChild0 = new Idea("Great grand child 0");
+//        ideaGrandChild0.add(greatGrandChild0);
+//        Idea greatGreatGrandChild0 = new Idea("Great great grand child 0");
+//        greatGrandChild0.add(greatGreatGrandChild0);
+//        
+//        // Reset back to idea
+//        idea = ideaParent;
+//        Idea greatGrandIdea = idea.getSubIdeas().get(2).getSubIdeas(
+//                ).get(0).getSubIdeas().get(0);
+//        assertEquals("15 Great grand child should have angle 0.0", 0.0,
+//                greatGrandIdea.getAngle());
+//        
+//        idea.setAngle(-3.0);
+//        assertEquals("18 Should let me set angle", -3.0, idea.getAngle());
     }
 }

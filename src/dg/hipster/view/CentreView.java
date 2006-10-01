@@ -60,7 +60,7 @@ public class CentreView extends IdeaView {
     }
     
     public void paint(Graphics g, IdeaMap map) {
-        paintBranches(g, new Point(0, 0), this, getAngle(), 0, map, this);
+        paintBranches(g, new Point(0, 0), this, getIdea().getAngle(), 0, map, this);
         Color colour = Color.WHITE;
         if (this.isSelected()) {
             colour = invert(colour);
@@ -76,7 +76,7 @@ public class CentreView extends IdeaView {
         g.drawOval(-ROOT_RADIUS_X, -ROOT_RADIUS_Y, ROOT_RADIUS_X * 2,
                 ROOT_RADIUS_Y * 2);
         drawString((Graphics2D)g, getIdea().getText(), new Point(0, 0), 4,
-                getAngle(), this.isEditing(), map);
+                getIdea().getAngle(), this.isEditing(), map);
     }
     
     boolean hits(Point2D p) {

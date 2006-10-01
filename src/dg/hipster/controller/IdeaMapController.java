@@ -193,7 +193,7 @@ public final class IdeaMapController implements ActionListener, KeyListener,
                     IdeaView parentView = (IdeaView) parent;
                     angle = angle - parentView.getRealAngle();
                 }
-                current.setAngle(angle);
+                current.getIdea().setAngle(angle);
             }
         } else {
             IdeaView selectedView = ideaMap.getSelectedView();
@@ -529,7 +529,7 @@ public final class IdeaMapController implements ActionListener, KeyListener,
     private void adjust() {
         IdeaView rootView = ideaMap.getRootView();
         particles = new Vector<Vertex>();
-        createParticles(rootView, new Position(ORIGIN, rootView.getAngle()));
+        createParticles(rootView, new Position(ORIGIN, rootView.getIdea().getAngle()));
         mass = 2000.0 / (particles.size()
         * Math.sqrt((double) particles.size()));
         endForce(rootView, new Position(ORIGIN, 0.0));
@@ -547,7 +547,7 @@ public final class IdeaMapController implements ActionListener, KeyListener,
             Vertex particle = getParticle(view, p);
             Vertex force = repulsion(particle, view, p);
             totForce = totForce.add(force);
-            view.setV(getNewVelocity(force, view, p));
+            view.getIdea().setV(getNewVelocity(force, view, p));
         }
         return totForce;
     }
@@ -556,7 +556,7 @@ public final class IdeaMapController implements ActionListener, KeyListener,
             final Position p) {
         Vertex p2 = getParticle(view, new Position(ORIGIN, p.angle));
         double sideForce = (p2.y * force.x) + (-p2.x * force.y);
-        double v = view.getV();
+        double v = view.getIdea().getV();
         v += sideForce / mass;
         v *= 0.90;
         if (v > maxSpeed) {
@@ -582,7 +582,7 @@ public final class IdeaMapController implements ActionListener, KeyListener,
             }
             double newAngle = getNewAngle(parentView, previousView, view,
                     nextView);
-            view.setAngle(newAngle);
+            view.getIdea().setAngle(newAngle);
             adjustAngles(view);
         }
     }
@@ -591,24 +591,24 @@ public final class IdeaMapController implements ActionListener, KeyListener,
             final IdeaView previousView, final IdeaView view,
             final IdeaView nextView) {
         final List<BranchView> views = parentView.getSubViews();
-        final double v = view.getV();
+        final double v = view.getIdea().getV();
         double minDiffAngle = Math.PI / 2 / views.size();
         
-        double oldAngle = view.getAngle();
-        double newAngle = oldAngle  + (view.getV() / view.getLength());
+        double oldAngle = view.getIdea().getAngle();
+        double newAngle = oldAngle  + (view.getIdea().getV() / view.getIdea().getLength());
         if (previousView != null) {
-            double previousAngle = previousView.getAngle();
+            double previousAngle = previousView.getIdea().getAngle();
             if (previousAngle > newAngle - minDiffAngle) {
-                previousView.setAngle(newAngle - minDiffAngle);
+                previousView.getIdea().setAngle(newAngle - minDiffAngle);
                 newAngle = previousAngle + minDiffAngle;
-                double previousV = previousView.getV();
+                double previousV = previousView.getIdea().getV();
                 double diffV = v - previousV;
                 if (diffV > 0) {
-                    view.setV(diffV);
-                    previousView.setV(-diffV);
+                    view.getIdea().setV(diffV);
+                    previousView.getIdea().setV(-diffV);
                 } else {
-                    view.setV(-diffV);
-                    previousView.setV(diffV);
+                    view.getIdea().setV(-diffV);
+                    previousView.getIdea().setV(diffV);
                 }
             }
         } else {
@@ -618,25 +618,25 @@ public final class IdeaMapController implements ActionListener, KeyListener,
                 double previousV = 0.0;
                 double diffV = v - previousV;
                 if (diffV > 0) {
-                    view.setV(diffV);
+                    view.getIdea().setV(diffV);
                 } else {
-                    view.setV(-diffV);
+                    view.getIdea().setV(-diffV);
                 }
             }
         }
         if (nextView != null) {
-            double nextAngle = nextView.getAngle();
+            double nextAngle = nextView.getIdea().getAngle();
             if (nextAngle < newAngle + minDiffAngle) {
-                nextView.setAngle(newAngle + minDiffAngle);
+                nextView.getIdea().setAngle(newAngle + minDiffAngle);
                 newAngle = nextAngle - minDiffAngle;
-                double nextV = nextView.getV();
+                double nextV = nextView.getIdea().getV();
                 double diffV = 0.0;
                 if (diffV > 0) {
-                    view.setV(-diffV);
-                    nextView.setV(diffV);
+                    view.getIdea().setV(-diffV);
+                    nextView.getIdea().setV(diffV);
                 } else {
-                    view.setV(diffV);
-                    nextView.setV(-diffV);
+                    view.getIdea().setV(diffV);
+                    nextView.getIdea().setV(-diffV);
                 }
             }
         } else {
@@ -646,9 +646,9 @@ public final class IdeaMapController implements ActionListener, KeyListener,
                 double nextV = 0.0;
                 double diffV = 0.0;
                 if (diffV > 0) {
-                    view.setV(-diffV);
+                    view.getIdea().setV(-diffV);
                 } else {
-                    view.setV(diffV);
+                    view.getIdea().setV(diffV);
                 }
             }
         }
@@ -669,7 +669,7 @@ public final class IdeaMapController implements ActionListener, KeyListener,
             }
         }
         force = force.add(endForce(view, new Position(point,
-                view.getAngle() + p.angle)));
+                view.getIdea().getAngle() + p.angle)));
         return force;
     }
     
@@ -681,14 +681,14 @@ public final class IdeaMapController implements ActionListener, KeyListener,
             Vertex location = getParticle(view, start);
             particles.add(location);
             Position nextStart = new Position(location,
-                    start.angle + view.getAngle());
+                    start.angle + view.getIdea().getAngle());
             createParticles(view, nextStart);
         }
     }
     
     private Vertex getParticle(IdeaView view, Position p) {
-        double angle = view.getAngle() + p.angle;
-        double length = view.getLength();
+        double angle = view.getIdea().getAngle() + p.angle;
+        double length = view.getIdea().getLength();
         double x = p.start.x + Math.sin(angle) * length;
         double y = p.start.y + Math.cos(angle) * length;
         return new Vertex(x, y);

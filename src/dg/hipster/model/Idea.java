@@ -45,6 +45,9 @@ import java.util.Vector;
  * @author davidg
  */
 public final class Idea {
+    private double length;
+    private double angle;
+    private double v;
     /**
      * Short text version of the idea. Used for the text
      * on idea maps.
@@ -209,6 +212,7 @@ public final class Idea {
     
     /**
      * Get the list of links that this idea is connected to.
+     * @return list of links to related ideas.
      */
     public List<Idea> getLinks() {
         return (List<Idea>)links.clone();
@@ -222,6 +226,54 @@ public final class Idea {
      */
     public String toString() {
         return this.text + subIdeas.toString();
+    }
+
+    /**
+     * The length of this idea.
+     *@return length in points.
+     */
+    public double getLength() {
+        return length;
+    }
+
+    /**
+     * The length of this idea.
+     *@param length length in points.
+     */
+    public void setLength(double length) {
+        this.length = length;
+    }
+    
+    /**
+     * The angle of this idea relative to its parent.
+     *@return angle in radians.
+     */
+    public double getAngle() {
+        return angle;
+    }
+    
+    /**
+     * The angle of this idea relative to its parent.
+     *@param angle angle in radians.
+     */
+    public void setAngle(double angle) {
+        this.angle = angle;
+    }
+    
+    /**
+     * The velocity of this idea's end-point during animation.
+     *@return the velocity.
+     */
+    public double getV() {
+        return v;
+    }
+    
+    /**
+     * The velocity of this idea's end-point during animation.
+     *@param v the velocity.
+     */
+    public void setV(double v) {
+        this.v = v;
     }
 }
 

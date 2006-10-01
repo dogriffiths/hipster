@@ -54,9 +54,6 @@ import java.util.Vector;
  * @author davidg
  */
 public abstract class IdeaView implements IdeaListener, MapComponent {
-    private double length;
-    private double angle;
-    private double v;
     Vector<BranchView> subViews = new Vector<BranchView>();
     private Idea idea;
     private boolean selected;
@@ -72,23 +69,11 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
         setIdea(anIdea);
     }
     
-    public double getLength() {
-        return length;
-    }
-    
-    public void setLength(double length) {
-        this.length = length;
-    }
-    
-    public double getAngle() {
-        return angle;
-    }
-    
     public double getMinSubAngle() {
         double minAngle = Math.PI;
         for (IdeaView subView: subViews) {
-            if (subView.getAngle() < minAngle) {
-                minAngle = subView.getAngle();
+            if (subView.getIdea().getAngle() < minAngle) {
+                minAngle = subView.getIdea().getAngle();
             }
         }
         return minAngle;
@@ -97,16 +82,13 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
     public double getMaxSubAngle() {
         double maxAngle = -Math.PI;
         for (IdeaView subView: subViews) {
-            if (subView.getAngle() > maxAngle) {
-                maxAngle = subView.getAngle();
+            if (subView.getIdea().getAngle() > maxAngle) {
+                maxAngle = subView.getIdea().getAngle();
             }
         }
         return maxAngle;
     }
     
-    public void setAngle(double angle) {
-        this.angle = angle;
-    }
     public void ideaChanged(IdeaEvent fe) {
         String cmd = fe.getCommand();
         if ("ADDED".equals(cmd)) {
@@ -115,7 +97,7 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
             BranchView subIdeaView = new BranchView(subIdea);
             double maxAngle = getMaxSubAngle();
             double angle = (maxAngle + Math.PI) / 2.0;
-            subIdeaView.setAngle(angle);
+            subIdeaView.getIdea().setAngle(angle);
             add(pos, subIdeaView);
         } else if ("REMOVED".equals(cmd)) {
             Idea subIdea = (Idea) fe.getParas()[0];
@@ -127,7 +109,7 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
                 }
             }
         } else {
-            this.setLength(10 * idea.getText().length() + 20);
+            this.getIdea().setLength(10 * idea.getText().length() + 20);
         }
         repaintRequired();
     }
@@ -176,14 +158,6 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
         return (Vector<BranchView>)subViews.clone();
     }
     
-    public double getV() {
-        return v;
-    }
-    
-    public void setV(double v) {
-        this.v = v;
-    }
-    
     public Idea getIdea() {
         return idea;
     }
@@ -192,7 +166,7 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
         this.idea = newIdea;
         subViews.clear();
         if (newIdea != null) {
-            this.setLength(10 * newIdea.getText().length() + 20);
+            this.getIdea().setLength(10 * newIdea.getText().length() + 20);
             int subNum = newIdea.getSubIdeas().size();
             int i = 0;
             for (Idea subIdea: newIdea.getSubIdeas()) {
@@ -203,13 +177,15 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
                 if (!(this instanceof CentreView)) {
                     subAngle /= 2.0;
                 }
-                subView.setAngle(subAngle);
+                subView.getIdea().setAngle(subAngle);
                 add(subView);
                 i++;
             }
             newIdea.addIdeaListener(this);
         } else {
-            setLength(0);
+            if (this.idea != null) {
+                this.idea.setLength(0);
+            }
         }
     }
     
@@ -385,8 +361,8 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
         }
         for (int i = views.size() - 1; i >= 0; i--) {
             aView = views.get(i);
-            double length = aView.getLength();
-            angle += aView.getAngle();
+            double length = aView.getIdea().getLength();
+            angle += aView.getIdea().getAngle();
             if (i == (views.size() - 1)) {
                 x += (Math.sin(angle) * CentreView.ROOT_RADIUS_X);
                 y -= (Math.cos(angle) * CentreView.ROOT_RADIUS_Y);
