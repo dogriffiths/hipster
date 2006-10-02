@@ -323,11 +323,6 @@ public final class IdeaMapController implements ActionListener, KeyListener,
             case KeyEvent.VK_TAB:
                 insertChild();
                 break;
-            case KeyEvent.VK_EQUALS:
-                if (evt.getModifiersEx() != 0) {
-                    this.ideaMap.zoomIn();
-                }
-                break;
             default:
                 // Do nothing
         }
