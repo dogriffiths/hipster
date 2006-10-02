@@ -233,6 +233,8 @@ public final class IdeaMap extends JComponent implements MapComponent {
      */
     public void zoomIn() {
         zoom *= SCALE_FACTOR;
+        offset.x *= SCALE_FACTOR;
+        offset.y *= SCALE_FACTOR;
         repaintRequired();
     }
     
@@ -241,6 +243,8 @@ public final class IdeaMap extends JComponent implements MapComponent {
      */
     public void zoomOut() {
         zoom /= SCALE_FACTOR;
+        offset.x /= SCALE_FACTOR;
+        offset.y /= SCALE_FACTOR;
         repaintRequired();
     }
     
