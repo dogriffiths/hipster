@@ -296,4 +296,30 @@ public final class IdeaMap extends JComponent implements MapComponent {
         y /= z;
         return new Point2D.Double(x, y);
     }
+    
+    /**
+     * Reset the zoom and offset.
+     */
+    public void resetView() {
+        centreView();
+        resetZoom();
+    }
+    
+    /**
+     * Centre the view.
+     */
+    public void centreView() {
+        offset = new Point(0, 0);
+        repaintRequired();
+    }
+    
+    /**
+     * Centre the view.
+     */
+    public void resetZoom() {
+        offset.x /= zoom;
+        offset.y /= zoom;
+        zoom = 1.0;
+        repaintRequired();
+    }
 }

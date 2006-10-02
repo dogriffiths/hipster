@@ -14,15 +14,17 @@
         <item textName="-"/>
         <item textName="open" action="openDocument" key="O"/>
         <item textName="save" action="saveDocument" key="S"/>
-        <item textName="saveAs" action="saveAsDocument"/>
     </menu>
     <menu textName="edit">
         <item textName="insertChild" action="insertChild"/>
         <item textName="insertSibling" action="insertSibling"/>
     </menu>
     <menu textName="view">
-        <item textName="zoomIn" action="zoomIn" key="PLUS"/>
+        <item textName="zoomIn" action="zoomIn" key="EQUALS"/>
+        <item textName="resetZoom" action="resetZoom" key="0"/>
         <item textName="zoomOut" action="zoomOut" key="MINUS"/>
+        <item textName="centreView" action="centreView"/>
+        <item textName="resetView" action="resetView"/>
     </menu>
     <menu textName="help">
         <item textName="homePage" action="homePage"/>

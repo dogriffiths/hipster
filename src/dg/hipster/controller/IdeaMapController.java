@@ -172,18 +172,6 @@ public final class IdeaMapController implements ActionListener, KeyListener,
     public synchronized void mouseDragged(final MouseEvent evt) {
         if ((evt.getModifiersEx() & MouseEvent.SHIFT_DOWN_MASK) == 0) {
             IdeaView current = this.ideaMap.getSelectedView();
-            if (current == null) {
-                int xDiff = evt.getX() - downPoint.x;
-                int yDiff = evt.getY() - downPoint.y;
-                Point offset = ideaMap.getOffset();
-                if (offset == null) {
-                    offset = new Point(0, 0);
-                }
-                ideaMap.setOffset(new Point(offset.x + xDiff,
-                        offset.y + yDiff));
-                downPoint = evt.getPoint();
-                return;
-            }
             if (current instanceof BranchView) {
                 BranchView branch = (BranchView)current;
                 Point2D p = this.ideaMap.getMapPoint(evt.getPoint());
@@ -211,6 +199,17 @@ public final class IdeaMapController implements ActionListener, KeyListener,
                 if (Math.abs(oldAngle - angle) < Math.PI) {
                     current.getIdea().setAngle(angle);
                 }
+            } else {
+                int xDiff = evt.getX() - downPoint.x;
+                int yDiff = evt.getY() - downPoint.y;
+                Point offset = ideaMap.getOffset();
+                if (offset == null) {
+                    offset = new Point(0, 0);
+                }
+                ideaMap.setOffset(new Point(offset.x + xDiff,
+                        offset.y + yDiff));
+                downPoint = evt.getPoint();
+                return;
             }
         } else {
             IdeaView selectedView = ideaMap.getSelectedView();

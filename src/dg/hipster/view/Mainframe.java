@@ -126,6 +126,11 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
                 "/dg/hipster/view/mainframeMenu.xml", resBundle);
         if (!Main.isMac()) {
             JMenu fileMenu = menuBar.getMenu("file");
+            menuBar.createItem("saveAs", fileMenu, "saveAsDocument",
+                    KeyStroke.getKeyStroke(
+                    KeyEvent.VK_S,
+                    ActionEvent.SHIFT_MASK
+                    + Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
             fileMenu.addSeparator();
             menuBar.createItem("exit", fileMenu, "fileExit");
             JMenu editMenu = menuBar.getMenu("edit");
@@ -135,6 +140,12 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
                     KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0));
             menuBar.createItem("about", helpMenu, "helpAbout");
         } else {
+            JMenu fileMenu = menuBar.getMenu("file");
+            menuBar.createItem("saveAs", fileMenu, "saveAsDocument",
+                    KeyStroke.getKeyStroke(
+                    KeyEvent.VK_S,
+                    ActionEvent.SHIFT_MASK
+                    + Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
             JMenu helpMenu = menuBar.getMenu("help");
             menuBar.createItem("manual", helpMenu, "helpManual",
                     KeyStroke.getKeyStroke(
@@ -160,6 +171,7 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
         } else {
             ideaMap.repaintRequired();
         }
+        resetView();
     }
     
     public IdeaDocument getDocument() {
@@ -249,14 +261,14 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
     throws IOException, ReaderException {
         File file = f;
         if (file == null) {
-            FileDialog chooser = new FileDialog(this,
-                    document.getTitle() + ".opml",
-                    FileDialog.SAVE);
             String filename = document.getTitle();
             if (!filename.toUpperCase().endsWith(".OPML")) {
                 filename += ".opml";
             }
             int pos = filename.lastIndexOf(File.separatorChar);
+            FileDialog chooser = new FileDialog(this,
+                    resBundle.getString("save.opml.file"),
+                    FileDialog.SAVE);
             chooser.setFile(filename.substring(pos + 1));
             
             chooser.setVisible(true);
@@ -340,5 +352,25 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
     
     public void focusLost(final FocusEvent evt) {
         this.unEditSelected();
+    }
+    /**
+     * Reset the zoom and offset.
+     */
+    public void resetView() {
+        ideaMap.resetView();
+    }
+    
+    /**
+     * Centre the view.
+     */
+    public void centreView() {
+        ideaMap.centreView();
+    }
+    
+    /**
+     * Centre the view.
+     */
+    public void resetZoom() {
+        ideaMap.resetZoom();
     }
 }
