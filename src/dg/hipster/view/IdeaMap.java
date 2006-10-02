@@ -42,7 +42,9 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.RenderingHints;
+import java.awt.geom.Point2D;
 import javax.swing.JComponent;
 import javax.swing.JTextField;
 
@@ -76,6 +78,10 @@ public final class IdeaMap extends JComponent implements MapComponent {
      * Amount this map is scaled.
      */
     private double zoom = 1.0;
+    /**
+     * Amount to offset the map by.
+     */
+    private Point offset;
     
     /** Creates a new instance of Fred */
     public IdeaMap() {
@@ -204,6 +210,9 @@ public final class IdeaMap extends JComponent implements MapComponent {
         g.setColor(Color.BLACK);
         Dimension size = getSize();
         g.translate(size.width / 2, size.height / 2);
+        if (offset != null) {
+            g.translate(offset.x, offset.y);
+        }
         ((Graphics2D)g).scale(zoom, zoom);
         if (rootView != null) {
             rootView.paint(g, this);
@@ -254,5 +263,33 @@ public final class IdeaMap extends JComponent implements MapComponent {
      */
     public IdeaMapController getController() {
         return this.controller;
+    }
+    
+    public Point getOffset() {
+        return offset;
+    }
+    
+    public void setOffset(Point offset) {
+        this.offset = offset;
+        repaintRequired();
+    }
+    
+    /**
+     * 2D point in map space corresponding to the given point in screen space.
+     *@param p Point in screen space.
+     *@return Point2D in map space.
+     */
+    public Point2D getMapPoint(Point p) {
+        Dimension size = getSize();
+        double x = p.x - (size.width / 2);
+        double y = p.y - (size.height / 2);
+        if (offset != null) {
+            x -= offset.x;
+            y -= offset.y;
+        }
+        double z = zoom;
+        x /= z;
+        y /= z;
+        return new Point2D.Double(x, y);
     }
 }

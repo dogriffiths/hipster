@@ -199,10 +199,10 @@ public class BranchView extends IdeaView {
         double vx2 = p.getX();
         double vy2 = p.getY();
         
-        double minX = Math.min(vx0, vx1) - thickness;
-        double maxX = Math.max(vx0, vx1) + thickness;
-        double minY = Math.min(vy0, vy1) - thickness;
-        double maxY = Math.max(vy0, vy1) + thickness;
+        double minX = Math.min(vx0, vx1) - thickness / 2;
+        double maxX = Math.max(vx0, vx1) + thickness / 2;
+        double minY = Math.min(vy0, vy1) - thickness / 2;
+        double maxY = Math.max(vy0, vy1) + thickness / 2;
         
         if ((vx2 > maxX) || (vx2 < minX)) {
             return false;

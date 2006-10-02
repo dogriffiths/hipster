@@ -45,6 +45,7 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.Stroke;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -113,6 +114,8 @@ public final class IdeaMapController implements ActionListener, KeyListener,
         
     }
     
+    private Point downPoint;
+    
     public void mousePressed(final MouseEvent evt) {
         IdeaView selected = this.ideaMap.getSelectedView();
         if (selected != null) {
@@ -120,13 +123,8 @@ public final class IdeaMapController implements ActionListener, KeyListener,
             ideaMap.getTextField().setEnabled(false);
             selected.setEditing(false);
         }
-        Dimension size = this.ideaMap.getSize();
-        double x = evt.getX() - (size.width / 2);
-        double y = evt.getY() - (size.height / 2);
-        double z = ideaMap.getZoom();
-        x /= z;
-        y /= z;
-        Point2D p = new Point2D.Double(x, y);
+        downPoint = evt.getPoint();
+        Point2D p = this.ideaMap.getMapPoint(evt.getPoint());
         if ((this.ideaMap != null) && (this.ideaMap.getRootView() != null)) {
             IdeaView hit = this.ideaMap.getRootView().getViewAt(p);
             if (hit != null) {
@@ -136,19 +134,15 @@ public final class IdeaMapController implements ActionListener, KeyListener,
                 if (evt.getClickCount() == 2) {
                     editIdeaView(hit);
                 }
+            } else {
+                ideaMap.setSelectedView(null);
             }
         }
     }
     
     public void mouseReleased(final MouseEvent evt) {
         if ((evt.getModifiersEx() & MouseEvent.SHIFT_DOWN_MASK) != 0) {
-            Dimension size = this.ideaMap.getSize();
-            double x = evt.getX() - (size.width / 2);
-            double y = evt.getY() - (size.height / 2);
-            double z = ideaMap.getZoom();
-            x /= z;
-            y /= z;
-            Point2D p = new Point2D.Double(x, y);
+            Point2D p = this.ideaMap.getMapPoint(evt.getPoint());
             if ((this.ideaMap != null) && (this.ideaMap.getRootView() != null)) {
                 IdeaView hit = this.ideaMap.getRootView().getViewAt(p);
                 if (hit != null) {
@@ -179,24 +173,29 @@ public final class IdeaMapController implements ActionListener, KeyListener,
         if ((evt.getModifiersEx() & MouseEvent.SHIFT_DOWN_MASK) == 0) {
             IdeaView current = this.ideaMap.getSelectedView();
             if (current == null) {
+                int xDiff = evt.getX() - downPoint.x;
+                int yDiff = evt.getY() - downPoint.y;
+                Point offset = ideaMap.getOffset();
+                if (offset == null) {
+                    offset = new Point(0, 0);
+                }
+                ideaMap.setOffset(new Point(offset.x + xDiff,
+                        offset.y + yDiff));
+                downPoint = evt.getPoint();
                 return;
             }
             if (current instanceof BranchView) {
                 BranchView branch = (BranchView)current;
-                Dimension size = this.ideaMap.getSize();
-                double x = evt.getX() - (size.width / 2);
-                double y = evt.getY() - (size.height / 2);
-                double z = ideaMap.getZoom();
-                x /= z;
-                y /= z;
+                Point2D p = this.ideaMap.getMapPoint(evt.getPoint());
                 Point2D fromPoint = branch.getFromPoint();
                 MapComponent parent = current.getParent();
                 if (parent instanceof CentreView) {
                     CentreView centre = (CentreView)parent;
+                    double x = p.getX();
                     x = x * centre.ROOT_RADIUS_Y / centre.ROOT_RADIUS_X;
+                    p.setLocation(x, p.getY());
                     fromPoint = new Point2D.Double(0, 0);
                 }
-                Point2D p = new Point2D.Double(x, y);
                 double angle = getAngleBetween(fromPoint, p);
                 if (parent instanceof IdeaView) {
                     IdeaView parentView = (IdeaView) parent;
