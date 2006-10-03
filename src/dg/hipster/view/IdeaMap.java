@@ -289,7 +289,6 @@ public final class IdeaMap extends JComponent implements MapComponent {
     
     public void setOffset(Point offset) {
         this.offset = offset;
-        //repaintRequired();
         repaint();
     }
     

@@ -31,7 +31,7 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
-
+ 
  */
 
 package dg.hipster.model;
@@ -65,14 +65,14 @@ public final class Idea {
      * List of objects that are observing this idea.
      */
     private List<IdeaListener> listeners = new Vector<IdeaListener>();
-
+    
     /**
      * No args constructor.
      */
     public Idea() {
-
+        
     }
-
+    
     /**
      * Constructor for an idea with the given text.
      * @param text zhort text description of the idea
@@ -80,7 +80,7 @@ public final class Idea {
     public Idea(String text) {
         setText(text);
     }
-
+    
     /**
      * Add a sub-idea to this idea.
      * @param subIdea sub-idea to add
@@ -89,7 +89,7 @@ public final class Idea {
         subIdeas.add(subIdea);
         notify("ADDED", subIdea, subIdeas.size() - 1);
     }
-
+    
     /**
      * Add a sub-idea to this idea at the given position.
      * @param pos position in the list of sub-ideas to insert
@@ -99,7 +99,7 @@ public final class Idea {
         subIdeas.add(pos, subIdea);
         notify("ADDED", subIdea, pos);
     }
-
+    
     /**
      * Remove the given sub-idea from this idea. No
      * exception is raised if the idea given is
@@ -110,7 +110,7 @@ public final class Idea {
         subIdeas.remove(subIdea);
         notify("REMOVED", subIdea);
     }
-
+    
     /**
      * Add an idea listener to this idea. The idea listener
      * will be informed when anything changes about this
@@ -120,7 +120,7 @@ public final class Idea {
     public void addIdeaListener(IdeaListener ideaListener) {
         listeners.add(ideaListener);
     }
-
+    
     /**
      * The given idea-listener will no longer be
      * notified of changes to this idea. No exception
@@ -131,7 +131,7 @@ public final class Idea {
     public void removeIdeaListener(IdeaListener ideaListener) {
         listeners.remove(ideaListener);
     }
-
+    
     /**
      * Notify all listeners that something has changed. The parameters
      * provide more detail about the change.
@@ -144,7 +144,7 @@ public final class Idea {
             listener.ideaChanged(new IdeaEvent(this, command, paras));
         }
     }
-
+    
     /**
      * Get a list of the sub-ideas for this idea.
      *@return list of idea objects
@@ -152,7 +152,7 @@ public final class Idea {
     public List<Idea> getSubIdeas() {
         return (List<Idea>)subIdeas.clone();
     }
-
+    
     /**
      * Get the short text description of this idea.
      * @return short text string, using for idea maps
@@ -160,14 +160,17 @@ public final class Idea {
     public String getText() {
         return text;
     }
-
+    
     /**
-     * Specify the short text description of this idea.
-     * @param text string to use
+     * Specify the short newText description of this idea.
+     *
+     * @param newText string to use
      */
-    public void setText(String text) {
-        this.text = text;
-        notify("CHANGED");
+    public void setText(String newText) {
+        if ((this.text == null) || (!this.text.equals(newText))) {
+            this.text = newText;
+            notify("CHANGED");
+        }
     }
     
     /**
@@ -217,7 +220,7 @@ public final class Idea {
     public List<Idea> getLinks() {
         return (List<Idea>)links.clone();
     }
-
+    
     /**
      * String version of this idea. It will be the short text
      * description, followed by a recursive list of the
@@ -227,7 +230,7 @@ public final class Idea {
     public String toString() {
         return this.text + subIdeas.toString();
     }
-
+    
     /**
      * The length of this idea.
      *@return length in points.
@@ -235,7 +238,7 @@ public final class Idea {
     public double getLength() {
         return length;
     }
-
+    
     /**
      * The length of this idea.
      *@param length length in points.

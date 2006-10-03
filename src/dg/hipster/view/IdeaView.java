@@ -194,7 +194,13 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
         if (!isSelected) {
             setEditing(false);
         }
-        adjust();
+        repaint();
+    }
+    
+    public void repaint() {
+        if (parent != null) {
+            parent.repaint();
+        }
     }
     
     public boolean isSelected() {
@@ -203,7 +209,7 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
     
     public void setEditing(boolean isEditing) {
         this.editing = isEditing;
-        adjust();
+        repaint();
     }
     
     public boolean isEditing() {

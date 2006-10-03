@@ -15,4 +15,5 @@ package dg.hipster.view;
  */
 public interface MapComponent {
     void adjust();
+    void repaint();
 }
