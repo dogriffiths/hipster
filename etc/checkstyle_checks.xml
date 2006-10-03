@@ -146,4 +146,7 @@
     <module name="NestedTryDepth"/>
     <module name="ExplicitInitialization"/>
   </module>
+  <module name="au.com.redhillconsulting.simian.SimianCheck">
+    <property name="language" value="java"/>
+  </module>
 </module>

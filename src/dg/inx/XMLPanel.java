@@ -1,6 +1,4 @@
 /*
- *  $Id: $
- *
  *  Part of INX: INterfaces in Xml.
  *  Copyright (C) 2004 David Griffiths
  *

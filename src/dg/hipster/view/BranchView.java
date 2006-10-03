@@ -49,11 +49,15 @@ import java.awt.geom.Point2D;
  * @author davidg
  */
 public class BranchView extends IdeaView {
-    private static Color[] COLOURS = {new Color(255, 20, 20), Color.ORANGE,
+    public static final Color[] COLOURS = {new Color(255, 20, 20), Color.ORANGE,
     new Color(20, 200, 20), Color.CYAN};
     private double thickness;
     private Point2D fromPoint;
     private Point2D toPoint;
+    /**
+     * Default width of the stroke used to render branches.
+     */
+    public static final float DEFAULT_STROKE_WIDTH = 20.0f;
     
     /** Creates a new instance of BranchView */
     public BranchView() {
@@ -88,9 +92,9 @@ public class BranchView extends IdeaView {
         setFromPoint(c);
         setToPoint(s);
         Stroke oldStroke = ((Graphics2D)g).getStroke();
-        float strokeWidth = 20.0f - (depth * 2);
-        if (strokeWidth < 10.0f) {
-            strokeWidth = 10.0f;
+        float strokeWidth = DEFAULT_STROKE_WIDTH - (depth * 2);
+        if (strokeWidth < (DEFAULT_STROKE_WIDTH / 2)) {
+            strokeWidth = DEFAULT_STROKE_WIDTH / 2;
         }
         Stroke stroke = new BasicStroke(strokeWidth,
                 BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL);

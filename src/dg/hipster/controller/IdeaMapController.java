@@ -37,16 +37,10 @@ package dg.hipster.controller;
 
 import dg.hipster.model.Idea;
 import dg.hipster.view.BranchView;
-import dg.hipster.view.CentreView;
 import dg.hipster.view.IdeaMap;
 import dg.hipster.view.IdeaView;
 import dg.hipster.view.MapComponent;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics2D;
 import java.awt.Point;
-import java.awt.Stroke;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
@@ -56,28 +50,41 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.geom.Point2D;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
-import javax.swing.Timer;
 
 /**
  *
  * @author davidg
  */
-public final class IdeaMapController implements ActionListener, KeyListener,
-        FocusListener, MouseListener, MouseMotionListener {
-    private static final double MAX_SPEED = 5.0;
-    private static final double MAX_MOVE_TIME_SECS = 23.0;
-    private final static Vertex ORIGIN = new Vertex(0.0, 0.0);
+public final class IdeaMapController implements KeyListener, FocusListener,
+        MouseListener, MouseMotionListener {
+    /**
+     * Idea map being controlled.
+     */
     private IdeaMap ideaMap;
-    private Timer ticker = new Timer(50, this);
-    long timeChanged = 0;
-    private IdeaView draggedIdea;
+    /**
+     * Point in idea-map relative screen space when the mouse was last
+     * pressed. This is used to drag the result of dragging.
+     */
+    private Point downPoint;
+    /**
+     * The controller animating the map.
+     */
+    private MapMover mapMover;
+    /**
+     * Branch being dragged.
+     */
+    private BranchView draggedBranch;
     
-    /** Creates a new instance of IdeaMapController */
+    /**
+     * Creates a new instance of IdeaMapController.
+     *@param newIdeaMap Idea map to control.
+     */
     public IdeaMapController(final IdeaMap newIdeaMap) {
         this.ideaMap = newIdeaMap;
         this.ideaMap.setFocusTraversalKeysEnabled(false);
@@ -86,188 +93,183 @@ public final class IdeaMapController implements ActionListener, KeyListener,
         this.ideaMap.addKeyListener(this);
         this.ideaMap.addMouseListener(this);
         this.ideaMap.addMouseMotionListener(this);
+        this.ideaMap.addMouseWheelListener(
+                new MouseWheelListener() {
+            public void mouseWheelMoved(MouseWheelEvent e) {
+                int rotation = e.getWheelRotation();
+                ideaMap.zoom(Math.pow(0.8, rotation));
+            }
+        });
         this.ideaMap.getTextField().addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(final ActionEvent e) {
                 unEditCurrent();
             }
         });
         this.ideaMap.getTextField().addFocusListener(new FocusListener() {
-            public void focusLost(FocusEvent fe) {
+            public void focusLost(final FocusEvent fe) {
                 unEditCurrent();
             }
-            public void focusGained(FocusEvent fe) {
+            public void focusGained(final FocusEvent fe) {
                 
             }
         });
         this.ideaMap.requestFocusInWindow();
+        this.mapMover = new MapMover(this.ideaMap);
     }
     
+    public void stopAdjust() {
+        mapMover.stopAdjust();
+    }
+    
+    public void startAdjust() {
+        mapMover.startAdjust();
+    }
+    
+    /**
+     * Switch the current idea view out of editing mode.
+     */
     private void unEditCurrent() {
         ideaMap.requestFocusInWindow();
         IdeaView current = ideaMap.getSelectedView();
         if (current != null) {
-            unEditIdeaView(current);
+            this.ideaMap.unEditIdeaView(current);
         }
     }
     
+    /**
+     * Called when a mouse is pressed and released on
+     * the idea map.
+     * @param evt event describing the mouse click.
+     */
     public void mouseClicked(final MouseEvent evt) {
-        
+        Point2D p = this.ideaMap.getMapPoint(evt.getPoint());
+        IdeaView hit = this.ideaMap.getRootView().getViewAt(p);
+        if (hit == null) {
+            ideaMap.setSelectedView(null);
+        }
     }
     
-    private Point downPoint;
     
+    /**
+     * Called when a mouse is pressed on the idea map.
+     * @param evt event describing the mouse press.
+     */
     public void mousePressed(final MouseEvent evt) {
+        deSelect();
+        downPoint = evt.getPoint();
+        Point2D p = this.ideaMap.getMapPoint(evt.getPoint());
+        if ((this.ideaMap != null) && (this.ideaMap.getRootView() != null)) {
+            boolean shouldEdit = (evt.getClickCount() == 2);
+            selectIdeaViewAt(p, shouldEdit);
+        }
+    }
+    
+    private void deSelect() {
         IdeaView selected = this.ideaMap.getSelectedView();
         if (selected != null) {
             selected.getIdea().setText(ideaMap.getTextField().getText());
             ideaMap.getTextField().setEnabled(false);
             selected.setEditing(false);
         }
-        downPoint = evt.getPoint();
-        Point2D p = this.ideaMap.getMapPoint(evt.getPoint());
-        if ((this.ideaMap != null) && (this.ideaMap.getRootView() != null)) {
-            IdeaView hit = this.ideaMap.getRootView().getViewAt(p);
-            if (hit != null) {
-                this.ideaMap.setSelectedView(hit);
-                draggedIdea = hit;
-                ideaMap.getTextField().setText(hit.getIdea().getText());
-                if (evt.getClickCount() == 2) {
-                    editIdeaView(hit);
-                }
-            } else {
-                ideaMap.setSelectedView(null);
+    }
+    
+    private void selectIdeaViewAt(final Point2D p, final boolean shouldEdit) {
+        IdeaView hit = this.ideaMap.getRootView().getViewAt(p);
+        if (hit != null) {
+            this.ideaMap.setSelectedView(hit);
+            if (hit instanceof BranchView) {
+                draggedBranch = (BranchView) hit;
+                mapMover.setFixedBranch(draggedBranch);
+            }
+            ideaMap.getTextField().setText(hit.getIdea().getText());
+            if (shouldEdit) {
+                this.ideaMap.editIdeaView(hit);
             }
         }
     }
     
+    /**
+     * Called when a mouse is released over the idea map.
+     * @param evt event describing the mouse release.
+     */
     public void mouseReleased(final MouseEvent evt) {
         if ((evt.getModifiersEx() & MouseEvent.SHIFT_DOWN_MASK) != 0) {
             Point2D p = this.ideaMap.getMapPoint(evt.getPoint());
-            if ((this.ideaMap != null) && (this.ideaMap.getRootView() != null)) {
-                IdeaView hit = this.ideaMap.getRootView().getViewAt(p);
-                if (hit != null) {
-                    Idea selectedIdea = this.ideaMap.getSelected();
-                    if (selectedIdea != null) {
-                        Idea hitIdea = hit.getIdea();
-                        selectedIdea.addLink(hitIdea);
-                    }
+            createLinkTo(p);
+        }
+        draggedBranch = null;
+        mapMover.setFixedBranch(null);
+        this.ideaMap.clearRubberBand();
+    }
+    
+    private void createLinkTo(final Point2D p) {
+        if ((this.ideaMap != null)
+        && (this.ideaMap.getRootView() != null)) {
+            IdeaView hit = this.ideaMap.getRootView().getViewAt(p);
+            if (hit != null) {
+                Idea selectedIdea = this.ideaMap.getSelected();
+                if (selectedIdea != null) {
+                    Idea hitIdea = hit.getIdea();
+                    selectedIdea.addLink(hitIdea);
                 }
             }
         }
-        draggedIdea = null;
     }
     
+    /**
+     * Called when a mouse exits the idea map.
+     * @param evt event describing the mouse exit.
+     */
     public void mouseExited(final MouseEvent evt) {
         
     }
     
+    /**
+     * Called when a mouse enters the idea map.
+     * @param evt event describing the mouse entry.
+     */
     public void mouseEntered(final MouseEvent evt) {
         
     }
     
+    /**
+     * Called when a mouse moves over the idea map.
+     * @param evt event describing the mouse movement.
+     */
     public void mouseMoved(final MouseEvent evt) {
         
     }
     
+    /**
+     * Called when a mouse is dragged over the idea map.
+     * @param evt event describing the mouse drag.
+     */
     public synchronized void mouseDragged(final MouseEvent evt) {
         if ((evt.getModifiersEx() & MouseEvent.SHIFT_DOWN_MASK) == 0) {
-            IdeaView current = this.ideaMap.getSelectedView();
-            if (current instanceof BranchView) {
-                BranchView branch = (BranchView)current;
-                Point2D p = this.ideaMap.getMapPoint(evt.getPoint());
-                Point2D fromPoint = branch.getFromPoint();
-                MapComponent parent = current.getParent();
-                if (parent instanceof CentreView) {
-                    CentreView centre = (CentreView)parent;
-                    double x = p.getX();
-                    x = x * centre.ROOT_RADIUS_Y / centre.ROOT_RADIUS_X;
-                    p.setLocation(x, p.getY());
-                    fromPoint = new Point2D.Double(0, 0);
-                }
-                double angle = getAngleBetween(fromPoint, p);
-                if (parent instanceof IdeaView) {
-                    IdeaView parentView = (IdeaView) parent;
-                    angle = angle - parentView.getRealAngle();
-                }
-                while (angle < -Math.PI) {
-                    angle += 2 * Math.PI;
-                }
-                while (angle > Math.PI) {
-                    angle -= 2 * Math.PI;
-                }
-                double oldAngle = current.getIdea().getAngle();
-                if (Math.abs(oldAngle - angle) < Math.PI) {
-                    current.getIdea().setAngle(angle);
-                }
+            if (draggedBranch != null) {
+                this.ideaMap.dragBranchTo(draggedBranch, evt.getPoint());
             } else {
-                int xDiff = evt.getX() - downPoint.x;
-                int yDiff = evt.getY() - downPoint.y;
-                Point offset = ideaMap.getOffset();
-                if (offset == null) {
-                    offset = new Point(0, 0);
-                }
-                ideaMap.setOffset(new Point(offset.x + xDiff,
-                        offset.y + yDiff));
-                downPoint = evt.getPoint();
+                dragMapTo(evt.getPoint());
                 return;
             }
         } else {
-            IdeaView selectedView = ideaMap.getSelectedView();
-            if ((selectedView != null)
-            && (selectedView instanceof BranchView)) {
-                BranchView branch = (BranchView)selectedView;
-                Graphics2D g = (Graphics2D)ideaMap.getGraphics();
-                g.setColor(Color.GRAY);
-                Dimension size = ideaMap.getSize();
-                Point2D p = branch.getMidPoint();
-                int x = (int)p.getX() + (size.width / 2);
-                int y = (int)p.getY() + (size.height / 2);
-                Stroke oldStroke = g.getStroke();
-                float strokeWidth = 20.0f;
-                Stroke stroke = new BasicStroke(strokeWidth,
-                        BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL);
-                g.setStroke(stroke);
-                g.drawLine(x,
-                        y, evt.getX(), evt.getY());
-                g.setStroke(oldStroke);
-                
-            }
+            this.ideaMap.drawLinkRubberBand(evt.getPoint());
         }
     }
     
-    static double getAngleBetween(final Point2D fromP, final Point2D toP) {
-        double diffX = toP.getX() - fromP.getX();
-        double diffY = toP.getY() - fromP.getY();
-        double angle = 0.0;
-        double tan = Math.abs(diffX) / Math.abs(diffY);
-        angle = Math.atan(tan);
-        if (diffY > 0) {
-            angle = (Math.PI - angle);
+    private void dragMapTo(final Point p) {
+        if ((p == null) || (downPoint == null)) {
+            return;
         }
-        if (diffX < 0) {
-            angle *= -1;
+        int xDiff = p.x - downPoint.x;
+        int yDiff = p.y - downPoint.y;
+        Point offset = ideaMap.getOffset();
+        if (offset == null) {
+            offset = new Point(0, 0);
         }
-        return angle;
-    }
-    
-    public void repaintRequired() {
-        timeChanged = System.currentTimeMillis();
-        ticker.start();
-    }
-    
-    public void actionPerformed(final ActionEvent evt) {
-        if (timeChanged == 0) {
-            timeChanged = System.currentTimeMillis();
-        }
-        long now = System.currentTimeMillis();
-        maxSpeed = 0.0;
-        if ((now - timeChanged) < (MAX_MOVE_TIME_SECS * 1000.0)) {
-            maxSpeed = MAX_SPEED - ((now - timeChanged) * MAX_SPEED / 1000.0
-                    / MAX_MOVE_TIME_SECS);
-        } else {
-            ticker.stop();
-        }
-        adjust();
+        ideaMap.setOffset(new Point(offset.x + xDiff,
+                offset.y + yDiff));
+        downPoint = p;
     }
     
     public void focusGained(final FocusEvent evt) {
@@ -285,8 +287,11 @@ public final class IdeaMapController implements ActionListener, KeyListener,
     public void keyPressed(final KeyEvent evt) {
         switch(evt.getKeyCode()) {
             case KeyEvent.VK_SPACE:
-                ticker.stop();
-                maxSpeed = 0.0;
+                if (mapMover.isRunning()) {
+                    stopAdjust();
+                } else {
+                    startAdjust();
+                }
                 break;
             case KeyEvent.VK_UP:
                 selectUp();
@@ -302,26 +307,26 @@ public final class IdeaMapController implements ActionListener, KeyListener,
                 break;
             case KeyEvent.VK_BACK_SPACE:
             case KeyEvent.VK_DELETE:
-                deleteSelected();
+                this.ideaMap.deleteSelected();
                 break;
             case KeyEvent.VK_ESCAPE:
                 IdeaView hit2 = this.ideaMap.getSelectedView();
                 if (hit2 != null) {
-                    unEditIdeaView(hit2);
+                    this.ideaMap.unEditIdeaView(hit2);
                 }
                 break;
             case KeyEvent.VK_ENTER:
                 if (evt.getModifiers() != 0) {
                     IdeaView hit = this.ideaMap.getSelectedView();
                     if (hit != null) {
-                        editIdeaView(hit);
+                        this.ideaMap.editIdeaView(hit);
                     }
                 } else {
-                    insertIdea();
+                    this.ideaMap.insertIdea();
                 }
                 break;
             case KeyEvent.VK_TAB:
-                insertChild();
+                this.ideaMap.insertChild();
                 break;
             default:
                 // Do nothing
@@ -347,7 +352,7 @@ public final class IdeaMapController implements ActionListener, KeyListener,
             }
         }
         if (nextView != null) {
-            selectIdeaView(nextView);
+            this.ideaMap.selectIdeaView(nextView);
         }
     }
     
@@ -363,14 +368,14 @@ public final class IdeaMapController implements ActionListener, KeyListener,
         // Find the most Westerly
         double y = Double.POSITIVE_INFINITY;
         IdeaView nextView = null;
-        for (Point2D endPoint: viewMap.keySet()) {
+        for (Point2D endPoint : viewMap.keySet()) {
             if (endPoint.getY() < y) {
                 y = endPoint.getY();
                 nextView = viewMap.get(endPoint);
             }
         }
         if (nextView != null) {
-            selectIdeaView(nextView);
+            this.ideaMap.selectIdeaView(nextView);
         }
     }
     
@@ -383,7 +388,7 @@ public final class IdeaMapController implements ActionListener, KeyListener,
         if (previous == null) {
             return;
         }
-        selectIdeaView(previous);
+        this.ideaMap.selectIdeaView(previous);
     }
     
     private void selectRight() {
@@ -398,14 +403,14 @@ public final class IdeaMapController implements ActionListener, KeyListener,
         // Find the most Easterly
         double x = Double.NEGATIVE_INFINITY;
         IdeaView nextView = null;
-        for (Point2D endPoint: viewMap.keySet()) {
+        for (Point2D endPoint : viewMap.keySet()) {
             if (endPoint.getX() > x) {
                 x = endPoint.getX();
                 nextView = viewMap.get(endPoint);
             }
         }
         if (nextView != null) {
-            selectIdeaView(nextView);
+            this.ideaMap.selectIdeaView(nextView);
         }
     }
     
@@ -421,14 +426,14 @@ public final class IdeaMapController implements ActionListener, KeyListener,
         // Find the most Westerly
         double x = Double.POSITIVE_INFINITY;
         IdeaView nextView = null;
-        for (Point2D endPoint: viewMap.keySet()) {
+        for (Point2D endPoint : viewMap.keySet()) {
             if (endPoint.getX() < x) {
                 x = endPoint.getX();
                 nextView = viewMap.get(endPoint);
             }
         }
         if (nextView != null) {
-            selectIdeaView(nextView);
+            this.ideaMap.selectIdeaView(nextView);
         }
     }
     
@@ -437,7 +442,7 @@ public final class IdeaMapController implements ActionListener, KeyListener,
         List<BranchView> subViews = ideaView.getSubViews();
         // Add all the sub-views
         results.put(ideaView.getEndPoint(), ideaView);
-        for(IdeaView subView: subViews) {
+        for (IdeaView subView : subViews) {
             results.put(subView.getEndPoint(), subView);
         }
         IdeaView previousSibling = ideaView.getPreviousSibling();
@@ -462,316 +467,7 @@ public final class IdeaMapController implements ActionListener, KeyListener,
         return results;
     }
     
-    private void deleteSelected() {
-        final IdeaView selected = this.ideaMap.getSelectedView();
-        if (selected == null) {
-            return;
-        }
-        MapComponent parent = selected.getParent();
-        if (!(parent instanceof IdeaView)) {
-            return;
-        }
-        IdeaView parentView = (IdeaView) parent;
-        IdeaView nextToSelect = null;
-        IdeaView nextSibling = selected.getNextSibling();
-        IdeaView previousSibling = selected.getPreviousSibling();
-        if (nextSibling != null) {
-            nextToSelect = nextSibling;
-        } else if (previousSibling != null) {
-            nextToSelect = previousSibling;
-        } else {
-            nextToSelect = parentView;
-        }
-        parentView.getIdea().remove(selected.getIdea());
-        selectIdeaView(nextToSelect);
-    }
-    
-    int newCount = 0;
-    public void insertIdea() {
-        final IdeaView selected = this.ideaMap.getSelectedView();
-        if (selected == null) {
-            return;
-        }
-        MapComponent parent = selected.getParent();
-        if (!(parent instanceof IdeaView)) {
-            return;
-        }
-        IdeaView parentView = (IdeaView) parent;
-        int pos = parentView.getSubViews().indexOf(selected);
-        Idea newIdea = new Idea("New " + (newCount++));
-        parentView.getIdea().add(pos + 1, newIdea);
-        editIdeaView(selected.getNextSibling());
-    }
-    
-    public void editIdeaView(final IdeaView selected) {
-        selectIdeaView(selected);
-        selected.setEditing(true);
-        ideaMap.getTextField().setEnabled(true);
-        ideaMap.getTextField().requestFocusInWindow();
-        ideaMap.getTextField().selectAll();
-    }
-    
-    public void unEditIdeaView(final IdeaView ideaView) {
-        ideaView.getIdea().setText(ideaMap.getTextField().getText());
-        ideaView.setEditing(false);
-        ideaMap.getTextField().select(0, 0);
-        ideaMap.getTextField().setEnabled(false);
-    }
-    
-    public void startAdjust() {
-        this.ticker.start();
-    }
-    
-    public void stopAdjust() {
-        this.ticker.stop();
-        this.maxSpeed = 0.0;
-        ideaMap.repaint();
-    }
-    
-    private void selectIdeaView(final IdeaView selected) {
-        this.ideaMap.setSelectedView(selected);
-        ideaMap.getTextField().setText(selected.getIdea().getText());
-    }
-    
-    public void insertChild() {
-        final IdeaView selected = this.ideaMap.getSelectedView();
-        if (selected == null) {
-            return;
-        }
-        Idea newIdea = new Idea("New " + (newCount++));
-        selected.getIdea().add(0, newIdea);
-        editIdeaView(selected.getSubViews().get(0));
-    }
-    
-    private double mass = 0.0;
-    private double maxSpeed = 0.0;
-    
-    List<Vertex> particles;
-    private void adjust() {
-        IdeaView rootView = ideaMap.getRootView();
-        particles = new Vector<Vertex>();
-        createParticles(rootView, new Position(ORIGIN, rootView.getIdea().getAngle()));
-        mass = 2000.0 / (particles.size()
-        * Math.sqrt((double) particles.size()));
-        endForce(rootView, new Position(ORIGIN, 0.0));
-        adjustAngles(rootView);
-        ideaMap.repaint();
-    }
-    
-    private Vertex endForce(final IdeaView parentView, final Position p) {
-        final List<BranchView> views = parentView.getSubViews();
-        if (views.size() == 0) {
-            return new Vertex(0.0, 0.0);
-        }
-        Vertex totForce = new Vertex(0.0, 0.0);
-        for (IdeaView view: views) {
-            Vertex particle = getParticle(view, p);
-            Vertex force = repulsion(particle, view, p);
-            totForce = totForce.add(force);
-            view.getIdea().setV(getNewVelocity(force, view, p));
-        }
-        return totForce;
-    }
-    
-    private double getNewVelocity(final Vertex force, final IdeaView view,
-            final Position p) {
-        Vertex p2 = getParticle(view, new Position(ORIGIN, p.angle));
-        double sideForce = (p2.y * force.x) + (-p2.x * force.y);
-        double v = view.getIdea().getV();
-        v += sideForce / mass;
-        v *= 0.90;
-        if (v > maxSpeed) {
-            v = maxSpeed;
-        }
-        if (v < -maxSpeed) {
-            v = -maxSpeed;
-        }
-        return v;
-    }
-    
-    private void adjustAngles(final IdeaView parentView) {
-        final List<BranchView> views = parentView.getSubViews();
-        for (int i = 0; i < views.size(); i++) {
-            IdeaView previousView = null;
-            IdeaView nextView = null;
-            IdeaView view = views.get(i);
-            if (i > 0) {
-                previousView = views.get(i - 1);
-            }
-            if (i < views.size() - 1) {
-                nextView = views.get(i + 1);
-            }
-            double newAngle = getNewAngle(parentView, previousView, view,
-                    nextView);
-            if (view != draggedIdea) {
-                view.getIdea().setAngle(newAngle);
-            }
-            adjustAngles(view);
-        }
-    }
-    
-    private double getNewAngle(final IdeaView parentView,
-            final IdeaView previousView, final IdeaView view,
-            final IdeaView nextView) {
-        final List<BranchView> views = parentView.getSubViews();
-        final double v = view.getIdea().getV();
-        double minDiffAngle = Math.PI / 2 / views.size();
-        
-        double oldAngle = view.getIdea().getAngle();
-        double newAngle = oldAngle  + (view.getIdea().getV() / view.getIdea().getLength());
-        if (previousView != null) {
-            double previousAngle = previousView.getIdea().getAngle();
-            if (previousAngle > newAngle - minDiffAngle) {
-                previousView.getIdea().setAngle(newAngle - minDiffAngle);
-                newAngle = previousAngle + minDiffAngle;
-                double previousV = previousView.getIdea().getV();
-                double diffV = v - previousV;
-                if (diffV > 0) {
-                    view.getIdea().setV(diffV);
-                    previousView.getIdea().setV(-diffV);
-                } else {
-                    view.getIdea().setV(-diffV);
-                    previousView.getIdea().setV(diffV);
-                }
-            }
-        } else {
-            double previousAngle = -Math.PI;
-            double md = Math.PI / 20;
-            if (previousAngle > newAngle - md) {
-                newAngle = previousAngle + md;
-                double previousV = 0.0;
-                double diffV = v - previousV;
-                if (diffV > 0) {
-                    view.getIdea().setV(diffV);
-                } else {
-                    view.getIdea().setV(-diffV);
-                }
-            }
-        }
-        if (nextView != null) {
-            double nextAngle = nextView.getIdea().getAngle();
-            if (nextAngle < newAngle + minDiffAngle) {
-                nextView.getIdea().setAngle(newAngle + minDiffAngle);
-                newAngle = nextAngle - minDiffAngle;
-                double nextV = nextView.getIdea().getV();
-                double diffV = 0.0;
-                if (diffV > 0) {
-                    view.getIdea().setV(-diffV);
-                    nextView.getIdea().setV(diffV);
-                } else {
-                    view.getIdea().setV(diffV);
-                    nextView.getIdea().setV(-diffV);
-                }
-            }
-        } else {
-            double nextAngle = Math.PI;
-            double md = Math.PI / 20;
-            if (nextAngle < newAngle + md) {
-                newAngle = nextAngle - md;
-                double nextV = 0.0;
-                double diffV = 0.0;
-                if (diffV > 0) {
-                    view.getIdea().setV(-diffV);
-                } else {
-                    view.getIdea().setV(diffV);
-                }
-            }
-        }
-        return newAngle;
-    }
-    
-    private Vertex repulsion(final Vertex point, final IdeaView view,
-            final Position p) {
-        Vertex force = new Vertex(0, 0);
-        for(Vertex other: particles) {
-            Vertex dir = point.subtract(other);
-            double dSquare = point.distanceSq(other);
-            if (dSquare > 0.000001) {
-                double unitFactor = point.distance(other);
-                Vertex scaled = dir.scale(mass * mass / (dSquare * unitFactor));
-                force = force.add(scaled);
-                force.trim(-1.0, 1.0);
-            }
-        }
-        force = force.add(endForce(view, new Position(point,
-                view.getIdea().getAngle() + p.angle)));
-        return force;
-    }
-    
-    private void createParticles(final IdeaView parentView,
-            final Position start) {
-        List<BranchView> views = parentView.getSubViews();
-        particles.add(ORIGIN);
-        for(IdeaView view: views) {
-            Vertex location = getParticle(view, start);
-            particles.add(location);
-            Position nextStart = new Position(location,
-                    start.angle + view.getIdea().getAngle());
-            createParticles(view, nextStart);
-        }
-    }
-    
-    private Vertex getParticle(IdeaView view, Position p) {
-        double angle = view.getIdea().getAngle() + p.angle;
-        double length = view.getIdea().getLength();
-        double x = p.start.x + Math.sin(angle) * length;
-        double y = p.start.y + Math.cos(angle) * length;
-        return new Vertex(x, y);
-    }
-    
-}
-
-class Position {
-    Vertex start;
-    double angle;
-    Position(Vertex aStart, double anAngle) {
-        this.start = aStart;
-        this.angle = anAngle;
-    }
-}
-
-class Vertex {
-    double x;
-    double y;
-    Vertex(double anX, double aY) {
-        this.x = anX;
-        this.y = aY;
-    }
-    
-    Vertex add(Vertex other) {
-        return new Vertex(this.x + other.x, this.y + other.y);
-    }
-    
-    Vertex subtract(Vertex other) {
-        return new Vertex(this.x - other.x, this.y - other.y);
-    }
-    
-    double distanceSq(Vertex other) {
-        return (new Point2D.Double(x, y)).distanceSq(
-                new Point2D.Double(other.x, other.y));
-    }
-    
-    double distance(Vertex other) {
-        return (new Point2D.Double(x, y)).distance(
-                new Point2D.Double(other.x, other.y));
-    }
-    
-    Vertex scale(double factor) {
-        return new Vertex(this.x * factor, this.y * factor);
-    }
-    
-    void trim(double min, double max) {
-        if (x < min) {
-            x = min;
-        }
-        if (x > max) {
-            x = max;
-        }
-        if (y < min) {
-            y = min;
-        }
-        if (y > max) {
-            y = max;
-        }
+    public void adjust() {
+        mapMover.startAdjust();
     }
 }

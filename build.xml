@@ -140,7 +140,7 @@
 
         <!-- Extra task for checking style -->
         <taskdef resource="checkstyletask.properties"
-        classpath="lib/checkstyle-all-4.2.jar"/>
+        classpath="lib/checkstyle-all-4.2.jar:lib/simian-2.2.12.jar"/>
         <path id="javancss.classpath">
             <fileset dir="lib">
                 <include name="ccl*.jar"/>

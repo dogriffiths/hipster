@@ -56,21 +56,21 @@ public final class MacAppListener implements ApplicationListener {
         application.setEnabledPreferencesMenu(true);
         application.setEnabledAboutMenu(true);
     }
-    
-    
+
+
     public MacAppListener() {
     }
-    
+
     public void handleAbout(ApplicationEvent event)  {
         Main.showAbout();
         event.setHandled(true);
     }
-    public void	handleOpenApplication(ApplicationEvent event) {
+    public void handleOpenApplication(ApplicationEvent event) {
         if (event.getFilename() != null) {
             handleOpenFile(event);
         }
     }
-    public void	handleOpenFile(ApplicationEvent event) {
+    public void handleOpenFile(ApplicationEvent event) {
         File f = new File(event.getFilename());
         try {
             IdeaDocument document = ReaderFactory.getInstance().read(f);
@@ -80,16 +80,16 @@ public final class MacAppListener implements ApplicationListener {
         }
         event.setHandled(true);
     }
-    public void	handlePreferences(ApplicationEvent event) {
+    public void handlePreferences(ApplicationEvent event) {
         Main.showPreferences();
         event.setHandled(true);
     }
     public void handlePrintFile(ApplicationEvent event) {
     }
-    public void	handleQuit(ApplicationEvent event) {
+    public void handleQuit(ApplicationEvent event) {
         Main.handleQuit();
         event.setHandled(true);
     }
-    public void	handleReOpenApplication(ApplicationEvent event) {
+    public void handleReOpenApplication(ApplicationEvent event) {
     }
 }

@@ -111,7 +111,7 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
         } else {
             this.getIdea().setLength(10 * idea.getText().length() + 20);
         }
-        repaintRequired();
+        adjust();
     }
     
     public IdeaView getPreviousSibling() {
@@ -194,7 +194,7 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
         if (!isSelected) {
             setEditing(false);
         }
-        repaintRequired();
+        adjust();
     }
     
     public boolean isSelected() {
@@ -203,8 +203,7 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
     
     public void setEditing(boolean isEditing) {
         this.editing = isEditing;
-        repaintRequired();
-        
+        adjust();
     }
     
     public boolean isEditing() {
@@ -332,9 +331,9 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
                 );
     }
     
-    public void repaintRequired() {
+    public void adjust() {
         if (parent != null) {
-            parent.repaintRequired();
+            parent.adjust();
         }
     }
     

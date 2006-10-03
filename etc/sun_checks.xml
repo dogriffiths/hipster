@@ -167,5 +167,7 @@
         <module name="UpperEll"/>
 
     </module>
-
+    <module name="au.com.redhillconsulting.simian.SimianCheck">
+        <property name="language" value="java"/>
+    </module>
 </module>

@@ -124,13 +124,13 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
     private JMenuBar createMenu() {
         XMLMenuBar menuBar = new XMLMenuBar(this,
                 "/dg/hipster/view/mainframeMenu.xml", resBundle);
+        JMenu fileMenu = menuBar.getMenu("file");
+        menuBar.createItem("saveAs", fileMenu, "saveAsDocument",
+                KeyStroke.getKeyStroke(
+                KeyEvent.VK_S,
+                ActionEvent.SHIFT_MASK
+                + Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         if (!Main.isMac()) {
-            JMenu fileMenu = menuBar.getMenu("file");
-            menuBar.createItem("saveAs", fileMenu, "saveAsDocument",
-                    KeyStroke.getKeyStroke(
-                    KeyEvent.VK_S,
-                    ActionEvent.SHIFT_MASK
-                    + Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
             fileMenu.addSeparator();
             menuBar.createItem("exit", fileMenu, "fileExit");
             JMenu editMenu = menuBar.getMenu("edit");
@@ -140,12 +140,6 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
                     KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0));
             menuBar.createItem("about", helpMenu, "helpAbout");
         } else {
-            JMenu fileMenu = menuBar.getMenu("file");
-            menuBar.createItem("saveAs", fileMenu, "saveAsDocument",
-                    KeyStroke.getKeyStroke(
-                    KeyEvent.VK_S,
-                    ActionEvent.SHIFT_MASK
-                    + Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
             JMenu helpMenu = menuBar.getMenu("help");
             menuBar.createItem("manual", helpMenu, "helpManual",
                     KeyStroke.getKeyStroke(
@@ -169,7 +163,7 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
         if (!document.isNeedsAdjustment()) {
             ideaMap.getController().stopAdjust();
         } else {
-            ideaMap.repaintRequired();
+            ideaMap.adjust();
         }
         resetView();
     }
@@ -213,11 +207,11 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
     }
     
     public void editSelected() {
-        ideaMap.getController().editIdeaView(ideaMap.getRootView());
+        ideaMap.editIdeaView(ideaMap.getRootView());
     }
     
     public void unEditSelected() {
-        ideaMap.getController().unEditIdeaView(ideaMap.getRootView());
+        ideaMap.unEditIdeaView(ideaMap.getRootView());
     }
     
     public void newDocument() {
@@ -340,11 +334,11 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
     }
     
     public void insertChild() {
-        getIdeaMap().getController().insertChild();
+        getIdeaMap().insertChild();
     }
     
     public void insertSibling() {
-        getIdeaMap().getController().insertIdea();
+        getIdeaMap().insertIdea();
     }
     
     public void focusGained(final FocusEvent evt) {
