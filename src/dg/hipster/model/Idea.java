@@ -180,6 +180,7 @@ public final class Idea {
     public void addLink(Idea other) {
         if (!this.equals(other)) {
             links.add(other);
+            notify("ADDED_LINK", this, other);
         }
     }
     
