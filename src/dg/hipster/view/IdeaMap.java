@@ -456,6 +456,7 @@ public final class IdeaMap extends JComponent implements MapComponent {
         if (Math.abs(oldAngle - angle) < Math.PI) {
             branch.getIdea().setAngle(angle);
         }
+        adjust();
     }
     
     private double normalizeRange(double angle) {
