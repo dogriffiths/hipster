@@ -64,7 +64,7 @@ public class XMLPanel extends JPanel {
 
     public XMLPanel(AbstractModel model, String viewXML) {
         this.setBackground(null);
-        this.setForeground(Color.WHITE);
+        this.setForeground(null);
         c = new Controller(model);
 
         GridBagLayout gbl = new GridBagLayout();
@@ -194,7 +194,8 @@ public class XMLPanel extends JPanel {
     private JLabel makeLabel(String text, GridBagLayout gbl,
             GridBagConstraints con) {
         JLabel label = new JLabel(text);
-        label.setForeground(this.getForeground());
+        label.setForeground(null);
+        label.setBackground(null);
         gbl.setConstraints(label, con);
         return label;
     }
@@ -202,6 +203,9 @@ public class XMLPanel extends JPanel {
     private static JTextField makeText(Controller c, String source,
             GridBagLayout gbl, GridBagConstraints con) {
         JTextField txt = new JTextField();
+        txt.setForeground(null);
+        txt.setBackground(new Color(55, 55, 55));
+        txt.setCaretColor(Color.WHITE);
         gbl.setConstraints(txt, con);
         if (source.startsWith("#")) {
             c.bind(txt, source.substring(1));
@@ -214,6 +218,9 @@ public class XMLPanel extends JPanel {
     private static JTextArea makeTextArea(Controller c, String source,
             GridBagLayout gbl, GridBagConstraints con, int rows, int cols) {
         JTextArea txt = new JTextArea();
+        txt.setForeground(null);
+        txt.setBackground(new Color(55, 55, 55));
+        txt.setCaretColor(Color.WHITE);
         txt.setAutoscrolls(true);
         txt.setColumns(cols);
         txt.setRows(rows);
