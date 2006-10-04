@@ -57,24 +57,24 @@ import org.w3c.dom.Element;
 public final class OPMLWriter implements IdeaWriter {
     private DocumentBuilder db;
     private Writer out;
-
+    
     public OPMLWriter(Writer out) {
         this.out = out;
     }
-
+    
     public void write(IdeaDocument document) throws IOException {
         save(document);
         out.flush();
         out.close();
     }
-
+    
     private void save(final IdeaDocument document) throws IOException {
         Idea idea = document.getIdea();
         try {
-
+            
             db = DocumentBuilderFactory.newInstance(
                     ).newDocumentBuilder();
-
+            
             Document xmlDocument = db.newDocument();
             xmlDocument.setXmlVersion("1.0");
             Element opml = xmlDocument.createElement("opml");
@@ -87,7 +87,7 @@ public final class OPMLWriter implements IdeaWriter {
             Element body = xmlDocument.createElement("body");
             opml.appendChild(body);
             appendIdea(xmlDocument, body, idea);
-
+            
             Transformer transformer = null;
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             try {
@@ -106,11 +106,16 @@ public final class OPMLWriter implements IdeaWriter {
             e.printStackTrace();
         }
     }
-
+    
     private void appendIdea(Document document, Element element, Idea idea) throws IOException {
         Element ideaElement = document.createElement("outline");
         ideaElement.setAttribute("text", idea.getText());
         ideaElement.setAttribute("angle", "" + idea.getAngle());
+        String notes = idea.getNotes();
+        System.out.println("notes = " + notes);
+        if ((notes != null) && (notes.length() != 0)) {
+            ideaElement.setAttribute("notes", idea.getNotes());
+        }
         element.appendChild(ideaElement);
         for (Idea subIdea: idea.getSubIdeas()) {
             appendIdea(document, ideaElement, subIdea);

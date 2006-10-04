@@ -32,6 +32,8 @@
 
 package dg.inx;
 
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -40,6 +42,7 @@ import java.io.InputStream;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -60,6 +63,8 @@ public class XMLPanel extends JPanel {
     private Controller c;
     
     public XMLPanel(AbstractModel model, String viewXML) {
+        this.setBackground(null);
+        this.setForeground(Color.WHITE);
         c = new Controller(model);
         
         GridBagLayout gbl = new GridBagLayout();
@@ -155,7 +160,12 @@ public class XMLPanel extends JPanel {
                             int rows = new Integer(colElement.getAttribute("rows")).intValue();
                             int cols = new Integer(colElement.getAttribute("cols")).intValue();
                             con.weighty = 0.01 * rows * 2;
-                            add(makeTextArea(c, colElement.getAttribute("value"), gbl, con, rows, cols));
+                            JScrollPane scroll = new JScrollPane(
+                                    makeTextArea(c,
+                                    colElement.getAttribute("value"),
+                                    gbl, con, rows, cols));
+                            gbl.setConstraints(scroll, con);
+                            add(scroll);
                         }
                     }
                 }
@@ -180,10 +190,11 @@ public class XMLPanel extends JPanel {
     public Controller getController() {
         return this.c;
     }
-
-    private static JLabel makeLabel(String text, GridBagLayout gbl,
+    
+    private JLabel makeLabel(String text, GridBagLayout gbl,
             GridBagConstraints con) {
         JLabel label = new JLabel(text);
+        label.setForeground(this.getForeground());
         gbl.setConstraints(label, con);
         return label;
     }
@@ -212,6 +223,8 @@ public class XMLPanel extends JPanel {
         } else {
             txt.setText(source);
         }
+        txt.setLineWrap(true);
+        txt.setAutoscrolls(true);
         return txt;
     }
     

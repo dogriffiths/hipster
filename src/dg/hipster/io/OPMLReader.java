@@ -63,6 +63,11 @@ public final class OPMLReader extends DefaultHandler implements IdeaReader {
             if (attrs != null) {
                 String text = attrs.getValue("text");
                 Idea i = new Idea(text);
+                String notes = attrs.getValue("notes");
+                if (notes == null) {
+                    notes = "";
+                }
+                i.setNotes(notes);
                 String angleString = attrs.getValue("angle");
                 if ((angleString != null) && (angleString.length() > 0)) {
                     i.setAngle(Double.valueOf(angleString));

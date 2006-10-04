@@ -37,6 +37,7 @@ package dg.hipster.view;
 
 import dg.hipster.controller.IdeaMapController;
 import dg.hipster.model.Idea;
+import dg.inx.XMLPanel;
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -46,9 +47,19 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.Stroke;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.awt.geom.Point2D;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JLayeredPane;
+import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SpringLayout;
+import javax.swing.Timer;
 
 /**
  * Main component for displaying the mind maps.
@@ -93,6 +104,23 @@ public final class IdeaMap extends JComponent implements MapComponent {
      * Default background colour.
      */
     private static final Color DEFAULT_BACKGROUND = new Color(95, 95, 95);
+    /**
+     * Content pane where the map is displayed.
+     */
+    private JLayeredPane mapArea;
+    private FloatingPanel propertiesPanel;
+    /**
+     * Pause between animation updates. 40 = 20 fps.
+     */
+    private static final int REFRESH_PAUSE = 50; // milliseconds
+    /**
+     * Timer that updates the edited text.
+     */
+    private Timer ticker = new Timer(REFRESH_PAUSE, new ActionListener() {
+        public void actionPerformed(final ActionEvent evt) {
+            repaint();
+        }
+    });
     
     /** Creates a new instance of Fred */
     public IdeaMap() {
@@ -101,6 +129,17 @@ public final class IdeaMap extends JComponent implements MapComponent {
         add(text, BorderLayout.NORTH);
         controller = new IdeaMapController(this);
         setBackground(DEFAULT_BACKGROUND);
+        JLayeredPane mapArea = new JLayeredPane();
+        mapArea.setBackground(new Color(0, 0, 0, 0));
+        add(mapArea, BorderLayout.CENTER);
+        propertiesPanel = new FloatingPanel();
+        propertiesPanel.setCaption("Properties");
+        propertiesPanel.setBounds(50, 50, 200, 200);
+        JLabel labTest = new JLabel("Test");
+        labTest.setForeground(null);
+        propertiesPanel.getContentPane().add(labTest);
+        mapArea.add(propertiesPanel);
+        this.setPropertiesVisible(false);
     }
     
     /**
@@ -126,6 +165,7 @@ public final class IdeaMap extends JComponent implements MapComponent {
             text.setText(newIdea.getText());
             text.setEnabled(false);
         }
+        this.resetView();
     }
     
     /**
@@ -188,6 +228,18 @@ public final class IdeaMap extends JComponent implements MapComponent {
         this.selected = newSelectedView;
         if (this.selected != null) {
             this.selected.setSelected(true);
+            propertiesPanel.getContentPane().removeAll();
+            propertiesPanel.getContentPane().add(new XMLPanel(
+                    newSelectedView.getIdea(),
+                    "/dg/hipster/view/ideaProperties.xml"));
+            propertiesPanel.auto();
+            this.setPropertiesVisible(this.getPropertiesVisible());
+            if (propertiesVisible) {
+                propertiesPanel.setVisible(false);
+                propertiesPanel.setVisible(true);
+            }
+        } else {
+            propertiesPanel.setVisible(false);
         }
     }
     
@@ -345,6 +397,7 @@ public final class IdeaMap extends JComponent implements MapComponent {
     public void resetView() {
         centreView();
         resetZoom();
+        setPropertiesVisible(false);
     }
     
     /**
@@ -387,6 +440,7 @@ public final class IdeaMap extends JComponent implements MapComponent {
         text.setEnabled(true);
         text.requestFocusInWindow();
         text.selectAll();
+        ticker.start();
     }
     
     public void selectIdeaView(final IdeaView selected) {
@@ -415,6 +469,7 @@ public final class IdeaMap extends JComponent implements MapComponent {
         ideaView.setEditing(false);
         text.select(0, 0);
         text.setEnabled(false);
+        ticker.stop();
     }
     
     public void deleteSelected() {
@@ -503,17 +558,16 @@ public final class IdeaMap extends JComponent implements MapComponent {
     private Point rubberBandTo;
     
     public void drawLinkRubberBand(final Point toPoint) {
-       IdeaView selectedView = getSelectedView();
-       if ((selectedView == null) || (!(selectedView instanceof BranchView))) {
-           return;
-       }
+        IdeaView selectedView = getSelectedView();
+        if ((selectedView == null) || (!(selectedView instanceof BranchView))) {
+            return;
+        }
         BranchView branch = (BranchView) selectedView;
         Point2D fromPoint = branch.getMidPoint();
         Point fp = getScreenPoint(fromPoint);
         Graphics2D g = (Graphics2D) getGraphics();
         rubberBandFrom = fp;
         rubberBandTo = toPoint;
-        //drawRubberBand(g);
         repaint();
     }
     
@@ -521,7 +575,7 @@ public final class IdeaMap extends JComponent implements MapComponent {
         this.rubberBandFrom = null;
         this.rubberBandTo = null;
     }
-
+    
     private void drawRubberBand(final Graphics2D g) {
         g.setColor(Color.GRAY);
         Dimension size = getSize();
@@ -533,5 +587,114 @@ public final class IdeaMap extends JComponent implements MapComponent {
         g.drawLine(rubberBandFrom.x, rubberBandFrom.y,
                 rubberBandTo.x, rubberBandTo.y);
         g.setStroke(oldStroke);
+    }
+    
+    public JLayeredPane getMapArea() {
+        return mapArea;
+    }
+    
+    private boolean propertiesVisible;
+    public void setPropertiesVisible(boolean show) {
+        if (this.getSelectedView() != null) {
+            propertiesPanel.setVisible(show);
+        }
+        propertiesVisible = show;
+    }
+    
+    public boolean getPropertiesVisible() {
+        return this.propertiesVisible;
+    }
+    
+    public void togglePropertiesPanel() {
+        setPropertiesVisible(!getPropertiesVisible());
+    }
+}
+
+final class FloatingPanel extends JPanel implements MouseListener,
+        MouseMotionListener {
+    private static Color SHADED = new Color(0, 0, 0, 95);
+    private static Color CLEAR = new Color(0, 0, 0, 0);
+    private JPanel contentPane;
+    private JLabel title;
+//    private JButton closeButton;
+    
+    FloatingPanel() {
+        setBackground(new Color(0, 0, 0, 0));
+        this.addMouseListener(this);
+        this.addMouseMotionListener(this);
+        SpringLayout layout = new SpringLayout();
+        this.setLayout(layout);
+        title = new JLabel("Test");
+        title.setBackground(SHADED);
+        title.setForeground(Color.WHITE);
+        this.add(title);
+        contentPane = new JPanel();
+        contentPane.setBackground(CLEAR);
+        contentPane.setForeground(Color.WHITE);
+        this.add(contentPane);
+        layout.putConstraint(SpringLayout.WEST, title, 10,
+                SpringLayout.WEST, this);
+        layout.putConstraint(SpringLayout.NORTH, title, 10,
+                SpringLayout.NORTH, this);
+        layout.putConstraint(SpringLayout.NORTH, contentPane, 10,
+                SpringLayout.SOUTH, title);
+        layout.putConstraint(SpringLayout.WEST, contentPane, 10,
+                SpringLayout.WEST, this);
+    }
+    
+    public void setCaption(String caption) {
+        title.setText(caption);
+    }
+    
+    public String getCaption() {
+        return title.getText();
+    }
+    
+    private Point downPoint;
+    private Point start;
+    public void mouseEntered(final MouseEvent evt) {
+    }
+    public void mouseExited(final MouseEvent evt) {
+    }
+    public void mouseClicked(final MouseEvent evt) {
+    }
+    public void mouseMoved(final MouseEvent evt) {
+    }
+    public void mouseReleased(final MouseEvent evt) {
+        downPoint = null;
+    }
+    public void mousePressed(final MouseEvent evt) {
+        downPoint = evt.getPoint();
+        start = this.getLocation();
+        downPoint = evt.getPoint();
+        downPoint.x += start.x;
+        downPoint.y += start.y;
+    }
+    public void mouseDragged(final MouseEvent evt) {
+        Point p = evt.getPoint();
+        Point s = this.getLocation();
+        int xDiff = s.x + p.x - downPoint.x;
+        int yDiff = s.y + p.y - downPoint.y;
+        setLocation(new Point(start.x + xDiff, start.y + yDiff));
+    }
+    
+    public void paintComponent(Graphics g) {
+        g.setColor(SHADED);
+        Dimension size = getSize();
+        g.fillRoundRect(0, 0, size.width, size.height, 10, 10);
+        g.setColor(Color.GRAY.darker());
+        g.drawLine(5, 0, size.width - 5, 0);
+        g.setColor(Color.BLACK);
+        g.drawLine(5, size.height - 1,
+                size.width - 5, size.height - 1);
+    }
+    
+    public void auto() {
+        Dimension panSize = contentPane.getPreferredSize();
+        setSize(panSize.width + 20, panSize.height + 50);
+    }
+    
+    public JPanel getContentPane() {
+        return contentPane;
     }
 }

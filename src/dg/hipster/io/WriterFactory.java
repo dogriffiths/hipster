@@ -37,7 +37,8 @@ package dg.hipster.io;
 
 import dg.hipster.model.IdeaDocument;
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
 
 /**
  *
@@ -58,7 +59,8 @@ public final class WriterFactory {
         try {
             IdeaWriter writer = null;
             if (f.getName().toLowerCase().endsWith(".opml")) {
-                writer = new OPMLWriter(new FileWriter(f));
+                writer = new OPMLWriter(new OutputStreamWriter(
+                        new FileOutputStream(f), "UTF-8"));
             }
             if (writer != null) {
                 try {

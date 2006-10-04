@@ -26,6 +26,9 @@
         <item textName="centreView" action="centreView"/>
         <item textName="resetView" action="resetView"/>
     </menu>
+    <menu textName="window">
+        <item textName="properties" action="togglePropertiesPanel" key="I"/>
+    </menu>
     <menu textName="help">
         <item textName="homePage" action="homePage"/>
     </menu>

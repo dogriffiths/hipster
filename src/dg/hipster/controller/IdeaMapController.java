@@ -325,6 +325,11 @@ public final class IdeaMapController implements KeyListener, FocusListener,
                     this.ideaMap.insertIdea();
                 }
                 break;
+//            case KeyEvent.VK_I:
+//                if (evt.getModifiers() != 0) {
+//                    this.ideaMap.togglePropertiesPanel();
+//                }
+//                break;
             case KeyEvent.VK_TAB:
                 this.ideaMap.insertChild();
                 break;

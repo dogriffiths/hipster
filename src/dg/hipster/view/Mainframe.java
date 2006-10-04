@@ -367,4 +367,11 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
     public void resetZoom() {
         ideaMap.resetZoom();
     }
+    
+    /**
+     * Toggle the properties panel.
+     */
+    public void togglePropertiesPanel() {
+        this.ideaMap.togglePropertiesPanel();
+    }
 }

@@ -36,6 +36,7 @@
 
 package dg.hipster.model;
 
+import dg.inx.AbstractModel;
 import java.util.List;
 import java.util.Vector;
 
@@ -44,7 +45,7 @@ import java.util.Vector;
  *
  * @author davidg
  */
-public final class Idea {
+public final class Idea extends AbstractModel {
     private double length;
     private double angle;
     private double v;
@@ -65,6 +66,10 @@ public final class Idea {
      * List of objects that are observing this idea.
      */
     private List<IdeaListener> listeners = new Vector<IdeaListener>();
+    /**
+     * Longer notes.
+     */
+    private String notes;
     
     /**
      * No args constructor.
@@ -167,9 +172,11 @@ public final class Idea {
      * @param newText string to use
      */
     public void setText(String newText) {
+        String oldText = this.text;
         if ((this.text == null) || (!this.text.equals(newText))) {
             this.text = newText;
             notify("CHANGED");
+            this.firePropertyChange("text", oldText, newText);
         }
     }
     
@@ -278,6 +285,16 @@ public final class Idea {
      */
     public void setV(double v) {
         this.v = v;
+    }
+
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String newNotes) {
+        String oldNotes = this.notes;
+        this.notes = newNotes;
+        this.firePropertyChange("notes", oldNotes, newNotes);
     }
 }
 
