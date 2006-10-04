@@ -44,26 +44,26 @@ import javax.swing.text.JTextComponent;
 
 public class Controller {
     private AbstractModel model;
-    
+
     public Controller(AbstractModel model) {
         this.model = model;
     }
-    
+
     private static String getSetter(String propertyName) {
         return "set" + propertyName.substring(0, 1).toUpperCase()
         + propertyName.substring(1);
     }
-    
+
     private static String getGetter(String propertyName) {
         return "get" + propertyName.substring(0, 1).toUpperCase()
         + propertyName.substring(1);
     }
-    
+
     private static String getIsser(String propertyName) {
         return "is" + propertyName.substring(0, 1).toUpperCase()
         + propertyName.substring(1);
     }
-    
+
     private static Method getMethod(Object object, String methodName) {
         try {
             Method[] methods = object.getClass().getMethods();
@@ -75,7 +75,7 @@ public class Controller {
                 }
             }
             if (method == null) {
-                throw new RuntimeException("Can't find method " + methodName 
+                throw new RuntimeException("Can't find method " + methodName
                         + " on " + object);
             }
             return method;
@@ -83,7 +83,7 @@ public class Controller {
             throw new RuntimeException("Binding failed: " + e.getMessage());
         }
     }
-    
+
     public void bind(ItemSelectable view, String modelProperty) {
         try {
             String viewProperty = "selected";
@@ -103,7 +103,7 @@ public class Controller {
             throw new RuntimeException("Oops - " + e.getMessage());
         }
     }
-    
+
     public void bind(JComboBox view, String modelProperty) {
         try {
             String viewProperty = "selectedItem";
@@ -118,12 +118,12 @@ public class Controller {
             Object[] values = {value};
             viewSetter.invoke(view, values);
             bindImpl(view, viewProperty, model, modelProperty);
-            bindImpl(model, modelProperty, (ItemSelectable)view, viewProperty);
+            bindImpl(model, modelProperty, (ItemSelectable) view, viewProperty);
         } catch(Exception e) {
             throw new RuntimeException("Oops - " + e.getMessage());
         }
     }
-    
+
     public void bind(JCheckBox view, String modelProperty) {
         try {
             String viewProperty = "selected";
@@ -138,12 +138,12 @@ public class Controller {
             Object[] values = {value};
             viewSetter.invoke(view, values);
             bindImpl(view, viewProperty, model, modelProperty);
-            bindImpl(model, modelProperty, (ItemSelectable)view, viewProperty);
+            bindImpl(model, modelProperty, (ItemSelectable) view, viewProperty);
         } catch(Exception e) {
             throw new RuntimeException("Oops - " + e.getMessage());
         }
     }
-    
+
     public void bind(JTextArea view, String modelProperty) {
         try {
             String viewProperty = "text";
@@ -163,7 +163,7 @@ public class Controller {
             throw new RuntimeException("Oops - " + e.getMessage());
         }
     }
-    
+
     public void bind(JTextField view, String modelProperty) {
         try {
             String viewProperty = "text";
@@ -183,7 +183,7 @@ public class Controller {
             throw new RuntimeException("Oops - " + e.getMessage());
         }
     }
-    
+
     public void bind(TextComponent view, String modelProperty) {
         try {
             String viewProperty = "text";
@@ -203,8 +203,8 @@ public class Controller {
             throw new RuntimeException("Oops - " + e.getMessage());
         }
     }
-    
-    public void bind(Object target, String targetProperty, 
+
+    public void bind(Object target, String targetProperty,
             String itemProperty) {
         try {
             bindImpl(target, targetProperty, model, itemProperty);
@@ -212,27 +212,27 @@ public class Controller {
             throw new RuntimeException("Oops - " + e.getMessage());
         }
     }
-    
-    private void bindImpl(Object target, String targetProperty, 
+
+    private void bindImpl(Object target, String targetProperty,
             AbstractModel source, String itemProperty) {
-        PropertyChangeListener pcl = (PropertyChangeListener)EventHandler.create(
-                PropertyChangeListener.class, target, targetProperty, 
+        PropertyChangeListener pcl = (PropertyChangeListener) EventHandler.create(
+                PropertyChangeListener.class, target, targetProperty,
                 "source." + itemProperty, "propertyChange");
         source.addPropertyChangeListener(pcl);
     }
-    
+
     private void bindImpl(Object target, String targetProperty, Component source,
             String itemProperty) {
-        PropertyChangeListener pcl = (PropertyChangeListener)EventHandler.create(
-                PropertyChangeListener.class, target, targetProperty, 
+        PropertyChangeListener pcl = (PropertyChangeListener) EventHandler.create(
+                PropertyChangeListener.class, target, targetProperty,
                 "source." + itemProperty, "propertyChange");
         source.addPropertyChangeListener(pcl);
     }
-    
-    private void bindImpl(Object target, String targetProperty, 
+
+    private void bindImpl(Object target, String targetProperty,
             ItemSelectable is, String itemProperty) {
         is.addItemListener(
-                (ItemListener)EventHandler.create(
+                (ItemListener) EventHandler.create(
                 ItemListener.class,
                 target,
                 targetProperty,
@@ -240,11 +240,11 @@ public class Controller {
                 )
                 );
     }
-    
-    private void bindImpl(Object target, String targetProperty, 
+
+    private void bindImpl(Object target, String targetProperty,
             ComboBoxModel model, String itemProperty) {
         model.addListDataListener(
-                (ListDataListener)EventHandler.create(
+                (ListDataListener) EventHandler.create(
                 ListDataListener.class,
                 target,
                 targetProperty,
@@ -255,7 +255,7 @@ public class Controller {
     private void bindImpl(Object target, String targetProperty, JTextField view,
             String itemProperty) {
         view.addFocusListener(
-                (FocusListener)EventHandler.create(
+                (FocusListener) EventHandler.create(
                 FocusListener.class,
                 target,
                 targetProperty,
@@ -266,7 +266,7 @@ public class Controller {
     private void bindImpl(Object target, String targetProperty, JTextArea view,
             String itemProperty) {
         view.addFocusListener(
-                (FocusListener)EventHandler.create(
+                (FocusListener) EventHandler.create(
                 FocusListener.class,
                 target,
                 targetProperty,
@@ -284,7 +284,7 @@ public class Controller {
     try {
       Method method = clazz.getMethod("addActionListener",
           new Class[]{ActionListener.class});
-      ActionListener actionListener = (ActionListener)EventHandler.create(
+      ActionListener actionListener = (ActionListener) EventHandler.create(
         ActionListener.class,
         target,
         methodName

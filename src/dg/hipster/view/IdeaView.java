@@ -60,15 +60,15 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
     private boolean editing;
     MapComponent parent;
     private double realAngle;
-    
+
     public IdeaView() {
         this(null);
     }
-    
+
     public IdeaView(Idea anIdea) {
         setIdea(anIdea);
     }
-    
+
     public double getMinSubAngle() {
         double minAngle = Math.PI;
         for (IdeaView subView: subViews) {
@@ -78,7 +78,7 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
         }
         return minAngle;
     }
-    
+
     public double getMaxSubAngle() {
         double maxAngle = -Math.PI;
         for (IdeaView subView: subViews) {
@@ -88,7 +88,7 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
         }
         return maxAngle;
     }
-    
+
     public void ideaChanged(IdeaEvent fe) {
         String cmd = fe.getCommand();
         if ("ADDED".equals(cmd)) {
@@ -113,15 +113,15 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
         }
         adjust();
     }
-    
+
     public IdeaView getPreviousSibling() {
         return getSibling(-1);
     }
-    
+
     public IdeaView getNextSibling() {
         return getSibling(+1);
     }
-    
+
     public IdeaView getSibling(int difference) {
         MapComponent parent = getParent();
         if (!(parent instanceof IdeaView)) {
@@ -138,30 +138,30 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
         siblingPos = (siblingPos + subCount) % subCount;
         return parentView.getSubViews().get(siblingPos);
     }
-    
+
     public synchronized void add(BranchView subView) {
         subView.parent = this;
         subViews.add(subView);
     }
-    
+
     public synchronized void add(int pos, BranchView subView) {
         subView.parent = this;
         subViews.add(pos, subView);
     }
-    
+
     public synchronized void remove(BranchView subView) {
         subView.parent = null;
         subViews.remove(subView);
     }
-    
+
     public synchronized Vector<BranchView> getSubViews() {
         return (Vector<BranchView>)subViews.clone();
     }
-    
+
     public Idea getIdea() {
         return idea;
     }
-    
+
     public void setIdea(Idea newIdea) {
         this.idea = newIdea;
         subViews.clear();
@@ -188,7 +188,7 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
             }
         }
     }
-    
+
     public void setSelected(boolean isSelected) {
         this.selected = isSelected;
         if (!isSelected) {
@@ -196,32 +196,32 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
         }
         repaint();
     }
-    
+
     public void repaint() {
         if (parent != null) {
             parent.repaint();
         }
     }
-    
+
     public boolean isSelected() {
         return this.selected;
     }
-    
+
     public void setEditing(boolean isEditing) {
         this.editing = isEditing;
         repaint();
     }
-    
+
     public boolean isEditing() {
         return this.editing;
     }
-    
+
     public IdeaView getViewAt(Point2D p) {
         IdeaView hit = null;
         if (hits(p)) {
             hit = this;
         }
-        
+
         for (BranchView subView: subViews) {
             IdeaView hit2 = subView.getViewAt(p);
             if (hit2 != null) {
@@ -230,9 +230,9 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
         }
         return hit;
     }
-    
+
     abstract boolean hits(Point2D p);
-    
+
     void paintBranches(final Graphics g, final Point c2,
             final IdeaView aView, final double initAngle,
             final int depth,
@@ -244,20 +244,20 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
             }
         }
     }
-    
+
     static Color invert(Color colour) {
         int red = colour.getRed();
         int green = colour.getGreen();
         int blue = colour.getBlue();
         return new Color(255 - red, 255 - green, 255 - blue);
     }
-    
+
     Point getView(final Point c, final Point2D p) {
         int sx = c.x + (int) p.getX();
         int sy = c.y - (int) p.getY();
         return new Point(sx, sy);
     }
-    
+
     /**
      * Search this view and it's child-views and return any that have
      * an idea matching the one given.
@@ -276,7 +276,7 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
         }
         return null;
     }
-    
+
     /**
      * Get the root view - that is the ancestor without an ancestor.
      */
@@ -284,37 +284,37 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
         if (this instanceof CentreView) {
             return this;
         }
-        IdeaView parentView = (IdeaView)this.getParent();
+        IdeaView parentView = (IdeaView) this.getParent();
         return parentView.getRootView();
     }
-    
+
     void drawString(Graphics2D graphics2d, String string, Point p,
             int alignment, double orientation, boolean editing, IdeaMap map) {
         double orient = orientation % Math.PI;
-        
+
         if (orient > (Math.PI / 2.0)) {
             orient -= Math.PI;
         }
         if (orient < (-Math.PI / 2.0)) {
             orient += Math.PI;
         }
-        
+
         int xc = p.x;
         int yc = p.y;
-        
+
         AffineTransform transform = graphics2d.getTransform();
-        
+
         transform(graphics2d, orient, xc, yc);
-        
+
         FontMetrics fm = graphics2d.getFontMetrics();
         double realTextWidth = fm.stringWidth(string);
         double realTextHeight = fm.getHeight() - fm.getDescent();
-        
+
         int offsetX = (int) (realTextWidth * (double) (alignment % 3) / 2.0);
         int offsetY = (int) (-realTextHeight * (double) (alignment / 3) / 2.0);
-        
+
         if (!editing) {
-            
+
             if ((graphics2d != null) && (string != null)) {
                 graphics2d.drawString(string, xc - offsetX, yc - offsetY);
             }
@@ -324,10 +324,10 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
             map.getTextField().paint(g2d);
             g2d.dispose();
         }
-        
+
         graphics2d.setTransform(transform);
     }
-    
+
     private void transform(Graphics2D graphics2d, double orientation, int x,
             int y) {
         graphics2d.transform(
@@ -336,21 +336,21 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
                 )
                 );
     }
-    
+
     public void adjust() {
         if (parent != null) {
             parent.adjust();
         }
     }
-    
+
     public MapComponent getParent() {
         return parent;
     }
-    
+
     public void setParent(MapComponent parent) {
         this.parent = parent;
     }
-    
+
     public Point2D getEndPoint() {
         double x = 0.0;
         double y = 0.0;
@@ -378,11 +378,11 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
         }
         return new Point2D.Double(x, y);
     }
-    
+
     void setRealAngle(double ra) {
         this.realAngle = ra;
     }
-    
+
     public double getRealAngle() {
         return this.realAngle;
     }

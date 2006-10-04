@@ -51,7 +51,7 @@ import javax.swing.Timer;
  */
 
 final class MapMover implements ActionListener {
-    
+
     /**
      * Maximum speed the particles may move at.
      */
@@ -109,30 +109,30 @@ final class MapMover implements ActionListener {
      * else such as the mouse is controlling it).
      */
     private BranchView fixedBranch;
-    
+
     public MapMover(IdeaMap newIdeaMap) {
         this.ideaMap = newIdeaMap;
     }
-    
+
     public void startAdjust() {
         timeChanged = System.currentTimeMillis();
         this.ticker.start();
     }
-    
+
     public void stopAdjust() {
         this.ticker.stop();
         this.maxSpeed = 0.0;
         ideaMap.repaint();
     }
-    
+
     public boolean isRunning() {
         return ticker.isRunning();
     }
-    
+
     public void setFixedBranch(BranchView fixed) {
         this.fixedBranch = fixed;
     }
-    
+
     public void actionPerformed(final ActionEvent evt) {
         if (timeChanged == 0) {
             timeChanged = System.currentTimeMillis();
@@ -147,7 +147,7 @@ final class MapMover implements ActionListener {
         }
         adjust();
     }
-    
+
     private void adjust() {
         IdeaView rootView = ideaMap.getRootView();
         particles = new Vector<Vertex>();
@@ -159,7 +159,7 @@ final class MapMover implements ActionListener {
         adjustAngles(rootView);
         ideaMap.repaint();
     }
-    
+
     private double getNewVelocity(final Vertex force, final IdeaView view,
             final Position p) {
         Vertex p2 = getParticle(view, new Position(ORIGIN, p.angle));
@@ -175,7 +175,7 @@ final class MapMover implements ActionListener {
         }
         return v;
     }
-    
+
     private void adjustAngles(final IdeaView parentView) {
         final List<BranchView> views = parentView.getSubViews();
         for (int i = 0; i < views.size(); i++) {
@@ -196,14 +196,14 @@ final class MapMover implements ActionListener {
             adjustAngles(view);
         }
     }
-    
+
     private double getNewAngle(final IdeaView parentView,
             final IdeaView previousView, final IdeaView view,
             final IdeaView nextView) {
         final List<BranchView> views = parentView.getSubViews();
         final double v = view.getIdea().getV();
         double minDiffAngle = Math.PI / 2 / views.size();
-        
+
         double oldAngle = view.getIdea().getAngle();
         double newAngle = oldAngle  + (view.getIdea().getV()
         / view.getIdea().getLength());
@@ -267,10 +267,10 @@ final class MapMover implements ActionListener {
         }
         return newAngle;
     }
-    
-    
-    
-    
+
+
+
+
     private Vertex endForce(final IdeaView parentView, final Position p) {
         final List<BranchView> views = parentView.getSubViews();
         if (views.size() == 0) {
@@ -285,7 +285,7 @@ final class MapMover implements ActionListener {
         }
         return totForce;
     }
-    
+
     private Vertex repulsion(final Vertex point, final IdeaView view,
             final Position p) {
         Vertex force = new Vertex(0, 0);
@@ -303,8 +303,8 @@ final class MapMover implements ActionListener {
                 view.getIdea().getAngle() + p.angle)));
         return force;
     }
-    
-    
+
+
     /**
      *
      * @param parentView
@@ -322,7 +322,7 @@ final class MapMover implements ActionListener {
             createParticles(view, nextStart);
         }
     }
-    
+
     private Vertex getParticle(final IdeaView view, final Position p) {
         double angle = view.getIdea().getAngle() + p.angle;
         double length = view.getIdea().getLength();
@@ -348,29 +348,29 @@ final class Vertex {
         this.x = anX;
         this.y = aY;
     }
-    
+
     Vertex add(final Vertex other) {
         return new Vertex(this.x + other.x, this.y + other.y);
     }
-    
+
     Vertex subtract(final Vertex other) {
         return new Vertex(this.x - other.x, this.y - other.y);
     }
-    
+
     double distanceSq(final Vertex other) {
         return (new Point2D.Double(x, y)).distanceSq(
                 new Point2D.Double(other.x, other.y));
     }
-    
+
     double distance(final Vertex other) {
         return (new Point2D.Double(x, y)).distance(
                 new Point2D.Double(other.x, other.y));
     }
-    
+
     Vertex scale(final double factor) {
         return new Vertex(this.x * factor, this.y * factor);
     }
-    
+
     void trim(final double min, final double max) {
         if (x < min) {
             x = min;

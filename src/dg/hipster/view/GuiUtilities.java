@@ -46,34 +46,34 @@ import javax.swing.JOptionPane;
 public class GuiUtilities {
     protected static ResourceBundle resBundle = ResourceBundle.getBundle(
             "dg/hipster/resource/strings");
-    
+
     /** Creates a new instance of GuiUtilities */
     private GuiUtilities() {
     }
-    
+
     public static void showMessage(final String messageName, int msgType) {
         Mainframe mainframe = Main.getMainframe();
         JOptionPane.showMessageDialog(mainframe.getContentPane(),
                 resBundle.getString(messageName), mainframe.getTitle(),
                 msgType);
     }
-    
+
     public static void showInfo(final String messageName) {
         showMessage(messageName, JOptionPane.INFORMATION_MESSAGE);
     }
-    
+
     public static void showWarning(final String messageName) {
         showMessage(messageName, JOptionPane.WARNING_MESSAGE);
     }
-    
+
     public static void showError(final String messageName) {
         showMessage(messageName, JOptionPane.ERROR_MESSAGE);
     }
-    
+
     public static void showDebug(final String message) {
         Mainframe mainframe = Main.getMainframe();
         JOptionPane.showMessageDialog(mainframe.getContentPane(),
                 message, mainframe.getTitle(),
                 JOptionPane.INFORMATION_MESSAGE);
-    }    
+    }
 }

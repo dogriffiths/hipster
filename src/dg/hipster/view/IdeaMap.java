@@ -49,16 +49,11 @@ import java.awt.RenderingHints;
 import java.awt.Stroke;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
 import java.awt.geom.Point2D;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
-import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.SpringLayout;
 import javax.swing.Timer;
 
 /**
@@ -108,6 +103,9 @@ public final class IdeaMap extends JComponent implements MapComponent {
      * Content pane where the map is displayed.
      */
     private JLayeredPane mapArea;
+    /**
+     * Floating properties panel.
+     */
     private FloatingPanel propertiesPanel;
     /**
      * Pause between animation updates. 40 = 20 fps.
@@ -121,7 +119,16 @@ public final class IdeaMap extends JComponent implements MapComponent {
             repaint();
         }
     });
-    
+    /**
+     * &quot;From&quot; point of the link rubber-band.
+     */
+    private Point rubberBandFrom;
+    /**
+     * &quot;To&quot; point of the link rubber-band.
+     */
+    private Point rubberBandTo;
+
+
     /** Creates a new instance of Fred */
     public IdeaMap() {
         text = new JTextField("");
@@ -141,7 +148,7 @@ public final class IdeaMap extends JComponent implements MapComponent {
         mapArea.add(propertiesPanel);
         this.setPropertiesVisible(false);
     }
-    
+
     /**
      * Text field that appears at the top of the component.
      * @return Text field that appears at the top of the component.
@@ -149,7 +156,7 @@ public final class IdeaMap extends JComponent implements MapComponent {
     public JTextField getTextField() {
         return this.text;
     }
-    
+
     /**
      * Set the central newIdea of the map.
      *
@@ -167,7 +174,7 @@ public final class IdeaMap extends JComponent implements MapComponent {
         }
         this.resetView();
     }
-    
+
     /**
      * Currently selected idea branch (if any).
      * @return Currently selected idea branch (if any).
@@ -175,7 +182,7 @@ public final class IdeaMap extends JComponent implements MapComponent {
     public Idea getSelected() {
         return this.selected.getIdea();
     }
-    
+
     /**
      * Currently selected idea branch (if any).
      * @param selectedIdea Currently selected idea branch (if any).
@@ -183,7 +190,7 @@ public final class IdeaMap extends JComponent implements MapComponent {
     public void setSelected(Idea selectedIdea) {
         setSelectedView(findIdeaViewFor(rootView, selectedIdea));
     }
-    
+
     /**
      * Find the view (if any) that represents the given idea.
      * Start the search at the given view, and search all of
@@ -208,7 +215,7 @@ public final class IdeaMap extends JComponent implements MapComponent {
         }
         return null;
     }
-    
+
     /**
      * Currently selected idea branch (if any).
      * @return Currently selected idea branch (if any).
@@ -216,7 +223,7 @@ public final class IdeaMap extends JComponent implements MapComponent {
     public IdeaView getSelectedView() {
         return this.selected;
     }
-    
+
     /**
      * Select the given view.
      * @param newSelectedView View to select.
@@ -242,7 +249,7 @@ public final class IdeaMap extends JComponent implements MapComponent {
             propertiesPanel.setVisible(false);
         }
     }
-    
+
     /**
      * The idea represented at the centre of this map.
      * @return central idea.
@@ -253,7 +260,7 @@ public final class IdeaMap extends JComponent implements MapComponent {
         }
         return null;
     }
-    
+
     /**
      * The idea-view at the centre of this map.
      * @return idea-view at the centre of this map.
@@ -261,7 +268,7 @@ public final class IdeaMap extends JComponent implements MapComponent {
     public IdeaView getRootView() {
         return this.rootView;
     }
-    
+
     /**
      * Paint the map part of the component (the text-field
      * will paint itself).
@@ -288,7 +295,7 @@ public final class IdeaMap extends JComponent implements MapComponent {
             this.drawRubberBand((Graphics2D)gOrig);
         }
     }
-    
+
     /**
      * Amount this map is scaled.
      * @return  Amount this map is scaled.
@@ -296,9 +303,10 @@ public final class IdeaMap extends JComponent implements MapComponent {
     public double getZoom() {
         return zoom;
     }
-    
+
     /**
      * Scale this map up by the given factor.
+     * @param factor scaling factor - 1.0 for normal view.
      */
     public void zoom(double factor) {
         zoom *= factor;
@@ -306,51 +314,60 @@ public final class IdeaMap extends JComponent implements MapComponent {
         offset.y *= factor;
         repaint();
     }
-    
+
     /**
      * Scale this map up by {@link #SCALE_FACTOR}.
      */
     public void zoomIn() {
         zoom(SCALE_FACTOR);
     }
-    
+
     /**
      * Scale this map down by {@link #SCALE_FACTOR}.
      */
     public void zoomOut() {
         zoom(1.0 / SCALE_FACTOR);
     }
-    
+
     /**
      * Call for a repaint of this map.
      */
     public void adjust() {
         controller.adjust();
     }
-    
+
     /**
      * Call for a repaint of this map.
      */
     public void startAdjust() {
         controller.startAdjust();
     }
-    
+
     /**
      * Get the controller for this map.
+     * @return this idea-map's controller.
      */
     public IdeaMapController getController() {
         return this.controller;
     }
-    
+
+    /**
+     * Amount that the current display is offset.
+     * @return offset point.
+     */
     public Point getOffset() {
         return offset;
     }
-    
+
+    /**
+     * Amount the current display is offset.
+     * @param offset point to offset by.
+     */
     public void setOffset(Point offset) {
         this.offset = offset;
         repaint();
     }
-    
+
     /**
      * 2D point in map space corresponding to the given point in screen space.
      *@param p Point in screen space.
@@ -369,7 +386,7 @@ public final class IdeaMap extends JComponent implements MapComponent {
         y /= z;
         return new Point2D.Double(x, y);
     }
-    
+
     /**
      * Point in screen space corresponding to the given point in map space.
      *@param p Point2D in map space.
@@ -388,9 +405,9 @@ public final class IdeaMap extends JComponent implements MapComponent {
         }
         x += (size.width / 2);
         y += (size.height / 2);
-        return new Point((int)x, (int)y);
+        return new Point((int) x, (int) y);
     }
-    
+
     /**
      * Reset the zoom and offset.
      */
@@ -399,7 +416,7 @@ public final class IdeaMap extends JComponent implements MapComponent {
         resetZoom();
         setPropertiesVisible(false);
     }
-    
+
     /**
      * Centre the view.
      */
@@ -408,7 +425,7 @@ public final class IdeaMap extends JComponent implements MapComponent {
         //repaintRequired();
         repaint();
     }
-    
+
     /**
      * Centre the view.
      */
@@ -419,7 +436,7 @@ public final class IdeaMap extends JComponent implements MapComponent {
         //repaintRequired();
         repaint();
     }
-    
+
     /**
      * Insert a child branch to the currently selected idea (do nothing
      * if none selected).
@@ -433,7 +450,11 @@ public final class IdeaMap extends JComponent implements MapComponent {
         selected.getIdea().add(0, newIdea);
         editIdeaView(selected.getSubViews().get(0));
     }
-    
+
+    /**
+     * Select and put the given idea-view into edit mode.
+     * @param selected view to select and edit.
+     */
     public void editIdeaView(final IdeaView selected) {
         selectIdeaView(selected);
         selected.setEditing(true);
@@ -442,12 +463,19 @@ public final class IdeaMap extends JComponent implements MapComponent {
         text.selectAll();
         ticker.start();
     }
-    
+
+    /**
+     * Select the given idea view.
+     * @param selected view to select.
+     */
     public void selectIdeaView(final IdeaView selected) {
         setSelectedView(selected);
         text.setText(selected.getIdea().getText());
     }
-    
+
+    /**
+     * Insert a child idea to the currently selected idea.
+     */
     public void insertIdea() {
         final IdeaView selected = getSelectedView();
         if (selected == null) {
@@ -463,7 +491,11 @@ public final class IdeaMap extends JComponent implements MapComponent {
         parentView.getIdea().add(pos + 1, newIdea);
         editIdeaView(selected.getNextSibling());
     }
-    
+
+    /**
+     * Switch the given idea view out of edit mode.
+     * @param ideaView idea-view to unedit.
+     */
     public void unEditIdeaView(final IdeaView ideaView) {
         ideaView.getIdea().setText(text.getText());
         ideaView.setEditing(false);
@@ -471,7 +503,11 @@ public final class IdeaMap extends JComponent implements MapComponent {
         text.setEnabled(false);
         ticker.stop();
     }
-    
+
+    /**
+     * Delete the currently selected idea (and consequently
+     * its child ideas).
+     */
     public void deleteSelected() {
         final IdeaView selected = getSelectedView();
         if (selected == null) {
@@ -495,7 +531,12 @@ public final class IdeaMap extends JComponent implements MapComponent {
         parentView.getIdea().remove(selected.getIdea());
         selectIdeaView(nextToSelect);
     }
-    
+
+    /**
+     * Turn the given branch to point at the given point.
+     * @param branch idea to to drag.
+     * @param screenPoint Point it will face.
+     */
     public void dragBranchTo(final BranchView branch,
             final Point screenPoint) {
         Point2D p = getMapPoint(screenPoint);
@@ -520,7 +561,12 @@ public final class IdeaMap extends JComponent implements MapComponent {
         }
         adjust();
     }
-    
+
+    /**
+     * Put the given angle into the range -Pi to Pi.
+     * @param angle angle to transform.
+     * @return equivalent in the -Pi to Pi range.
+     */
     private double normalizeRange(double angle) {
         while (angle < -Math.PI) {
             angle += 2 * Math.PI;
@@ -530,7 +576,7 @@ public final class IdeaMap extends JComponent implements MapComponent {
         }
         return angle;
     }
-    
+
     /**
      * The clockwise angle in radians of the line between
      * the given points. If toP is directly above fromP, the
@@ -553,10 +599,14 @@ public final class IdeaMap extends JComponent implements MapComponent {
         }
         return angle;
     }
-    
-    private Point rubberBandFrom;
-    private Point rubberBandTo;
-    
+
+    /**
+     * Request that a rubber band be drawn from the mid-point
+     * of the selected idea, to the given point. This will
+     * not actually be drawn until some time later, when
+     * this idea map is repainted.
+     * @param toPoint point to draw the rubber band line to.
+     */
     public void drawLinkRubberBand(final Point toPoint) {
         IdeaView selectedView = getSelectedView();
         if ((selectedView == null) || (!(selectedView instanceof BranchView))) {
@@ -570,12 +620,21 @@ public final class IdeaMap extends JComponent implements MapComponent {
         rubberBandTo = toPoint;
         repaint();
     }
-    
+
+    /**
+     * Request that the rubber-band line is removed. It will
+     * not actually be cleared until this idea-map is repainted.
+     */
     public void clearRubberBand() {
         this.rubberBandFrom = null;
         this.rubberBandTo = null;
     }
-    
+
+    /**
+     * Draw a rubber band as specified by drawLinkRubberBand.
+     * May do nothing if no band specified.
+     * @param g graphics to draw on.
+     */
     private void drawRubberBand(final Graphics2D g) {
         g.setColor(Color.GRAY);
         Dimension size = getSize();
@@ -588,113 +647,42 @@ public final class IdeaMap extends JComponent implements MapComponent {
                 rubberBandTo.x, rubberBandTo.y);
         g.setStroke(oldStroke);
     }
-    
+
+    /**
+     * Layered pane covering the map area.
+     * @return layered pane covering the map area.
+     */
     public JLayeredPane getMapArea() {
         return mapArea;
     }
-    
+
+    /**
+     * Whether the properties panel is visible.
+     */
     private boolean propertiesVisible;
+    /**
+     * Whether the properties panel is visible.
+     * @param show true if visible, false otherwise.
+     */
     public void setPropertiesVisible(boolean show) {
         if (this.getSelectedView() != null) {
             propertiesPanel.setVisible(show);
         }
         propertiesVisible = show;
     }
-    
+
+    /**
+     * Whether the properties panel is visible.
+     * @return true if visible, false otherwise.
+     */
     public boolean getPropertiesVisible() {
         return this.propertiesVisible;
     }
-    
+
+    /**
+     * The properties visible if it is not, or vice versa.
+     */
     public void togglePropertiesPanel() {
         setPropertiesVisible(!getPropertiesVisible());
-    }
-}
-
-final class FloatingPanel extends JPanel implements MouseListener,
-        MouseMotionListener {
-    private static Color SHADED = new Color(0, 0, 0, 95);
-    private static Color CLEAR = new Color(0, 0, 0, 0);
-    private JPanel contentPane;
-    private JLabel title;
-//    private JButton closeButton;
-    
-    FloatingPanel() {
-        setBackground(new Color(0, 0, 0, 0));
-        this.addMouseListener(this);
-        this.addMouseMotionListener(this);
-        SpringLayout layout = new SpringLayout();
-        this.setLayout(layout);
-        title = new JLabel("Test");
-        title.setBackground(SHADED);
-        title.setForeground(Color.WHITE);
-        this.add(title);
-        contentPane = new JPanel();
-        contentPane.setBackground(CLEAR);
-        contentPane.setForeground(Color.WHITE);
-        this.add(contentPane);
-        layout.putConstraint(SpringLayout.WEST, title, 10,
-                SpringLayout.WEST, this);
-        layout.putConstraint(SpringLayout.NORTH, title, 10,
-                SpringLayout.NORTH, this);
-        layout.putConstraint(SpringLayout.NORTH, contentPane, 10,
-                SpringLayout.SOUTH, title);
-        layout.putConstraint(SpringLayout.WEST, contentPane, 10,
-                SpringLayout.WEST, this);
-    }
-    
-    public void setCaption(String caption) {
-        title.setText(caption);
-    }
-    
-    public String getCaption() {
-        return title.getText();
-    }
-    
-    private Point downPoint;
-    private Point start;
-    public void mouseEntered(final MouseEvent evt) {
-    }
-    public void mouseExited(final MouseEvent evt) {
-    }
-    public void mouseClicked(final MouseEvent evt) {
-    }
-    public void mouseMoved(final MouseEvent evt) {
-    }
-    public void mouseReleased(final MouseEvent evt) {
-        downPoint = null;
-    }
-    public void mousePressed(final MouseEvent evt) {
-        downPoint = evt.getPoint();
-        start = this.getLocation();
-        downPoint = evt.getPoint();
-        downPoint.x += start.x;
-        downPoint.y += start.y;
-    }
-    public void mouseDragged(final MouseEvent evt) {
-        Point p = evt.getPoint();
-        Point s = this.getLocation();
-        int xDiff = s.x + p.x - downPoint.x;
-        int yDiff = s.y + p.y - downPoint.y;
-        setLocation(new Point(start.x + xDiff, start.y + yDiff));
-    }
-    
-    public void paintComponent(Graphics g) {
-        g.setColor(SHADED);
-        Dimension size = getSize();
-        g.fillRoundRect(0, 0, size.width, size.height, 10, 10);
-        g.setColor(Color.GRAY.darker());
-        g.drawLine(5, 0, size.width - 5, 0);
-        g.setColor(Color.BLACK);
-        g.drawLine(5, size.height - 1,
-                size.width - 5, size.height - 1);
-    }
-    
-    public void auto() {
-        Dimension panSize = contentPane.getPreferredSize();
-        setSize(panSize.width + 20, panSize.height + 50);
-    }
-    
-    public JPanel getContentPane() {
-        return contentPane;
     }
 }

@@ -31,7 +31,7 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- 
+
  */
 
 package dg.hipster.model;
@@ -70,14 +70,14 @@ public final class Idea extends AbstractModel {
      * Longer notes.
      */
     private String notes;
-    
+
     /**
      * No args constructor.
      */
     public Idea() {
-        
+
     }
-    
+
     /**
      * Constructor for an idea with the given text.
      * @param text zhort text description of the idea
@@ -85,7 +85,7 @@ public final class Idea extends AbstractModel {
     public Idea(String text) {
         setText(text);
     }
-    
+
     /**
      * Add a sub-idea to this idea.
      * @param subIdea sub-idea to add
@@ -94,7 +94,7 @@ public final class Idea extends AbstractModel {
         subIdeas.add(subIdea);
         notify("ADDED", subIdea, subIdeas.size() - 1);
     }
-    
+
     /**
      * Add a sub-idea to this idea at the given position.
      * @param pos position in the list of sub-ideas to insert
@@ -104,7 +104,7 @@ public final class Idea extends AbstractModel {
         subIdeas.add(pos, subIdea);
         notify("ADDED", subIdea, pos);
     }
-    
+
     /**
      * Remove the given sub-idea from this idea. No
      * exception is raised if the idea given is
@@ -115,7 +115,7 @@ public final class Idea extends AbstractModel {
         subIdeas.remove(subIdea);
         notify("REMOVED", subIdea);
     }
-    
+
     /**
      * Add an idea listener to this idea. The idea listener
      * will be informed when anything changes about this
@@ -125,7 +125,7 @@ public final class Idea extends AbstractModel {
     public void addIdeaListener(IdeaListener ideaListener) {
         listeners.add(ideaListener);
     }
-    
+
     /**
      * The given idea-listener will no longer be
      * notified of changes to this idea. No exception
@@ -136,7 +136,7 @@ public final class Idea extends AbstractModel {
     public void removeIdeaListener(IdeaListener ideaListener) {
         listeners.remove(ideaListener);
     }
-    
+
     /**
      * Notify all listeners that something has changed. The parameters
      * provide more detail about the change.
@@ -149,7 +149,7 @@ public final class Idea extends AbstractModel {
             listener.ideaChanged(new IdeaEvent(this, command, paras));
         }
     }
-    
+
     /**
      * Get a list of the sub-ideas for this idea.
      *@return list of idea objects
@@ -157,7 +157,7 @@ public final class Idea extends AbstractModel {
     public List<Idea> getSubIdeas() {
         return (List<Idea>)subIdeas.clone();
     }
-    
+
     /**
      * Get the short text description of this idea.
      * @return short text string, using for idea maps
@@ -165,7 +165,7 @@ public final class Idea extends AbstractModel {
     public String getText() {
         return text;
     }
-    
+
     /**
      * Specify the short newText description of this idea.
      *
@@ -179,7 +179,7 @@ public final class Idea extends AbstractModel {
             this.firePropertyChange("text", oldText, newText);
         }
     }
-    
+
     /**
      * Add a one-way link to another idea.
      *@param other idea to link to.
@@ -190,7 +190,7 @@ public final class Idea extends AbstractModel {
             notify("ADDED_LINK", this, other);
         }
     }
-    
+
     /**
      * Add a two-way link to another idea.
      *@param other idea to link to.
@@ -202,7 +202,7 @@ public final class Idea extends AbstractModel {
         this.addLink(other);
         other.addLink(this);
     }
-    
+
     /**
      * Remove a link to another idea.
      *@param other idea to link to.
@@ -220,7 +220,7 @@ public final class Idea extends AbstractModel {
             other.links.remove(this);
         }
     }
-    
+
     /**
      * Get the list of links that this idea is connected to.
      * @return list of links to related ideas.
@@ -228,7 +228,7 @@ public final class Idea extends AbstractModel {
     public List<Idea> getLinks() {
         return (List<Idea>)links.clone();
     }
-    
+
     /**
      * String version of this idea. It will be the short text
      * description, followed by a recursive list of the
@@ -238,7 +238,7 @@ public final class Idea extends AbstractModel {
     public String toString() {
         return this.text + subIdeas.toString();
     }
-    
+
     /**
      * The length of this idea.
      *@return length in points.
@@ -246,7 +246,7 @@ public final class Idea extends AbstractModel {
     public double getLength() {
         return length;
     }
-    
+
     /**
      * The length of this idea.
      *@param length length in points.
@@ -254,7 +254,7 @@ public final class Idea extends AbstractModel {
     public void setLength(double length) {
         this.length = length;
     }
-    
+
     /**
      * The angle of this idea relative to its parent.
      *@return angle in radians.
@@ -262,7 +262,7 @@ public final class Idea extends AbstractModel {
     public double getAngle() {
         return angle;
     }
-    
+
     /**
      * The angle of this idea relative to its parent.
      *@param angle angle in radians.
@@ -270,7 +270,7 @@ public final class Idea extends AbstractModel {
     public void setAngle(double angle) {
         this.angle = angle;
     }
-    
+
     /**
      * The velocity of this idea's end-point during animation.
      *@return the velocity.
@@ -278,7 +278,7 @@ public final class Idea extends AbstractModel {
     public double getV() {
         return v;
     }
-    
+
     /**
      * The velocity of this idea's end-point during animation.
      *@param v the velocity.

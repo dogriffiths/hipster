@@ -63,33 +63,33 @@ public final class XMLMenuBar extends JMenuBar {
      * Internationalization strings.
      */
     private ResourceBundle resBundle;
-    
+
     private Map<String, JMenu> menus = new HashMap<String, JMenu>();
     private Map<String, JMenuItem> menuItems = new HashMap<String, JMenuItem>();
     private Controller controller;
     private Object backingBean;
 //    private JMenuBar menuBar;
-    
+
     public XMLMenuBar(Object aBean, String viewXML, ResourceBundle resBundle) {
         super();
         this.backingBean = aBean;
         controller = new Controller(null);
         this.resBundle = resBundle;
-        
+
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         InputStream in = null;
         try {
             in = XMLMenuBar.class.getResourceAsStream(viewXML);
             Document document = factory.newDocumentBuilder().parse(in);
-            
-            Element docMenuBar = (Element)document.getElementsByTagName(
+
+            Element docMenuBar = (Element) document.getElementsByTagName(
                     "menuBar").item(0);
-            
+
             //menuBar = new JMenuBar();
-            
+
             NodeList menuList = docMenuBar.getElementsByTagName("menu");
             for (int i = 0; i < menuList.getLength(); i++) {
-                Element menuElement = (Element)menuList.item(i);
+                Element menuElement = (Element) menuList.item(i);
                 String menuName = menuElement.getTagName();
                 String menuTextName = menuElement.getAttribute("textName");
                 String menuText = resBundle.getString("menu." + menuTextName);
@@ -99,9 +99,9 @@ public final class XMLMenuBar extends JMenuBar {
                 NodeList itemList = menuElement.getChildNodes();
                 int col = 0;
                 for (int j = 0; j < itemList.getLength(); j++) {
-                    Node itemNode = (Node)itemList.item(j);
+                    Node itemNode = (Node) itemList.item(j);
                     if (itemNode instanceof Element) {
-                        Element itemElement = (Element)itemNode;
+                        Element itemElement = (Element) itemNode;
                         String itemName = itemElement.getTagName();
                         String itemTextName = itemElement.getAttribute("textName");
                         String action = itemElement.getAttribute("action");
@@ -116,7 +116,7 @@ public final class XMLMenuBar extends JMenuBar {
                     }
                 }
             }
-            
+
         } catch(Exception e) {
             e.printStackTrace();
         } finally {
@@ -128,18 +128,18 @@ public final class XMLMenuBar extends JMenuBar {
             }
         }
     }
-    
+
     public JMenuBar getMenuBar() {
         return this;
     }
-    
+
     public void createMenus(final JMenuBar menu, Object[][] params) {
         for(Object[] p: params) {
             String menuName = (String) p[0];
             createMenu(menuName, menu, (Object[][])p[1]);
         }
     }
-    
+
     public void createMenu(final String name, final JMenuBar menu, Object[][] params) {
         String text = resBundle.getString("menu." + name);
         JMenu aMenu = new JMenu(text);
@@ -155,11 +155,11 @@ public final class XMLMenuBar extends JMenuBar {
             }
         }
     }
-    
+
     public void createItem(String name, JMenu menu, String action) {
         createItem(name, menu, action, 0);
     }
-    
+
     public void createItem(String name, JMenu menu, String action, Integer keyStroke) {
         KeyStroke ks = null;
         if (keyStroke != 0) {
@@ -168,7 +168,7 @@ public final class XMLMenuBar extends JMenuBar {
         }
         createItem(name, menu, action, ks);
     }
-    
+
     public void createItem(String name, JMenu menu, String action, KeyStroke keyStroke) {
         String text = "-";
         if (!"-".equals(name)) {
@@ -185,11 +185,11 @@ public final class XMLMenuBar extends JMenuBar {
         menuItems.put(name, item);
         controller.bindMethod(backingBean, action, item);
     }
-    
+
     public JMenu getMenu(String name) {
         return menus.get(name);
     }
-    
+
     public JMenuItem getItem(String name) {
         return menuItems.get(name);
     }

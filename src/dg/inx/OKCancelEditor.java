@@ -54,7 +54,7 @@ import javax.swing.WindowConstants;
 public class OKCancelEditor extends JDialog {
     private boolean isCancelled = true;
     private Controller controller;
-    
+
     public OKCancelEditor(Frame parent, String title, AbstractModel model, String viewXML) {
         super(parent, true);
         XMLPanel panel = new XMLPanel(model, viewXML);
@@ -87,18 +87,18 @@ public class OKCancelEditor extends JDialog {
         centreOnScreen();
         //this.setAlwaysOnTop(true);
     }
-    
+
     public void centreOnScreen() {
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        
+
         int initialWidth = 350;
         int initialHeight = 400;
-        
+
         setBounds((screenSize.width - initialWidth) / 2,
                 (screenSize.height - initialHeight) / 2,
                 initialWidth, initialHeight);
     }
-    
+
     private JPanel createOKCancel() {
         JPanel panel = new JPanel();
         GridBagLayout gbl = new GridBagLayout();
@@ -108,7 +108,7 @@ public class OKCancelEditor extends JDialog {
         con.anchor = GridBagConstraints.EAST;
         con.insets = new Insets(0, 0, 0, 0);
         con.weightx = 10.0;
-        
+
         JButton btnCancel = new JButton("Cancel");
         gbl.setConstraints(btnCancel, con);
         panel.add(btnCancel);
@@ -117,10 +117,10 @@ public class OKCancelEditor extends JDialog {
                 cancel();
             }
         });
-        
+
         con.gridwidth = GridBagConstraints.REMAINDER;
         con.weightx = 0.0;
-        
+
         JButton btnOK = new JButton("OK");
         this.getRootPane().setDefaultButton(btnOK);
         gbl.setConstraints(btnOK, con);
@@ -132,17 +132,17 @@ public class OKCancelEditor extends JDialog {
         });
         return panel;
     }
-    
+
     private void OK() {
         this.isCancelled = false;
         this.setVisible(false);
     }
-    
+
     private void cancel() {
         this.isCancelled = true;
         this.setVisible(false);
     }
-    
+
     public boolean isCancelled() {
         return this.isCancelled;
     }

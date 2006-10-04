@@ -51,7 +51,7 @@ import javax.swing.WindowConstants;
  */
 public class Editor extends JDialog {
     private Controller controller;
-    
+
     public Editor(Frame parent, String title, AbstractModel model, String viewXML) {
         super(parent, true);
         XMLPanel panel = new XMLPanel(model, viewXML);
@@ -76,13 +76,13 @@ public class Editor extends JDialog {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         centreOnScreen();
     }
-    
+
     public void centreOnScreen() {
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        
+
         int initialWidth = 350;
         int initialHeight = 400;
-        
+
         setBounds((screenSize.width - initialWidth) / 2,
                 (screenSize.height - initialHeight) / 2,
                 initialWidth, initialHeight);
