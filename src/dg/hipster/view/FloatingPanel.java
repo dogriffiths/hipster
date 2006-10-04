@@ -78,7 +78,7 @@ public final class FloatingPanel extends JPanel  {
     /**
      * Radius of the corners.
      */
-    private static int RADIUS = 40;
+    private static int RADIUS = 20;
     /**
      * Edges of the panel.
      */
