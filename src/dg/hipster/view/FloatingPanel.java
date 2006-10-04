@@ -39,6 +39,9 @@ import dg.hipster.controller.FloatingPanelController;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Shape;
+import java.awt.geom.RoundRectangle2D;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
@@ -72,7 +75,15 @@ public final class FloatingPanel extends JPanel  {
      * panel.
      */
     private FloatingPanelController controller;
-
+    /**
+     * Radius of the corners.
+     */
+    private static int RADIUS = 40;
+    /**
+     * Edges of the panel.
+     */
+    private Shape boundary;
+    
     /**
      * Default constructor.
      */
@@ -98,7 +109,7 @@ public final class FloatingPanel extends JPanel  {
         layout.putConstraint(SpringLayout.WEST, contentPane, 10,
                 SpringLayout.WEST, this);
     }
-
+    
     /**
      * Text that will appear at the top of the panel.
      * @param text string to use at the top of the panel.
@@ -106,7 +117,7 @@ public final class FloatingPanel extends JPanel  {
     public void setCaption(String text) {
         caption.setText(text);
     }
-
+    
     /**
      * Text that will appear at the top of the panel.
      * @return text at the top of the panel.
@@ -114,22 +125,24 @@ public final class FloatingPanel extends JPanel  {
     public String getCaption() {
         return caption.getText();
     }
-
+    
     /**
      * Draw the component on the given graphics object.
      * @param g object to draw on.
      */
     public void paintComponent(Graphics g) {
+        if (getBoundary() != null) {
+            ((Graphics2D)g).clip(getBoundary());
+        }
         g.setColor(SHADED);
         Dimension size = getSize();
-        g.fillRoundRect(0, 0, size.width, size.height, 10, 10);
-        g.setColor(Color.GRAY.darker());
-        g.drawLine(5, 0, size.width - 5, 0);
+        g.fillRect(0, 0, size.width, size.height);
+        g.setColor(Color.GRAY);
+        g.drawLine(0, 0, size.width, 0);
         g.setColor(Color.BLACK);
-        g.drawLine(5, size.height - 1,
-                size.width - 5, size.height - 1);
+        g.drawLine(0, size.height - 1, size.width, size.height - 1);
     }
-
+    
     /**
      * Resize the panel, depending upon the size
      * of the content.
@@ -138,7 +151,18 @@ public final class FloatingPanel extends JPanel  {
         Dimension panSize = contentPane.getPreferredSize();
         setSize(panSize.width + 20, panSize.height + 50);
     }
-
+    
+    /**
+     * Resize the panel.
+     * @param width new width.
+     * @param height new height.
+     */
+    public void setSize(int width, int height) {
+        super.setSize(width, height);
+        boundary = new RoundRectangle2D.Double(0, 0, width, height, RADIUS,
+                RADIUS);
+    }
+    
     /**
      * Section of the pane that content should be
      * added to.
@@ -146,5 +170,13 @@ public final class FloatingPanel extends JPanel  {
      */
     public JPanel getContentPane() {
         return contentPane;
+    }
+
+    /**
+     * Outline boundary of the panel.
+     * @return boundary.
+     */
+    public Shape getBoundary() {
+        return boundary;
     }
 }
