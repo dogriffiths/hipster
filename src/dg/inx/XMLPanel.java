@@ -218,7 +218,7 @@ public class XMLPanel extends JPanel {
     private static JTextArea makeTextArea(Controller c, String source,
             GridBagLayout gbl, GridBagConstraints con, int rows, int cols) {
         JTextArea txt = new JTextArea();
-        txt.setForeground(null);
+        txt.setForeground(Color.WHITE);
         txt.setBackground(new Color(55, 55, 55));
         txt.setCaretColor(Color.WHITE);
         txt.setAutoscrolls(true);
