@@ -100,13 +100,13 @@ public final class FloatingPanel extends JPanel  {
         contentPane.setBackground(CLEAR);
         contentPane.setForeground(Color.WHITE);
         this.add(contentPane);
-        layout.putConstraint(SpringLayout.WEST, caption, 10,
+        layout.putConstraint(SpringLayout.WEST, caption, 3,
                 SpringLayout.WEST, this);
-        layout.putConstraint(SpringLayout.NORTH, caption, 10,
+        layout.putConstraint(SpringLayout.NORTH, caption, 3,
                 SpringLayout.NORTH, this);
-        layout.putConstraint(SpringLayout.NORTH, contentPane, 10,
+        layout.putConstraint(SpringLayout.NORTH, contentPane, 3,
                 SpringLayout.SOUTH, caption);
-        layout.putConstraint(SpringLayout.WEST, contentPane, 10,
+        layout.putConstraint(SpringLayout.WEST, contentPane, 3,
                 SpringLayout.WEST, this);
     }
     
@@ -149,7 +149,7 @@ public final class FloatingPanel extends JPanel  {
      */
     public void auto() {
         Dimension panSize = contentPane.getPreferredSize();
-        setSize(panSize.width + 20, panSize.height + 50);
+        setSize(panSize.width + 6, panSize.height + 25);
     }
     
     /**
