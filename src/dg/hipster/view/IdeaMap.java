@@ -89,6 +89,10 @@ public final class IdeaMap extends JComponent implements MapComponent {
      * (eg 3 for &quot;New 3&quot;).
      */
     private int newCount = 0;
+    /**
+     * Default background colour.
+     */
+    private static final Color DEFAULT_BACKGROUND = new Color(95, 95, 95);
     
     /** Creates a new instance of Fred */
     public IdeaMap() {
@@ -96,6 +100,7 @@ public final class IdeaMap extends JComponent implements MapComponent {
         setLayout(new BorderLayout());
         add(text, BorderLayout.NORTH);
         controller = new IdeaMapController(this);
+        setBackground(DEFAULT_BACKGROUND);
     }
     
     /**
@@ -211,11 +216,13 @@ public final class IdeaMap extends JComponent implements MapComponent {
      * @param gOrig Graphics object to draw on.
      */
     public void paintComponent(Graphics gOrig) {
+        Dimension size = getSize();
+        gOrig.setColor(this.getBackground());
+        gOrig.fillRect(0, 0, size.width, size.height);
         Graphics g = gOrig.create();
         ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_ON);
         g.setColor(Color.BLACK);
-        Dimension size = getSize();
         g.translate(size.width / 2, size.height / 2);
         if (offset != null) {
             g.translate(offset.x, offset.y);
