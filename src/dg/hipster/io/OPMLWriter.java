@@ -112,7 +112,6 @@ public final class OPMLWriter implements IdeaWriter {
         ideaElement.setAttribute("text", idea.getText());
         ideaElement.setAttribute("angle", "" + idea.getAngle());
         String notes = idea.getNotes();
-        System.out.println("notes = " + notes);
         if ((notes != null) && (notes.length() != 0)) {
             ideaElement.setAttribute("notes", idea.getNotes());
         }
