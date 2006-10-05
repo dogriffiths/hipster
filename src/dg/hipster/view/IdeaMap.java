@@ -100,10 +100,6 @@ public final class IdeaMap extends JComponent implements MapComponent {
      */
     private static final Color DEFAULT_BACKGROUND = new Color(95, 95, 95);
     /**
-     * Content pane where the map is displayed.
-     */
-    private JLayeredPane mapArea;
-    /**
      * Floating properties panel.
      */
     private FloatingPanel propertiesPanel;
@@ -127,6 +123,10 @@ public final class IdeaMap extends JComponent implements MapComponent {
      * &quot;To&quot; point of the link rubber-band.
      */
     private Point rubberBandTo;
+    /**
+     * Whether the properties panel is visible.
+     */
+    private boolean propertiesVisible;
 
 
     /** Creates a new instance of Fred */
@@ -188,7 +188,28 @@ public final class IdeaMap extends JComponent implements MapComponent {
      * @param selectedIdea Currently selected idea branch (if any).
      */
     public void setSelected(Idea selectedIdea) {
-        setSelectedView(findIdeaViewFor(rootView, selectedIdea));
+        IdeaView selectedView = findIdeaViewFor(rootView, selectedIdea);
+        if (this.selected != null) {
+            this.selected.setSelected(false);
+        }
+        this.selected = selectedView;
+        if (this.selected != null) {
+            this.selected.setSelected(true);
+            propertiesPanel.getContentPane().removeAll();
+            propertiesPanel.getContentPane().add(new XMLPanel(
+                    selectedView.getIdea(),
+                    "/dg/hipster/view/ideaProperties.xml"));
+            propertiesPanel.auto();
+            this.setPropertiesVisible(this.getPropertiesVisible());
+            if (propertiesVisible) {
+                propertiesPanel.setVisible(false);
+                propertiesPanel.setVisible(true);
+            }
+            text.setText(selected.getIdea().getText());
+        } else {
+            propertiesPanel.setVisible(false);
+            text.setText("");
+        }
     }
 
     /**
@@ -222,32 +243,6 @@ public final class IdeaMap extends JComponent implements MapComponent {
      */
     public IdeaView getSelectedView() {
         return this.selected;
-    }
-
-    /**
-     * Select the given view.
-     * @param newSelectedView View to select.
-     */
-    public void setSelectedView(IdeaView newSelectedView) {
-        if (this.selected != null) {
-            this.selected.setSelected(false);
-        }
-        this.selected = newSelectedView;
-        if (this.selected != null) {
-            this.selected.setSelected(true);
-            propertiesPanel.getContentPane().removeAll();
-            propertiesPanel.getContentPane().add(new XMLPanel(
-                    newSelectedView.getIdea(),
-                    "/dg/hipster/view/ideaProperties.xml"));
-            propertiesPanel.auto();
-            this.setPropertiesVisible(this.getPropertiesVisible());
-            if (propertiesVisible) {
-                propertiesPanel.setVisible(false);
-                propertiesPanel.setVisible(true);
-            }
-        } else {
-            propertiesPanel.setVisible(false);
-        }
     }
 
     /**
@@ -297,14 +292,6 @@ public final class IdeaMap extends JComponent implements MapComponent {
     }
 
     /**
-     * Amount this map is scaled.
-     * @return  Amount this map is scaled.
-     */
-    public double getZoom() {
-        return zoom;
-    }
-
-    /**
      * Scale this map up by the given factor.
      * @param factor scaling factor - 1.0 for normal view.
      */
@@ -330,25 +317,17 @@ public final class IdeaMap extends JComponent implements MapComponent {
     }
 
     /**
-     * Call for a repaint of this map.
-     */
-    public void adjust() {
-        controller.adjust();
-    }
-
-    /**
-     * Call for a repaint of this map.
+     * Start adjusting the map.
      */
     public void startAdjust() {
         controller.startAdjust();
     }
 
     /**
-     * Get the controller for this map.
-     * @return this idea-map's controller.
+     * Stop any automatic adjusting of the map.
      */
-    public IdeaMapController getController() {
-        return this.controller;
+    public void stopAdjust() {
+        controller.stopAdjust();
     }
 
     /**
@@ -392,7 +371,7 @@ public final class IdeaMap extends JComponent implements MapComponent {
      *@param p Point2D in map space.
      *@return Point in screen space.
      */
-    public Point getScreenPoint(Point2D p) {
+    private Point getScreenPoint(Point2D p) {
         Dimension size = getSize();
         double x = p.getX();
         double y = p.getY();
@@ -422,7 +401,6 @@ public final class IdeaMap extends JComponent implements MapComponent {
      */
     public void centreView() {
         offset = new Point(0, 0);
-        //repaintRequired();
         repaint();
     }
 
@@ -433,7 +411,6 @@ public final class IdeaMap extends JComponent implements MapComponent {
         offset.x /= zoom;
         offset.y /= zoom;
         zoom = 1.0;
-        //repaintRequired();
         repaint();
     }
 
@@ -456,21 +433,12 @@ public final class IdeaMap extends JComponent implements MapComponent {
      * @param selected view to select and edit.
      */
     public void editIdeaView(final IdeaView selected) {
-        selectIdeaView(selected);
+        setSelected(selected.getIdea());
         selected.setEditing(true);
         text.setEnabled(true);
         text.requestFocusInWindow();
         text.selectAll();
         ticker.start();
-    }
-
-    /**
-     * Select the given idea view.
-     * @param selected view to select.
-     */
-    public void selectIdeaView(final IdeaView selected) {
-        setSelectedView(selected);
-        text.setText(selected.getIdea().getText());
     }
 
     /**
@@ -529,7 +497,7 @@ public final class IdeaMap extends JComponent implements MapComponent {
             nextToSelect = parentView;
         }
         parentView.getIdea().remove(selected.getIdea());
-        selectIdeaView(nextToSelect);
+        setSelected(nextToSelect.getIdea());
     }
 
     /**
@@ -559,7 +527,7 @@ public final class IdeaMap extends JComponent implements MapComponent {
         if (Math.abs(oldAngle - angle) < Math.PI) {
             branch.getIdea().setAngle(angle);
         }
-        adjust();
+        startAdjust();
     }
 
     /**
@@ -649,22 +617,10 @@ public final class IdeaMap extends JComponent implements MapComponent {
     }
 
     /**
-     * Layered pane covering the map area.
-     * @return layered pane covering the map area.
-     */
-    public JLayeredPane getMapArea() {
-        return mapArea;
-    }
-
-    /**
-     * Whether the properties panel is visible.
-     */
-    private boolean propertiesVisible;
-    /**
      * Whether the properties panel is visible.
      * @param show true if visible, false otherwise.
      */
-    public void setPropertiesVisible(boolean show) {
+    private void setPropertiesVisible(boolean show) {
         if (this.getSelectedView() != null) {
             propertiesPanel.setVisible(show);
         }
@@ -675,14 +631,14 @@ public final class IdeaMap extends JComponent implements MapComponent {
      * Whether the properties panel is visible.
      * @return true if visible, false otherwise.
      */
-    public boolean getPropertiesVisible() {
+    private boolean getPropertiesVisible() {
         return this.propertiesVisible;
     }
 
     /**
      * The properties visible if it is not, or vice versa.
      */
-    public void togglePropertiesPanel() {
+    void togglePropertiesPanel() {
         setPropertiesVisible(!getPropertiesVisible());
     }
 }

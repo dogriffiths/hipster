@@ -145,7 +145,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
         Point2D p = this.ideaMap.getMapPoint(evt.getPoint());
         IdeaView hit = this.ideaMap.getRootView().getViewAt(p);
         if (hit == null) {
-            ideaMap.setSelectedView(null);
+            ideaMap.setSelected(null);
         }
     }
 
@@ -176,7 +176,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
     private void selectIdeaViewAt(final Point2D p, final boolean shouldEdit) {
         IdeaView hit = this.ideaMap.getRootView().getViewAt(p);
         if (hit != null) {
-            this.ideaMap.setSelectedView(hit);
+            this.ideaMap.setSelected(hit.getIdea());
             if (hit instanceof BranchView) {
                 draggedBranch = (BranchView) hit;
                 mapMover.setFixedBranch(draggedBranch);
@@ -325,11 +325,6 @@ public final class IdeaMapController implements KeyListener, FocusListener,
                     this.ideaMap.insertIdea();
                 }
                 break;
-//            case KeyEvent.VK_I:
-//                if (evt.getModifiers() != 0) {
-//                    this.ideaMap.togglePropertiesPanel();
-//                }
-//                break;
             case KeyEvent.VK_TAB:
                 this.ideaMap.insertChild();
                 break;
@@ -357,7 +352,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
             }
         }
         if (nextView != null) {
-            this.ideaMap.selectIdeaView(nextView);
+            this.ideaMap.setSelected(nextView.getIdea());
         }
     }
 
@@ -380,7 +375,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
             }
         }
         if (nextView != null) {
-            this.ideaMap.selectIdeaView(nextView);
+            this.ideaMap.setSelected(nextView.getIdea());
         }
     }
 
@@ -393,7 +388,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
         if (previous == null) {
             return;
         }
-        this.ideaMap.selectIdeaView(previous);
+        this.ideaMap.setSelected(previous.getIdea());
     }
 
     private void selectRight() {
@@ -415,7 +410,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
             }
         }
         if (nextView != null) {
-            this.ideaMap.selectIdeaView(nextView);
+            this.ideaMap.setSelected(nextView.getIdea());
         }
     }
 
@@ -438,7 +433,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
             }
         }
         if (nextView != null) {
-            this.ideaMap.selectIdeaView(nextView);
+            this.ideaMap.setSelected(nextView.getIdea());
         }
     }
 
@@ -470,9 +465,5 @@ public final class IdeaMapController implements KeyListener, FocusListener,
             }
         }
         return results;
-    }
-
-    public void adjust() {
-        mapMover.startAdjust();
     }
 }

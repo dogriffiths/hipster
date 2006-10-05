@@ -161,9 +161,9 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
         this.document.addPropertyChangeListener(this);
         this.updateIdeaMapWithDocument();
         if (!document.isNeedsAdjustment()) {
-            ideaMap.getController().stopAdjust();
+            ideaMap.stopAdjust();
         } else {
-            ideaMap.adjust();
+            ideaMap.startAdjust();
         }
         resetView();
     }

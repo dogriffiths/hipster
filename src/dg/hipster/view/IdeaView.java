@@ -111,7 +111,7 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
         } else {
             this.getIdea().setLength(10 * idea.getText().length() + 20);
         }
-        adjust();
+        startAdjust();
     }
 
     public IdeaView getPreviousSibling() {
@@ -337,9 +337,9 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
                 );
     }
 
-    public void adjust() {
+    public void startAdjust() {
         if (parent != null) {
-            parent.adjust();
+            parent.startAdjust();
         }
     }
 
