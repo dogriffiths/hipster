@@ -167,8 +167,8 @@ public final class IdeaMap extends JComponent implements MapComponent {
         if ((newIdea != null) && (!newIdea.equals(oldIdea))) {
             this.rootView = new CentreView(newIdea);
             this.rootView.setParent(this);
-            rootView.setSelected(true);
             this.selected = rootView;
+            setSelected(newIdea);
             text.setText(newIdea.getText());
             text.setEnabled(false);
         }
