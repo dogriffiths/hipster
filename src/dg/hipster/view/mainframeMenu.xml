@@ -18,6 +18,9 @@
     <menu textName="edit">
         <item textName="insertChild" action="insertChild"/>
         <item textName="insertSibling" action="insertSibling"/>
+        <item textName="cut" action="cutIdea" key="X"/>
+        <item textName="copy" action="copyIdea" key="C"/>
+        <item textName="paste" action="pasteIdea" key="V"/>
     </menu>
     <menu textName="view">
         <item textName="zoomIn" action="zoomIn" key="EQUALS"/>

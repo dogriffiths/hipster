@@ -333,5 +333,20 @@ public final class Idea extends AbstractModel implements IdeaListener {
     public String toString() {
         return this.text + subIdeas.toString();
     }
+    
+    /**
+     * Create a clone of this idea.
+     */
+    public Idea clone() {
+        Idea idea = new Idea(getText());
+        idea.setAngle(getAngle());
+        idea.setLength(getLength());
+        idea.setNotes(getNotes());
+        idea.setV(getV());
+        for (Idea subIdea : this.subIdeas) {
+            idea.add(subIdea.clone());
+        }
+        return idea;
+    }
 }
 
