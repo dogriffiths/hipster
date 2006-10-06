@@ -61,7 +61,7 @@ public final class FloatingPanelController implements MouseListener,
      * to its parent, when the mouse was first clicked.
      */
     private Point start;
-    
+
     /**
      * Constructor for a controller of a given floating
      * panel.
@@ -72,21 +72,21 @@ public final class FloatingPanelController implements MouseListener,
         this.floatingPanel.addMouseListener(this);
         this.floatingPanel.addMouseMotionListener(this);
     }
-    
+
     /**
      * Called when a mouse enters the panel.
      * @param evt mouse event describing the mouse entry.
      */
     public void mouseEntered(final MouseEvent evt) {
     }
-    
+
     /**
      * Called when a mouse exits the panel.
      * @param evt mouse event describing the mouse exit.
      */
     public void mouseExited(final MouseEvent evt) {
     }
-    
+
     /**
      * Called when a mouse is pressed and released
      * at a point on the panel.
@@ -94,14 +94,14 @@ public final class FloatingPanelController implements MouseListener,
      */
     public void mouseClicked(final MouseEvent evt) {
     }
-    
+
     /**
      * Called when a mouse moves over the panel.
      * @param evt mouse event describing the mouse move.
      */
     public void mouseMoved(final MouseEvent evt) {
     }
-    
+
     /**
      * Called when a mouse is released over the panel.
      * @param evt mouse event describing the mouse release.
@@ -109,7 +109,7 @@ public final class FloatingPanelController implements MouseListener,
     public void mouseReleased(final MouseEvent evt) {
         downPoint = null;
     }
-    
+
     /**
      * Called when a mouse is pressed on the panel.
      * @param evt mouse event describing the mouse press.
@@ -124,7 +124,7 @@ public final class FloatingPanelController implements MouseListener,
         downPoint.x += start.x;
         downPoint.y += start.y;
     }
-    
+
     /**
      * Called when a mouse is dragged over the panel.
      * @param evt mouse event describing the mouse drag.

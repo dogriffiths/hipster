@@ -83,7 +83,7 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
      * Main idea processor component.
      */
     private IdeaMap ideaMap;
-    private IdeaDocument document;
+    //private IdeaDocument document;
 
     /** Creates a new instance of Mainframe */
     public Mainframe() {
@@ -156,10 +156,10 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
     private void buildModel() {
     }
 
-    public void setDocument(final IdeaDocument newDocument) {
-        this.document = newDocument;
-        this.document.addPropertyChangeListener(this);
-        this.updateIdeaMapWithDocument();
+    public void setDocument(final IdeaDocument document) {
+        document.addPropertyChangeListener(this);
+        this.ideaMap.setDocument(document);
+        this.documentUpdated();
         if (!document.isNeedsAdjustment()) {
             ideaMap.stopAdjust();
         } else {
@@ -168,8 +168,8 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
         resetView();
     }
 
-    public IdeaDocument getDocument() {
-        return this.document;
+    private IdeaDocument getDocument() {
+        return this.ideaMap.getDocument();
     }
 
     public void setDirty(boolean dirty) {
@@ -182,20 +182,20 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
     }
 
     public void propertyChange(PropertyChangeEvent evt) {
-        if (evt.getSource() == this.document) {
-            this.updateIdeaMapWithDocument();
+        if (evt.getSource() == this.getDocument()) {
+            this.documentUpdated();
         }
     }
 
-    private void updateIdeaMapWithDocument() {
+    private void documentUpdated() {
+        String docTitle = this.getDocument().getTitle();
         if (Main.isMac()) {
-            this.setTitle(this.document.getTitle());
+            this.setTitle(docTitle);
         } else {
             this.setTitle(resBundle.getString("app.name") + " - "
-                    + this.document.getTitle());
+                    + docTitle);
         }
-        this.ideaMap.setIdea(this.document.getIdea());
-        this.setDirty(this.document.isDirty());
+        this.setDirty(this.getDocument().isDirty());
     }
 
     public void zoomIn() {
@@ -244,11 +244,11 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
     }
 
     public void saveAsDocument() throws IOException, ReaderException {
-        saveDocument(document, null);
+        saveDocument(this.getDocument(), null);
     }
 
     public void saveDocument() throws IOException, ReaderException {
-        saveDocument(document, document.getCurrentFile());
+        saveDocument(this.getDocument(), this.getDocument().getCurrentFile());
     }
 
     public void saveDocument(IdeaDocument document, File f)
@@ -338,7 +338,7 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
     }
 
     public void insertSibling() {
-        getIdeaMap().insertIdea();
+        getIdeaMap().insertSibling();
     }
 
     public void focusGained(final FocusEvent evt) {
@@ -372,6 +372,6 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
      * Toggle the properties panel.
      */
     public void togglePropertiesPanel() {
-        this.ideaMap.togglePropertiesPanel();
+        this.ideaMap.setPropertiesVisible(!this.ideaMap.getPropertiesVisible());
     }
 }

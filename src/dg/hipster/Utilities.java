@@ -37,28 +37,31 @@ package dg.hipster;
 
 
 /**
- *
+ * Functions that may be useful in various classes.
  * @author dgriffiths
  */
 public final class Utilities {
-    /** Creates a new instance of Utilities */
+
+    /**
+     * Creates a new instance of Utilities.
+     */
     private Utilities() {
     }
 
     /**
-     * Whether two strings are equal, without throwing
+     * Whether two objects are equal, without throwing
      * a null pointer exception.
-     * @param s0 first string we are comparing
-     * @param s1 second thing we are comparing
+     * @param object0 first object we are comparing
+     * @param object1 second object we are comparing
      * @return true if they are the same, false otherwise
      */
-    public static boolean stringsEqual(final String s0, final String s1) {
-        if ((s0 == null) && (s1 == null)) {
+    public static boolean areEqual(final Object object0, final Object object1) {
+        if ((object0 == null) && (object1 == null)) {
             return true;
         }
-        if ((s0 == null) || (s1 == null)) {
+        if ((object0 == null) || (object1 == null)) {
             return false;
         }
-        return s0.equals(s1);
+        return object0.equals(object1);
     }
 }

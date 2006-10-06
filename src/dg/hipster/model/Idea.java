@@ -31,7 +31,6 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
-
  */
 
 package dg.hipster.model;
@@ -45,7 +44,7 @@ import java.util.Vector;
  *
  * @author davidg
  */
-public final class Idea extends AbstractModel {
+public final class Idea extends AbstractModel implements IdeaListener {
     private double length;
     private double angle;
     private double v;
@@ -69,15 +68,15 @@ public final class Idea extends AbstractModel {
     /**
      * Longer notes.
      */
-    private String notes;
-
+    private String notes = "";
+    
     /**
      * No args constructor.
      */
     public Idea() {
-
+        
     }
-
+    
     /**
      * Constructor for an idea with the given text.
      * @param text zhort text description of the idea
@@ -85,16 +84,136 @@ public final class Idea extends AbstractModel {
     public Idea(String text) {
         setText(text);
     }
-
+    
+    //
+    // PROPERTIES
+    //
+    
+    /**
+     * Get the short text description of this idea.
+     * @return short text string, using for idea maps
+     */
+    public String getText() {
+        return text;
+    }
+    
+    /**
+     * Specify the short newText description of this idea.
+     *
+     * @param newText string to use
+     */
+    public void setText(String newText) {
+        String oldText = this.text;
+        if ((this.text == null) || (!this.text.equals(newText))) {
+            this.text = newText;
+            this.firePropertyChange("text", oldText, newText);
+            notify("CHANGED");
+        }
+    }
+    
+    /**
+     * The length of this idea.
+     *@return length in points.
+     */
+    public double getLength() {
+        return length;
+    }
+    
+    /**
+     * The length of this idea.
+     *@param length length in points.
+     */
+    public void setLength(double newLength) {
+        double oldLength = this.length;
+        this.length = newLength;
+        if (Math.abs(oldLength - newLength) > 0.0000001) {
+            this.firePropertyChange("length", oldLength, newLength);
+        }
+    }
+    
+    /**
+     * The angle of this idea relative to its parent.
+     *@return angle in radians.
+     */
+    public double getAngle() {
+        return angle;
+    }
+    
+    /**
+     * The angle of this idea relative to its parent.
+     *@param angle angle in radians.
+     */
+    public void setAngle(double newAngle) {
+        double oldAngle = this.angle;
+        this.angle = newAngle;
+        if (Math.abs(oldAngle - newAngle) > 0.0000001) {
+            this.firePropertyChange("angle", oldAngle, newAngle);
+        }
+    }
+    
+    /**
+     * The velocity of this idea's end-point during animation.
+     *@return the velocity.
+     */
+    public double getV() {
+        return v;
+    }
+    
+    /**
+     * The velocity of this idea's end-point during animation.
+     *@param v the velocity.
+     */
+    public void setV(double newV) {
+        double oldV = this.v;
+        this.v = newV;
+        if (Math.abs(oldV - newV) > 0.0000001) {
+            this.firePropertyChange("v", oldV, newV);
+        }
+    }
+    
+    public String getNotes() {
+        return notes;
+    }
+    
+    public void setNotes(String newNotes) {
+        String oldNotes = this.notes;
+        if ((this.notes == null) || (!this.notes.equals(newNotes))) {
+            this.notes = newNotes;
+            this.firePropertyChange("notes", oldNotes, newNotes);
+            notify("CHANGED");
+        }
+    }
+    
+    /**
+     * Get a list of the sub-ideas for this idea.
+     *@return list of idea objects
+     */
+    public List<Idea> getSubIdeas() {
+        return (List<Idea>)subIdeas.clone();
+    }
+    
+    /**
+     * Get the list of links that this idea is connected to.
+     * @return list of links to related ideas.
+     */
+    public List<Idea> getLinks() {
+        return (List<Idea>)links.clone();
+    }
+    
+    //
+    // Collection methods.
+    //
+    
     /**
      * Add a sub-idea to this idea.
      * @param subIdea sub-idea to add
      */
     public synchronized void add(Idea subIdea) {
         subIdeas.add(subIdea);
-        notify("ADDED", subIdea, subIdeas.size() - 1);
+        subIdea.addIdeaListener(this);
+        notify("ADDED", subIdea, subIdeas.size() - 1, this);
     }
-
+    
     /**
      * Add a sub-idea to this idea at the given position.
      * @param pos position in the list of sub-ideas to insert
@@ -102,9 +221,10 @@ public final class Idea extends AbstractModel {
      */
     public synchronized void add(int pos, Idea subIdea) {
         subIdeas.add(pos, subIdea);
-        notify("ADDED", subIdea, pos);
+        subIdea.addIdeaListener(this);
+        notify("ADDED", subIdea, pos, this);
     }
-
+    
     /**
      * Remove the given sub-idea from this idea. No
      * exception is raised if the idea given is
@@ -113,9 +233,55 @@ public final class Idea extends AbstractModel {
      */
     public synchronized void remove(Idea subIdea) {
         subIdeas.remove(subIdea);
-        notify("REMOVED", subIdea);
+        subIdea.removeIdeaListener(this);
+        notify("REMOVED", subIdea, this);
     }
-
+    
+    /**
+     * Add a one-way link to another idea.
+     *@param other idea to link to.
+     */
+    public void addLink(Idea other) {
+        if (!this.equals(other)) {
+            links.add(other);
+            notify("ADDED_LINK", this, other);
+        }
+    }
+    
+    /**
+     * Add a two-way link to another idea.
+     *@param other idea to link to.
+     */
+    public void addBiLink(Idea other) {
+        if (other == null) {
+            return;
+        }
+        this.addLink(other);
+        other.addLink(this);
+    }
+    
+    /**
+     * Remove a link to another idea.
+     *@param other idea to link to.
+     */
+    public void removeLink(Idea other) {
+        if (other == null) {
+            return;
+        }
+        if (links.contains(other)) {
+            links.remove(other);
+            notify("REMOVED_LINK", this, other);
+        }
+        if (other.links.contains(this)) {
+            other.links.remove(this);
+            notify("REMOVED_LINK", other, this);
+        }
+    }
+    
+    //
+    // Idea-listener methods.
+    //
+    
     /**
      * Add an idea listener to this idea. The idea listener
      * will be informed when anything changes about this
@@ -125,7 +291,7 @@ public final class Idea extends AbstractModel {
     public void addIdeaListener(IdeaListener ideaListener) {
         listeners.add(ideaListener);
     }
-
+    
     /**
      * The given idea-listener will no longer be
      * notified of changes to this idea. No exception
@@ -136,7 +302,7 @@ public final class Idea extends AbstractModel {
     public void removeIdeaListener(IdeaListener ideaListener) {
         listeners.remove(ideaListener);
     }
-
+    
     /**
      * Notify all listeners that something has changed. The parameters
      * provide more detail about the change.
@@ -149,86 +315,15 @@ public final class Idea extends AbstractModel {
             listener.ideaChanged(new IdeaEvent(this, command, paras));
         }
     }
-
-    /**
-     * Get a list of the sub-ideas for this idea.
-     *@return list of idea objects
-     */
-    public List<Idea> getSubIdeas() {
-        return (List<Idea>)subIdeas.clone();
+    
+    public void ideaChanged(IdeaEvent fe) {
+        notify(fe.getCommand(), fe.getParas());
     }
-
-    /**
-     * Get the short text description of this idea.
-     * @return short text string, using for idea maps
-     */
-    public String getText() {
-        return text;
-    }
-
-    /**
-     * Specify the short newText description of this idea.
-     *
-     * @param newText string to use
-     */
-    public void setText(String newText) {
-        String oldText = this.text;
-        if ((this.text == null) || (!this.text.equals(newText))) {
-            this.text = newText;
-            notify("CHANGED");
-            this.firePropertyChange("text", oldText, newText);
-        }
-    }
-
-    /**
-     * Add a one-way link to another idea.
-     *@param other idea to link to.
-     */
-    public void addLink(Idea other) {
-        if (!this.equals(other)) {
-            links.add(other);
-            notify("ADDED_LINK", this, other);
-        }
-    }
-
-    /**
-     * Add a two-way link to another idea.
-     *@param other idea to link to.
-     */
-    public void addBiLink(Idea other) {
-        if (other == null) {
-            return;
-        }
-        this.addLink(other);
-        other.addLink(this);
-    }
-
-    /**
-     * Remove a link to another idea.
-     *@param other idea to link to.
-     */
-    public void removeLink(Idea other) {
-        if (other == null) {
-            return;
-        }
-        if (links.contains(other)) {
-            System.out.println("removing " + other + " from " + this);
-            links.remove(other);
-        }
-        if (other.links.contains(this)) {
-            System.out.println("removing0 " + this + " from " + other);
-            other.links.remove(this);
-        }
-    }
-
-    /**
-     * Get the list of links that this idea is connected to.
-     * @return list of links to related ideas.
-     */
-    public List<Idea> getLinks() {
-        return (List<Idea>)links.clone();
-    }
-
+    
+    //
+    // Other methods.
+    //
+    
     /**
      * String version of this idea. It will be the short text
      * description, followed by a recursive list of the
@@ -237,64 +332,6 @@ public final class Idea extends AbstractModel {
      */
     public String toString() {
         return this.text + subIdeas.toString();
-    }
-
-    /**
-     * The length of this idea.
-     *@return length in points.
-     */
-    public double getLength() {
-        return length;
-    }
-
-    /**
-     * The length of this idea.
-     *@param length length in points.
-     */
-    public void setLength(double length) {
-        this.length = length;
-    }
-
-    /**
-     * The angle of this idea relative to its parent.
-     *@return angle in radians.
-     */
-    public double getAngle() {
-        return angle;
-    }
-
-    /**
-     * The angle of this idea relative to its parent.
-     *@param angle angle in radians.
-     */
-    public void setAngle(double angle) {
-        this.angle = angle;
-    }
-
-    /**
-     * The velocity of this idea's end-point during animation.
-     *@return the velocity.
-     */
-    public double getV() {
-        return v;
-    }
-
-    /**
-     * The velocity of this idea's end-point during animation.
-     *@param v the velocity.
-     */
-    public void setV(double v) {
-        this.v = v;
-    }
-
-    public String getNotes() {
-        return notes;
-    }
-
-    public void setNotes(String newNotes) {
-        String oldNotes = this.notes;
-        this.notes = newNotes;
-        this.firePropertyChange("notes", oldNotes, newNotes);
     }
 }
 

@@ -7,9 +7,8 @@
 
 package dg.hipster.model;
 
-import dg.hipster.view.BranchView;
-import dg.hipster.view.CentreView;
-import dg.hipster.view.IdeaView;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.List;
 import junit.framework.*;
 
@@ -41,9 +40,24 @@ public class IdeaTest extends TestCase {
      * Test adding and removing sub-ideas.
      */
     public void testAddRemove() {
-        Idea subIdea0 = new Idea();
+        idea.setText("idea");
+        Idea subIdea0 = new Idea("subIdea0");
+        
+        IdeaListenerImpl i = new IdeaListenerImpl();
+        idea.addIdeaListener(i);
+        
+        assertEquals("Should be no event yet", null, i.ideaEvent);
         
         idea.add(subIdea0);
+        
+        assertEquals("Should have fired add event", "ADDED",
+                i.ideaEvent.getCommand());
+        assertEquals("Should have fired add event", subIdea0,
+                i.ideaEvent.getParas()[0]);
+        assertEquals("Should have fired add event", 0,
+                i.ideaEvent.getParas()[1]);
+        
+        i.ideaEvent = null;
         
         assertEquals("Should now be 1 sub-idea", 1,
                 idea.getSubIdeas().size());
@@ -51,7 +65,7 @@ public class IdeaTest extends TestCase {
         assertEquals("Should have return the first sub idea in first place",
                 subIdea0, idea.getSubIdeas().get(0));
         
-        Idea subIdea1 = new Idea();
+        Idea subIdea1 = new Idea("subIdea1");
         
         idea.add(subIdea1);
         
@@ -64,7 +78,7 @@ public class IdeaTest extends TestCase {
         assertEquals("Should now return the second sub idea in second place",
                 subIdea1, idea.getSubIdeas().get(1));
         
-        Idea subIdea2 = new Idea();
+        Idea subIdea2 = new Idea("subIdea2");
         
         idea.add(1, subIdea2);
         
@@ -81,7 +95,16 @@ public class IdeaTest extends TestCase {
                 subIdea1, idea.getSubIdeas().get(2));
         
         idea.remove(subIdea0);
+        assertEquals("Should have fired add event", "REMOVED",
+                i.ideaEvent.getCommand());
+        i.ideaEvent = null;
+        
         idea.remove(subIdea1);
+        assertEquals("Should have fired add event", "REMOVED",
+                i.ideaEvent.getCommand());
+        assertEquals("Should have fired add event", subIdea1,
+                i.ideaEvent.getParas()[0]);
+        i.ideaEvent = null;
         
         assertEquals("Should now be just 1 sub-idea",
                 1, idea.getSubIdeas().size());
@@ -89,6 +112,15 @@ public class IdeaTest extends TestCase {
         assertEquals("First should now be subIdea2",
                 subIdea2, idea.getSubIdeas().get(0));
         
+        Idea subSubIdea0 = new Idea("subSubIdea0");
+        
+        subIdea2.add(subSubIdea0);
+        assertEquals("Should have fired add event", "ADDED",
+                i.ideaEvent.getCommand());
+        assertEquals("Should have fired add event", subSubIdea0,
+                i.ideaEvent.getParas()[0]);
+        assertEquals("Should have fired add event", 0,
+                i.ideaEvent.getParas()[1]);
     }
     
     /**
@@ -117,7 +149,7 @@ public class IdeaTest extends TestCase {
                 "ADDED", listener0.ie.getCommand());
         
         assertEquals("Listener should have 2 paras",
-                2, listener0.ie.getParas().length);
+                3, listener0.ie.getParas().length);
         
         assertEquals("1st Para should be the idea added",
                 subIdea0, listener0.ie.getParas()[0]);
@@ -185,9 +217,24 @@ public class IdeaTest extends TestCase {
      * Test of getText method, of class dg.hipster.model.Idea.
      */
     public void testGetSetText() {
+        IdeaListenerImpl i = new IdeaListenerImpl();
+        idea.addIdeaListener(i);
+        PropertyChangeListenerImpl p = new PropertyChangeListenerImpl();
+        idea.addPropertyChangeListener(p);
         assertEquals("Text should initially be zero-length", "", idea.getText());
         idea.setText("Some text");
         assertEquals("Text should have been updated", "Some text", idea.getText());
+        assertEquals("Should have sent an idea listener event", "CHANGED", i.ideaEvent.getCommand());
+        i.ideaEvent = null;
+        assertEquals("Should have sent a general property change event", 
+                p.propertyChangeEvent.getPropertyName(), 
+                "text");
+        p.propertyChangeEvent = null;
+        idea.removePropertyChangeListener(p);
+        idea.setText("Some more text");
+        assertEquals("Should not have sent a PCE", 
+                null, 
+                p.propertyChangeEvent);
     }
     
     public void testAddLink() {
@@ -229,27 +276,31 @@ public class IdeaTest extends TestCase {
      * Test of length getters and setters, of class dg.hipster.view.IdeaView.
      */
     public void testGetSetLength() {
-        Idea idea = new Idea();
+        IdeaListenerImpl i = new IdeaListenerImpl();
+        idea.addIdeaListener(i);
+        PropertyChangeListenerImpl p = new PropertyChangeListenerImpl();
+        idea.addPropertyChangeListener(p);
         assertEquals("New idea should give length of 0.0", 0.0,
                 idea.getLength(), 0.0000001);
         
         idea.setLength(100.0);
         assertEquals("Should allow me to set length", 100.0,
                 idea.getLength(), 0.0000001);
-        
-//        idea = new Idea("fred");
-//        
-//        assertEquals("New idea should give length of 10 * text length + 20",
-//                10.0 * 4 + 20,
-//                idea.getLength(), 0.0000001);
-        
+        assertEquals("Should not have sent an idea listener event", null,
+                i.ideaEvent);
+        assertEquals("Should have sent a general property change event", 
+                p.propertyChangeEvent.getPropertyName(), 
+                "length");
     }
     
     /**
      * Test of angle setters and getters, of class dg.hipster.view.IdeaView.
      */
     public void testGetSetAngle() {
-        Idea idea = new Idea();
+        IdeaListenerImpl i = new IdeaListenerImpl();
+        idea.addIdeaListener(i);
+        PropertyChangeListenerImpl p = new PropertyChangeListenerImpl();
+        idea.addPropertyChangeListener(p);
         
         assertEquals("0 Angle should be zero by default", 0.0,
                 idea.getAngle(), 0.0000001);
@@ -257,6 +308,25 @@ public class IdeaTest extends TestCase {
         idea.setAngle(Math.PI);
         assertEquals("1 Angle should be reset to Pi", Math.PI,
                 idea.getAngle(), 0.0000001);
+        assertEquals("Should not have sent an idea listener event", null,
+                i.ideaEvent);
+        assertEquals("Should have sent a general property change event", 
+                p.propertyChangeEvent.getPropertyName(), 
+                "angle");
+        idea.removePropertyChangeListener(p);
+        p = new PropertyChangeListenerImpl();
+        idea.addPropertyChangeListener("angle", p);
+        idea.setAngle(-1.0);
+        assertEquals("Should have sent a specific property change event", 
+                -1.0,
+                p.propertyChangeEvent.getNewValue());
+        idea.removePropertyChangeListener(p);
+        p = new PropertyChangeListenerImpl();
+        idea.addPropertyChangeListener("text", p);
+        idea.setAngle(Math.PI);
+        assertEquals("Should not have sent a specific property change event for another attribute", 
+                null,
+                p.propertyChangeEvent);
         
         Idea ideaParent = new Idea("parent");
         Idea ideaChild0 = new Idea("Child 0");
@@ -273,69 +343,111 @@ public class IdeaTest extends TestCase {
         subIdeas = idea.getSubIdeas();
         assertEquals("4 Should be one sub-idea", 2, subIdeas.size());
         Idea subIdea1 = subIdeas.get(1);
-//        assertEquals("5 Second idea should have angle Pi/2", Math.PI / 2,
-//                subIdea1.getAngle(), 0.0000001);
+    }
+    
+    /**
+     * Test of getV method, of class dg.hipster.model.Idea.
+     */
+    public void testGetSetV() {
+        IdeaListenerImpl i = new IdeaListenerImpl();
+        idea.addIdeaListener(i);
+        PropertyChangeListenerImpl p = new PropertyChangeListenerImpl();
+        idea.addPropertyChangeListener(p);
+        
+        assertEquals("0 v should be zero by default", 0.0,
+                idea.getV(), 0.0000001);
+        
+        idea.setV(1.4);
+        assertEquals("1 Angle should be reset to 1.4", 1.4,
+                idea.getV(), 0.0000001);
+        assertEquals("Should not have sent an idea listener event", null,
+                i.ideaEvent);
+        assertEquals("Should have sent a general property change event", 
+                p.propertyChangeEvent.getPropertyName(), 
+                "v");
+    }
+    
+    /**
+     * Test of getNotes method, of class dg.hipster.model.Idea.
+     */
+    public void testGetSetNotes() {
+        IdeaListenerImpl i = new IdeaListenerImpl();
+        idea.addIdeaListener(i);
+        PropertyChangeListenerImpl p = new PropertyChangeListenerImpl();
+        idea.addPropertyChangeListener(p);
+        assertEquals("Notes should initially be zero-length", "", idea.getNotes());
+        idea.setNotes("A note");
+        assertEquals("Notes should have been updated", "A note", idea.getNotes());
+        assertEquals("Should have sent an idea listener event", "CHANGED", i.ideaEvent.getCommand());
+    }
+    
+//    /**
+//     * Test of getLinks method, of class dg.hipster.model.Idea.
+//     */
+//    public void testGetLinks() {
+//        System.out.println("getLinks");
 //        
-//        // Reset back to idea
-//        idea = ideaParent;
-//        subIdeas = idea.getSubIdeas();
-//        assertEquals("6 Should be two sub-ideas", 2, subIdeas.size());
-//        subIdea0 = subIdeas.get(0);
-//        subIdea1 = subIdeas.get(1);
-//        assertEquals("7 First idea should have angle -Pi/2", -Math.PI / 2,
-//                subIdea0.getAngle(), 0.0000001);
-//        assertEquals("8 Second idea should have angle Pi/2", Math.PI / 2,
-//                subIdea1.getAngle(), 0.0000001);
+//        Idea instance = new Idea();
 //        
-//        // Now add a third
-//        Idea ideaChild2 = new Idea("Child 2");
-//        ideaParent.add(ideaChild2);
+//        List<Idea> expResult = null;
+//        List<Idea> result = instance.getLinks();
+//        assertEquals(expResult, result);
 //        
-//        // Reset back to idea
-//        idea = ideaParent;
-//        subIdeas = idea.getSubIdeas();
-//        assertEquals("9 Should be three sub-ideas", 3, subIdeas.size());
-//        subIdea0 = subIdeas.get(0);
-//        subIdea1 = subIdeas.get(1);
-//        Idea subIdea2 = subIdeas.get(2);
-//        assertEquals("10 First idea should have angle -2*Pi/3", -2 * Math.PI / 3,
-//                subIdea0.getAngle(), 0.0000001);
-//        assertEquals("11 Second idea should have angle 0", 0.0,
-//                subIdea1.getAngle(), 0.0000001);
-//        assertEquals("12 Third idea should have angle 2*Pi/3", 2 * Math.PI / 3,
-//                subIdea2.getAngle(), 0.0000001);
+//        // TODO review the generated test code and remove the default call to fail.
+//        fail("The test case is a prototype.");
+//    }
+//    
+//    /**
+//     * Test of addBiLink method, of class dg.hipster.model.Idea.
+//     */
+//    public void testAddBiLink() {
+//        System.out.println("addBiLink");
 //        
-//        // Add a grandchild
-//        Idea ideaGrandChild0 = new Idea("Grand child 0");
-//        ideaChild2.add(ideaGrandChild0);
+//        Idea other = null;
+//        Idea instance = new Idea();
 //        
-//        // Reset back to idea
-//        idea = ideaParent;
-//        subIdea2 = idea.getSubIdeas().get(2);
-//        subIdeas = subIdea2.getSubIdeas();
-//        assertEquals("13 Should be one sub-view", 1, subIdeas.size());
-//        Idea grandSubIdea0 = subIdeas.get(0);
-//        assertEquals("14 First grand-idea should have angle 0", 0.0,
-//                grandSubIdea0.getAngle(), 0.0000001);
+//        instance.addBiLink(other);
 //        
-//        Idea grandChild1 = new Idea("Grand child 1");
-//        ideaChild2.add(grandChild1);
-//        Idea grandChild2 = new Idea("Grand child 2");
-//        ideaChild2.add(grandChild2);
+//        // TODO review the generated test code and remove the default call to fail.
+//        fail("The test case is a prototype.");
+//    }
+//    
+//    /**
+//     * Test of removeLink method, of class dg.hipster.model.Idea.
+//     */
+//    public void testRemoveLink() {
+//        System.out.println("removeLink");
 //        
-//        Idea greatGrandChild0 = new Idea("Great grand child 0");
-//        ideaGrandChild0.add(greatGrandChild0);
-//        Idea greatGreatGrandChild0 = new Idea("Great great grand child 0");
-//        greatGrandChild0.add(greatGreatGrandChild0);
+//        Idea other = null;
+//        Idea instance = new Idea();
 //        
-//        // Reset back to idea
-//        idea = ideaParent;
-//        Idea greatGrandIdea = idea.getSubIdeas().get(2).getSubIdeas(
-//                ).get(0).getSubIdeas().get(0);
-//        assertEquals("15 Great grand child should have angle 0.0", 0.0,
-//                greatGrandIdea.getAngle());
+//        instance.removeLink(other);
 //        
-//        idea.setAngle(-3.0);
-//        assertEquals("18 Should let me set angle", -3.0, idea.getAngle());
+//        // TODO review the generated test code and remove the default call to fail.
+//        fail("The test case is a prototype.");
+//    }
+}
+
+class IdeaListenerImpl implements IdeaListener {
+    IdeaEvent ideaEvent;
+    
+    public IdeaListenerImpl() {
+        
+    }
+    
+    public void ideaChanged(IdeaEvent fe) {
+        this.ideaEvent = fe;
+    }
+}
+
+class PropertyChangeListenerImpl implements PropertyChangeListener {
+    PropertyChangeEvent propertyChangeEvent;
+    
+    public PropertyChangeListenerImpl() {
+        
+    }
+    
+    public void propertyChange(PropertyChangeEvent pce) {
+        this.propertyChangeEvent = pce;
     }
 }

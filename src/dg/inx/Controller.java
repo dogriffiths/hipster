@@ -218,7 +218,7 @@ public class Controller {
         PropertyChangeListener pcl = (PropertyChangeListener) EventHandler.create(
                 PropertyChangeListener.class, target, targetProperty,
                 "source." + itemProperty, "propertyChange");
-        source.addPropertyChangeListener(pcl);
+        source.addPropertyChangeListener(itemProperty, pcl);
     }
 
     private void bindImpl(Object target, String targetProperty, Component source,

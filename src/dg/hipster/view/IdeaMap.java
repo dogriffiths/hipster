@@ -37,6 +37,7 @@ package dg.hipster.view;
 
 import dg.hipster.controller.IdeaMapController;
 import dg.hipster.model.Idea;
+import dg.hipster.model.IdeaDocument;
 import dg.inx.XMLPanel;
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
@@ -74,6 +75,10 @@ public final class IdeaMap extends JComponent implements MapComponent {
      * Idea that will appear at the centre of the map.
      */
     private CentreView rootView;
+    /**
+     * Document containing the idea-map.
+     */
+    private IdeaDocument document;
     /**
      * Currently selected idea branch (if any).
      */
@@ -127,8 +132,8 @@ public final class IdeaMap extends JComponent implements MapComponent {
      * Whether the properties panel is visible.
      */
     private boolean propertiesVisible;
-    
-    
+
+
     /** Creates a new instance of Fred */
     public IdeaMap() {
         text = new JTextField("");
@@ -148,7 +153,7 @@ public final class IdeaMap extends JComponent implements MapComponent {
         mapArea.add(propertiesPanel);
         this.setPropertiesVisible(false);
     }
-    
+
     /**
      * Text field that appears at the top of the component.
      * @return Text field that appears at the top of the component.
@@ -158,11 +163,11 @@ public final class IdeaMap extends JComponent implements MapComponent {
     }
     
     /**
-     * Set the central newIdea of the map.
-     *
-     * @param newIdea Idea that will be displayed at the centre.
+     * Set document.
      */
-    public void setIdea(Idea newIdea) {
+    public void setDocument(IdeaDocument newDocument) {
+        this.document = newDocument;
+        Idea newIdea = this.document.getIdea();
         Idea oldIdea = getIdea();
         if ((newIdea != null) && (!newIdea.equals(oldIdea))) {
             this.rootView = new CentreView(newIdea);
@@ -175,6 +180,10 @@ public final class IdeaMap extends JComponent implements MapComponent {
         this.resetView();
     }
     
+    public IdeaDocument getDocument() {
+        return document;
+    }
+
     /**
      * Currently selected idea branch (if any).
      * @return Currently selected idea branch (if any).
@@ -182,13 +191,13 @@ public final class IdeaMap extends JComponent implements MapComponent {
     public Idea getSelected() {
         return this.selected.getIdea();
     }
-    
+
     /**
      * Currently selected idea branch (if any).
      * @param selectedIdea Currently selected idea branch (if any).
      */
     public void setSelected(Idea selectedIdea) {
-        IdeaView selectedView = findIdeaViewFor(rootView, selectedIdea);
+        IdeaView selectedView = findIdeaViewFor(this.rootView, selectedIdea);
         if (this.selected != null) {
             this.selected.setSelected(false);
         }
@@ -211,7 +220,7 @@ public final class IdeaMap extends JComponent implements MapComponent {
             text.setText("");
         }
     }
-    
+
     /**
      * Currently selected idea branch (if any).
      * @return Currently selected idea branch (if any).
@@ -219,7 +228,7 @@ public final class IdeaMap extends JComponent implements MapComponent {
     public IdeaView getSelectedView() {
         return this.selected;
     }
-    
+
     /**
      * The idea represented at the centre of this map.
      * @return central idea.
@@ -230,7 +239,7 @@ public final class IdeaMap extends JComponent implements MapComponent {
         }
         return null;
     }
-    
+
     /**
      * The idea-view at the centre of this map.
      * @return idea-view at the centre of this map.
@@ -238,7 +247,7 @@ public final class IdeaMap extends JComponent implements MapComponent {
     public IdeaView getRootView() {
         return this.rootView;
     }
-    
+
     /**
      * Paint the map part of the component (the text-field
      * will paint itself).
@@ -265,7 +274,7 @@ public final class IdeaMap extends JComponent implements MapComponent {
             this.drawRubberBand((Graphics2D)gOrig);
         }
     }
-    
+
     /**
      * Scale this map up by the given factor.
      * @param factor scaling factor - 1.0 for normal view.
@@ -276,35 +285,35 @@ public final class IdeaMap extends JComponent implements MapComponent {
         offset.y *= factor;
         repaint();
     }
-    
+
     /**
      * Scale this map up by {@link #SCALE_FACTOR}.
      */
     public void zoomIn() {
         zoom(SCALE_FACTOR);
     }
-    
+
     /**
      * Scale this map down by {@link #SCALE_FACTOR}.
      */
     public void zoomOut() {
         zoom(1.0 / SCALE_FACTOR);
     }
-    
+
     /**
      * Start adjusting the map.
      */
     public void startAdjust() {
         controller.startAdjust();
     }
-    
+
     /**
      * Stop any automatic adjusting of the map.
      */
     public void stopAdjust() {
         controller.stopAdjust();
     }
-    
+
     /**
      * Amount that the current display is offset.
      * @return offset point.
@@ -312,7 +321,7 @@ public final class IdeaMap extends JComponent implements MapComponent {
     public Point getOffset() {
         return offset;
     }
-    
+
     /**
      * Amount the current display is offset.
      * @param offset point to offset by.
@@ -321,7 +330,7 @@ public final class IdeaMap extends JComponent implements MapComponent {
         this.offset = offset;
         repaint();
     }
-    
+
     /**
      * 2D point in map space corresponding to the given point in screen space.
      *@param p Point in screen space.
@@ -340,7 +349,7 @@ public final class IdeaMap extends JComponent implements MapComponent {
         y /= z;
         return new Point2D.Double(x, y);
     }
-    
+
     /**
      * Reset the zoom and offset.
      */
@@ -349,7 +358,7 @@ public final class IdeaMap extends JComponent implements MapComponent {
         resetZoom();
         setPropertiesVisible(false);
     }
-    
+
     /**
      * Centre the view.
      */
@@ -357,7 +366,7 @@ public final class IdeaMap extends JComponent implements MapComponent {
         offset = new Point(0, 0);
         repaint();
     }
-    
+
     /**
      * Centre the view.
      */
@@ -367,7 +376,7 @@ public final class IdeaMap extends JComponent implements MapComponent {
         zoom = 1.0;
         repaint();
     }
-    
+
     /**
      * Insert a child branch to the currently selected idea (do nothing
      * if none selected).
@@ -382,7 +391,7 @@ public final class IdeaMap extends JComponent implements MapComponent {
         this.setSelected(newIdea);
         edit();
     }
-    
+
     /**
      * Put the selected idea into edit mode.
      * @param selected view to select and edit.
@@ -398,7 +407,7 @@ public final class IdeaMap extends JComponent implements MapComponent {
             repaint();
         }
     }
-    
+
     /**
      * Switch the given idea view out of edit mode.
      * @param ideaView idea-view to unedit.
@@ -415,11 +424,11 @@ public final class IdeaMap extends JComponent implements MapComponent {
         ticker.stop();
         repaint();
     }
-    
+
     /**
      * Insert a child idea to the currently selected idea.
      */
-    public void insertIdea() {
+    public void insertSibling() {
         final IdeaView selected = getSelectedView();
         if (selected == null) {
             return;
@@ -435,7 +444,7 @@ public final class IdeaMap extends JComponent implements MapComponent {
         this.setSelected(newIdea);
         edit();
     }
-    
+
     /**
      * Delete the currently selected idea (and consequently
      * its child ideas).
@@ -463,7 +472,7 @@ public final class IdeaMap extends JComponent implements MapComponent {
         parentView.getIdea().remove(selected.getIdea());
         setSelected(nextToSelect.getIdea());
     }
-    
+
     /**
      * Turn the given branch to point at the given point.
      * @param branch idea to to drag.
@@ -493,7 +502,7 @@ public final class IdeaMap extends JComponent implements MapComponent {
         }
         startAdjust();
     }
-    
+
     /**
      * The clockwise angle in radians of the line between
      * the given points. If toP is directly above fromP, the
@@ -516,7 +525,7 @@ public final class IdeaMap extends JComponent implements MapComponent {
         }
         return angle;
     }
-    
+
     /**
      * Request that a rubber band be drawn from the mid-point
      * of the selected idea, to the given point. This will
@@ -537,7 +546,7 @@ public final class IdeaMap extends JComponent implements MapComponent {
         rubberBandTo = toPoint;
         repaint();
     }
-    
+
     /**
      * Request that the rubber-band line is removed. It will
      * not actually be cleared until this idea-map is repainted.
@@ -547,12 +556,21 @@ public final class IdeaMap extends JComponent implements MapComponent {
         this.rubberBandTo = null;
         repaint();
     }
-    
-    /**
-     * The properties visible if it is not, or vice versa.
-     */
-    void togglePropertiesPanel() {
-        setPropertiesVisible(!getPropertiesVisible());
+
+    public void deSelect() {
+        IdeaView selected = getSelectedView();
+        if (selected != null) {
+            selected.getIdea().setText(getTextField().getText());
+            getTextField().setEnabled(false);
+            selected.setEditing(false);
+        }
+    }
+
+    public IdeaView getViewAt(Point2D p) {
+        if (this.rootView == null) {
+            return null;
+        }
+        return rootView.getViewAt(p);
     }
     
     /**
@@ -579,7 +597,7 @@ public final class IdeaMap extends JComponent implements MapComponent {
         }
         return null;
     }
-    
+
     /**
      * Point in screen space corresponding to the given point in map space.
      *@param p Point2D in map space.
@@ -600,7 +618,7 @@ public final class IdeaMap extends JComponent implements MapComponent {
         y += (size.height / 2);
         return new Point((int) x, (int) y);
     }
-    
+
     /**
      * Put the given angle into the range -Pi to Pi.
      * @param angle angle to transform.
@@ -615,7 +633,7 @@ public final class IdeaMap extends JComponent implements MapComponent {
         }
         return angle;
     }
-    
+
     /**
      * Draw a rubber band as specified by drawLinkRubberBand.
      * May do nothing if no band specified.
@@ -633,23 +651,23 @@ public final class IdeaMap extends JComponent implements MapComponent {
                 rubberBandTo.x, rubberBandTo.y);
         g.setStroke(oldStroke);
     }
-    
+
     /**
      * Whether the properties panel is visible.
      * @param show true if visible, false otherwise.
      */
-    private void setPropertiesVisible(boolean show) {
+    public void setPropertiesVisible(boolean show) {
         if (this.getSelectedView() != null) {
             propertiesPanel.setVisible(show);
         }
         propertiesVisible = show;
     }
-    
+
     /**
      * Whether the properties panel is visible.
      * @return true if visible, false otherwise.
      */
-    private boolean getPropertiesVisible() {
+    public boolean getPropertiesVisible() {
         return this.propertiesVisible;
     }
 }

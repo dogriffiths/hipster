@@ -36,7 +36,6 @@
 package dg.hipster;
 
 import dg.hipster.model.IdeaDocument;
-import dg.hipster.controller.MacAppListener;
 import dg.hipster.io.ReaderException;
 import dg.hipster.io.ReaderFactory;
 import dg.hipster.model.Settings;
@@ -50,17 +49,26 @@ import java.io.File;
 import java.util.ResourceBundle;
 
 /**
- *
+ * Main class of the application.
  * @author davidg
  */
 public final class Main {
+    /**
+     * The single instance of the application that will be created.
+     */
     private static Main main;
+    /**
+     * The main window.
+     */
     private Mainframe frame;
+    /**
+     * The &quot;About...&quot; box.
+     */
     private AboutBox aboutBox = new AboutBox();
     /**
      * Internationalization strings.
      */
-    protected static ResourceBundle resBundle = ResourceBundle.getBundle(
+    private static ResourceBundle resBundle = ResourceBundle.getBundle(
             "dg/hipster/resource/strings");
 
     static {
@@ -68,9 +76,10 @@ public final class Main {
     }
 
     /**
+     * The method executed at application start.
      * @param args the command line arguments
      */
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         main = new Main();
         main.initView();
         main.initControllers();
@@ -78,7 +87,7 @@ public final class Main {
         if (args.length > 0) {
             try {
                 document = ReaderFactory.getInstance().read(new File(args[0]));
-            } catch(ReaderException re) {
+            } catch (ReaderException re) {
                 GuiUtilities.showDebug(re.getMessage());
             }
         }
@@ -86,32 +95,54 @@ public final class Main {
         main.setVisible(true);
     }
 
-    public Main() {
+    /**
+     * Default constructor of the application. Left as package-private
+     * for unit-testing.
+     */
+    Main() {
     }
 
+    /**
+     * Set up the interface.
+     */
     private void initView() {
         frame = new Mainframe();
     }
 
+    /**
+     * Connect the controllers to the interface.
+     */
     private void initControllers() {
         if (frame != null) {
             frame.addWindowListener(new WindowAdapter() {
-                public void windowClosing(WindowEvent e) {
+                public void windowClosing(final WindowEvent e) {
                     handleQuit();
                     System.exit(0);
                 }
             });
         }
         if (isMac()) {
-            try {
-                Class.forName("dg.hipster.controller.MacAppListener");
-            } catch(ClassNotFoundException cnfe) {
-                cnfe.printStackTrace();
-            }
+            loadMacPlugins();
         }
     }
 
-    public void setVisible(boolean visible) {
+    /**
+     * Load plugins for integration with the Macintosh environment.
+     */
+    private void loadMacPlugins() {
+        try {
+            Class.forName("dg.hipster.controller.MacAppListener");
+        } catch (ClassNotFoundException cnfe) {
+            cnfe.printStackTrace();
+        }
+    }
+
+    /**
+     * Make the application visible. Will put the app into edit
+     * mode.
+     * @param visible true to become visible, false otherwise.
+     */
+    public void setVisible(final boolean visible) {
         if (frame != null) {
             frame.setVisible(visible);
             frame.editSelected();
@@ -144,7 +175,7 @@ public final class Main {
     }
 
     /**
-     * Display the preferences dialog
+     * Display the preferences dialog.
      */
     public static void showPreferences() {
         GuiUtilities.showInfo("preferences.placeholder");
@@ -163,6 +194,7 @@ public final class Main {
 
     /**
      * Get the main application frme.
+     * @return main application frame.
      */
     public static Mainframe getMainframe() {
         return main.frame;

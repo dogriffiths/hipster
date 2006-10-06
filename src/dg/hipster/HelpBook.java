@@ -41,10 +41,23 @@ package dg.hipster;
  *
  * @author davidg
  */
-public class HelpBook {
+public final class HelpBook {
+    /**
+     * Make sure the JNI library is loaded.
+     */
     static {
         System.loadLibrary("HelpBookJNI");
     }
-    
+
+    /**
+     * Private constructor to prevent instantiation.
+     */
+    private HelpBook() {
+        // Do nothing
+    }
+
+    /**
+     * Native method to call up the Macinstoch Help Viewer application.
+     */
     public static native void launchHelpViewer();
 }

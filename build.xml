@@ -169,7 +169,7 @@
     <target name="inspect"
     description="Generates a report of code convention violations."
     depends="pmd,checkstyle,coverage"/>
-    <target name="coverage">
+    <target name="coverage" depends="clean,test">
         <property name="cobertura.dir" value="lib" />
 
         <path id="cobertura.classpath">
