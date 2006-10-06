@@ -80,7 +80,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
      * Branch being dragged.
      */
     private BranchView draggedBranch;
-
+    
     /**
      * Creates a new instance of IdeaMapController.
      *@param newIdeaMap Idea map to control.
@@ -110,32 +110,28 @@ public final class IdeaMapController implements KeyListener, FocusListener,
                 unEditCurrent();
             }
             public void focusGained(final FocusEvent fe) {
-
+                
             }
         });
         this.ideaMap.requestFocusInWindow();
         this.mapMover = new MapMover(this.ideaMap);
     }
-
+    
     public void stopAdjust() {
         mapMover.stopAdjust();
     }
-
+    
     public void startAdjust() {
         mapMover.startAdjust();
     }
-
+    
     /**
      * Switch the current idea view out of editing mode.
      */
     private void unEditCurrent() {
-        ideaMap.requestFocusInWindow();
-        IdeaView current = ideaMap.getSelectedView();
-        if (current != null) {
-            this.ideaMap.unEditIdeaView(current);
-        }
+        this.ideaMap.unEdit();
     }
-
+    
     /**
      * Called when a mouse is pressed and released on
      * the idea map.
@@ -148,8 +144,8 @@ public final class IdeaMapController implements KeyListener, FocusListener,
             ideaMap.setSelected(null);
         }
     }
-
-
+    
+    
     /**
      * Called when a mouse is pressed on the idea map.
      * @param evt event describing the mouse press.
@@ -163,7 +159,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
             selectIdeaViewAt(p, shouldEdit);
         }
     }
-
+    
     private void deSelect() {
         IdeaView selected = this.ideaMap.getSelectedView();
         if (selected != null) {
@@ -172,7 +168,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
             selected.setEditing(false);
         }
     }
-
+    
     private void selectIdeaViewAt(final Point2D p, final boolean shouldEdit) {
         IdeaView hit = this.ideaMap.getRootView().getViewAt(p);
         if (hit != null) {
@@ -183,11 +179,11 @@ public final class IdeaMapController implements KeyListener, FocusListener,
             }
             ideaMap.getTextField().setText(hit.getIdea().getText());
             if (shouldEdit) {
-                this.ideaMap.editIdeaView(hit);
+                this.ideaMap.edit();
             }
         }
     }
-
+    
     /**
      * Called when a mouse is released over the idea map.
      * @param evt event describing the mouse release.
@@ -201,7 +197,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
         mapMover.setFixedBranch(null);
         this.ideaMap.clearRubberBand();
     }
-
+    
     private void createLinkTo(final Point2D p) {
         if ((this.ideaMap != null)
         && (this.ideaMap.getRootView() != null)) {
@@ -215,31 +211,31 @@ public final class IdeaMapController implements KeyListener, FocusListener,
             }
         }
     }
-
+    
     /**
      * Called when a mouse exits the idea map.
      * @param evt event describing the mouse exit.
      */
     public void mouseExited(final MouseEvent evt) {
-
+        
     }
-
+    
     /**
      * Called when a mouse enters the idea map.
      * @param evt event describing the mouse entry.
      */
     public void mouseEntered(final MouseEvent evt) {
-
+        
     }
-
+    
     /**
      * Called when a mouse moves over the idea map.
      * @param evt event describing the mouse movement.
      */
     public void mouseMoved(final MouseEvent evt) {
-
+        
     }
-
+    
     /**
      * Called when a mouse is dragged over the idea map.
      * @param evt event describing the mouse drag.
@@ -256,7 +252,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
             this.ideaMap.drawLinkRubberBand(evt.getPoint());
         }
     }
-
+    
     private void dragMapTo(final Point p) {
         if ((p == null) || (downPoint == null)) {
             return;
@@ -271,19 +267,19 @@ public final class IdeaMapController implements KeyListener, FocusListener,
                 offset.y + yDiff));
         downPoint = p;
     }
-
+    
     public void focusGained(final FocusEvent evt) {
     }
-
+    
     public void focusLost(final FocusEvent evt) {
     }
-
+    
     public void keyReleased(final KeyEvent evt) {
     }
-
+    
     public void keyTyped(final KeyEvent evt) {
     }
-
+    
     public void keyPressed(final KeyEvent evt) {
         switch(evt.getKeyCode()) {
             case KeyEvent.VK_SPACE:
@@ -310,17 +306,11 @@ public final class IdeaMapController implements KeyListener, FocusListener,
                 this.ideaMap.deleteSelected();
                 break;
             case KeyEvent.VK_ESCAPE:
-                IdeaView hit2 = this.ideaMap.getSelectedView();
-                if (hit2 != null) {
-                    this.ideaMap.unEditIdeaView(hit2);
-                }
+                this.ideaMap.unEdit();
                 break;
             case KeyEvent.VK_ENTER:
                 if (evt.getModifiers() != 0) {
-                    IdeaView hit = this.ideaMap.getSelectedView();
-                    if (hit != null) {
-                        this.ideaMap.editIdeaView(hit);
-                    }
+                    this.ideaMap.edit();
                 } else {
                     this.ideaMap.insertIdea();
                 }
@@ -332,7 +322,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
                 // Do nothing
         }
     }
-
+    
     private void selectDown() {
         final IdeaView selected = this.ideaMap.getSelectedView();
         if (selected == null) {
@@ -355,7 +345,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
             this.ideaMap.setSelected(nextView.getIdea());
         }
     }
-
+    
     private void selectUp() {
         final IdeaView selected = this.ideaMap.getSelectedView();
         if (selected == null) {
@@ -378,7 +368,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
             this.ideaMap.setSelected(nextView.getIdea());
         }
     }
-
+    
     private void selectSibling(final int diff) {
         final IdeaView selected = this.ideaMap.getSelectedView();
         if (selected == null) {
@@ -390,7 +380,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
         }
         this.ideaMap.setSelected(previous.getIdea());
     }
-
+    
     private void selectRight() {
         final IdeaView selected = this.ideaMap.getSelectedView();
         if (selected == null) {
@@ -413,7 +403,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
             this.ideaMap.setSelected(nextView.getIdea());
         }
     }
-
+    
     private void selectLeft() {
         final IdeaView selected = this.ideaMap.getSelectedView();
         if (selected == null) {
@@ -436,7 +426,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
             this.ideaMap.setSelected(nextView.getIdea());
         }
     }
-
+    
     private Map<Point2D, IdeaView> endPoints(final IdeaView ideaView) {
         Map<Point2D, IdeaView> results = new HashMap<Point2D, IdeaView>();
         List<BranchView> subViews = ideaView.getSubViews();

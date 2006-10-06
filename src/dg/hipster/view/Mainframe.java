@@ -207,11 +207,11 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
     }
 
     public void editSelected() {
-        ideaMap.editIdeaView(ideaMap.getRootView());
+        ideaMap.edit();
     }
 
     public void unEditSelected() {
-        ideaMap.unEditIdeaView(ideaMap.getRootView());
+        ideaMap.unEdit();
     }
 
     public void newDocument() {
