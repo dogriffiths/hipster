@@ -35,12 +35,24 @@
 
 package dg.hipster.controller;
 
+import dg.hipster.Main;
+import dg.hipster.io.ReaderFactory;
 import dg.hipster.model.Idea;
+import dg.hipster.model.IdeaDocument;
 import dg.hipster.view.BranchView;
 import dg.hipster.view.IdeaMap;
 import dg.hipster.view.IdeaView;
+import dg.hipster.view.Mainframe;
 import dg.hipster.view.MapComponent;
 import java.awt.Point;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetDragEvent;
+import java.awt.dnd.DropTargetDropEvent;
+import java.awt.dnd.DropTargetEvent;
+import java.awt.dnd.DropTargetListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
@@ -53,6 +65,8 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.Point2D;
+import java.io.File;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -86,7 +100,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
      * Factor to zoom by with each mouse-wheel click.
      */
     static final double ZOOM_PER_CLICK = 0.8;
-
+    
     /**
      * Creates a new instance of IdeaMapController.
      *@param newIdeaMap Idea map to control.
@@ -116,34 +130,73 @@ public final class IdeaMapController implements KeyListener, FocusListener,
                 unEditCurrent();
             }
             public void focusGained(final FocusEvent fe) {
-
+                
             }
         });
         this.ideaMap.requestFocusInWindow();
         this.mapMover = new MapMover(this.ideaMap);
+        DropTargetListener dtl = new DropTargetListener() {
+            public void dragEnter(DropTargetDragEvent dtde) {
+            }
+            public void dragExit(DropTargetEvent dtde) {
+            }
+            public void dragOver(DropTargetDragEvent dtde) {
+            }
+            public void dropActionChanged(DropTargetDragEvent dtde) {
+            }
+            public void drop(final DropTargetDropEvent event) {
+                try {
+                    Transferable transferable = event.getTransferable();
+                    if (transferable.isDataFlavorSupported(
+                            DataFlavor.javaFileListFlavor)){
+                        event.acceptDrop(DnDConstants.ACTION_COPY);
+                        final Object os = transferable.getTransferData(
+                                DataFlavor.javaFileListFlavor);
+                        if(!(os instanceof java.util.Collection)) {
+                            System.err.println("Not a collection!!!!!!");
+                            event.rejectDrop();
+                            return;
+                        }
+                        boolean err = false;
+                        File f = (File)((Collection)os).iterator().next();
+                        ReaderFactory factory = ReaderFactory.getInstance();
+                        IdeaDocument document = factory.read(f);
+                        Main.getMainframe().setDocument(document);
+                        event.getDropTargetContext().dropComplete(true);
+                    } else {
+                        event.rejectDrop();
+                    }
+                } catch (Throwable t) {
+                    t.printStackTrace();
+                    event.rejectDrop();
+                }
+            }
+        };
+        DropTarget dt = new DropTarget(ideaMap, dtl);
+        dt.setActive(true);
     }
-
+    
     /**
      * Stop the automatic adjustment process.
      */
     public void stopAdjust() {
         mapMover.stopAdjust();
     }
-
+    
     /**
      * Start the automatic adjustment process.
      */
     public void startAdjust() {
         mapMover.startAdjust();
     }
-
+    
     /**
      * Switch the current idea view out of editing mode.
      */
     private void unEditCurrent() {
         this.ideaMap.unEdit();
     }
-
+    
     /**
      * Called when a mouse is pressed and released on
      * the idea map.
@@ -156,8 +209,8 @@ public final class IdeaMapController implements KeyListener, FocusListener,
             ideaMap.setSelected(null);
         }
     }
-
-
+    
+    
     /**
      * Called when a mouse is pressed on the idea map.
      * @param evt event describing the mouse press.
@@ -171,7 +224,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
             selectIdeaViewAt(p, shouldEdit);
         }
     }
-
+    
     private void selectIdeaViewAt(final Point2D p, final boolean shouldEdit) {
         IdeaView hit = this.ideaMap.getViewAt(p);
         if (hit != null) {
@@ -186,7 +239,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
             }
         }
     }
-
+    
     /**
      * Called when a mouse is released over the idea map.
      * @param evt event describing the mouse release.
@@ -200,31 +253,31 @@ public final class IdeaMapController implements KeyListener, FocusListener,
         mapMover.setFixedBranch(null);
         this.ideaMap.clearRubberBand();
     }
-
+    
     /**
      * Called when a mouse exits the idea map.
      * @param evt event describing the mouse exit.
      */
     public void mouseExited(final MouseEvent evt) {
-
+        
     }
-
+    
     /**
      * Called when a mouse enters the idea map.
      * @param evt event describing the mouse entry.
      */
     public void mouseEntered(final MouseEvent evt) {
-
+        
     }
-
+    
     /**
      * Called when a mouse moves over the idea map.
      * @param evt event describing the mouse movement.
      */
     public void mouseMoved(final MouseEvent evt) {
-
+        
     }
-
+    
     /**
      * Called when a mouse is dragged over the idea map.
      * @param evt event describing the mouse drag.
@@ -241,7 +294,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
             this.ideaMap.drawLinkRubberBand(evt.getPoint());
         }
     }
-
+    
     private void dragMapTo(final Point p) {
         if ((p == null) || (downPoint == null)) {
             return;
@@ -256,19 +309,19 @@ public final class IdeaMapController implements KeyListener, FocusListener,
                 offset.y + yDiff));
         downPoint = p;
     }
-
+    
     public void focusGained(final FocusEvent evt) {
     }
-
+    
     public void focusLost(final FocusEvent evt) {
     }
-
+    
     public void keyReleased(final KeyEvent evt) {
     }
-
+    
     public void keyTyped(final KeyEvent evt) {
     }
-
+    
     public void keyPressed(final KeyEvent evt) {
         switch(evt.getKeyCode()) {
             case KeyEvent.VK_SPACE:
@@ -311,7 +364,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
                 // Do nothing
         }
     }
-
+    
     private void selectDown() {
         final IdeaView selected = this.ideaMap.getSelectedView();
         if (selected == null) {
@@ -334,7 +387,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
             this.ideaMap.setSelected(nextView.getIdea());
         }
     }
-
+    
     private void selectUp() {
         final IdeaView selected = this.ideaMap.getSelectedView();
         if (selected == null) {
@@ -357,7 +410,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
             this.ideaMap.setSelected(nextView.getIdea());
         }
     }
-
+    
     private void selectSibling(final int diff) {
         final IdeaView selected = this.ideaMap.getSelectedView();
         if (selected == null) {
@@ -369,7 +422,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
         }
         this.ideaMap.setSelected(previous.getIdea());
     }
-
+    
     private void selectRight() {
         final IdeaView selected = this.ideaMap.getSelectedView();
         if (selected == null) {
@@ -392,7 +445,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
             this.ideaMap.setSelected(nextView.getIdea());
         }
     }
-
+    
     private void selectLeft() {
         final IdeaView selected = this.ideaMap.getSelectedView();
         if (selected == null) {
@@ -415,7 +468,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
             this.ideaMap.setSelected(nextView.getIdea());
         }
     }
-
+    
     private Map<Point2D, IdeaView> endPoints(final IdeaView ideaView) {
         Map<Point2D, IdeaView> results = new HashMap<Point2D, IdeaView>();
         List<BranchView> subViews = ideaView.getSubViews();
@@ -445,7 +498,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
         }
         return results;
     }
-
+    
     private void createLinkTo(final Point2D p) {
         if (this.ideaMap != null) {
             IdeaView hit = this.ideaMap.getViewAt(p);
@@ -459,3 +512,5 @@ public final class IdeaMapController implements KeyListener, FocusListener,
         }
     }
 }
+
+
