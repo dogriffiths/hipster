@@ -42,7 +42,6 @@ import dg.hipster.model.IdeaDocument;
 import dg.hipster.view.BranchView;
 import dg.hipster.view.IdeaMap;
 import dg.hipster.view.IdeaView;
-import dg.hipster.view.Mainframe;
 import dg.hipster.view.MapComponent;
 import java.awt.Point;
 import java.awt.datatransfer.DataFlavor;
@@ -70,6 +69,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.ResourceBundle;
+import javax.swing.JOptionPane;
 
 /**
  * Object that can control an idea-map. It registers
@@ -79,6 +80,11 @@ import java.util.Map;
  */
 public final class IdeaMapController implements KeyListener, FocusListener,
         MouseListener, MouseMotionListener {
+    /**
+     * Internationalization strings.
+     */
+    protected static ResourceBundle resBundle = ResourceBundle.getBundle(
+            "dg/hipster/resource/strings");
     /**
      * Idea map being controlled.
      */
@@ -140,7 +146,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
             }
             public void dragExit(DropTargetEvent dtde) {
             }
-            public void dragOver(DropTargetDragEvent dtde) {
+            public void dragOver(DropTargetDragEvent event) {
             }
             public void dropActionChanged(DropTargetDragEvent dtde) {
             }
@@ -153,7 +159,6 @@ public final class IdeaMapController implements KeyListener, FocusListener,
                         final Object os = transferable.getTransferData(
                                 DataFlavor.javaFileListFlavor);
                         if(!(os instanceof java.util.Collection)) {
-                            System.err.println("Not a collection!!!!!!");
                             event.rejectDrop();
                             return;
                         }
@@ -161,7 +166,21 @@ public final class IdeaMapController implements KeyListener, FocusListener,
                         File f = (File)((Collection)os).iterator().next();
                         ReaderFactory factory = ReaderFactory.getInstance();
                         IdeaDocument document = factory.read(f);
-                        Main.getMainframe().setDocument(document);
+                        IdeaView ideaView = ideaMap.getViewAt(
+                                ideaMap.getMapPoint(event.getLocation()));
+                        if (ideaView != null) {
+                            int answer = JOptionPane.showConfirmDialog(ideaMap,
+                                    resBundle.getString("insert_drag_question"),
+                                    resBundle.getString("app.name"),
+                                    JOptionPane.YES_NO_CANCEL_OPTION);
+                            if (answer == JOptionPane.YES_OPTION) {
+                                ideaView.getIdea().add(document.getIdea());
+                            } else if (answer == JOptionPane.NO_OPTION) {
+                                Main.getMainframe().setDocument(document);
+                            }
+                        } else {
+                            Main.getMainframe().setDocument(document);
+                        }
                         event.getDropTargetContext().dropComplete(true);
                     } else {
                         event.rejectDrop();
