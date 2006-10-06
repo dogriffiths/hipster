@@ -60,7 +60,7 @@ final class MapMover implements ActionListener {
      * Maximum time in the seconds that the arrangement animation
      * will run before needing to be restarted.
      */
-    private static final double MAX_MOVE_TIME_SECS = 23.0;
+    private static final double MAX_MOVE_TIME_SECS = 8.0;
     /**
      * Pause between animation updates. 40 = 20 fps.
      */
