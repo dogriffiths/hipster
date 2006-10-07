@@ -52,7 +52,6 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
@@ -68,6 +67,7 @@ import java.util.ResourceBundle;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 
@@ -99,7 +99,11 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
                 s.getWindowWidth(), s.getWindowHeight());
         buildView();
         buildModel();
-        newDocument();
+        try {
+            newDocument();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
     
     /**
@@ -219,12 +223,18 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
         ideaMap.unEdit();
     }
     
-    public void newDocument() {
+    public void newDocument() throws IOException, ReaderException {
+        if (!checkIfSave()) {
+            return;
+        }
         this.setDocument(new IdeaDocument());
         this.editSelected();
     }
     
     public void openDocument() throws IOException, ReaderException {
+        if (!checkIfSave()) {
+            return;
+        }
         FileDialog chooser = new FileDialog(this,
                 resBundle.getString("open.opml.file"),
                 FileDialog.LOAD);
@@ -282,6 +292,24 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
             Idea idea = document.getIdea();
             WriterFactory.getInstance().write(file, document);
         }
+    }
+    
+    public boolean checkIfSave() throws IOException, ReaderException {
+        IdeaDocument doc = getDocument();
+        if (doc != null) {
+            if (doc.isDirty()) {
+                int answer = JOptionPane.showConfirmDialog(this,
+                        resBundle.getString("save_file_question"),
+                        resBundle.getString("app.name"),
+                        JOptionPane.YES_NO_CANCEL_OPTION);
+                if (answer == JOptionPane.YES_OPTION) {
+                    saveDocument();
+                } else if (answer == JOptionPane.CANCEL_OPTION) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
     
     public void fileExit() {
