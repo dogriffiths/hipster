@@ -87,8 +87,7 @@ public final class MacAppListener implements ApplicationListener {
     public void handlePrintFile(ApplicationEvent event) {
     }
     public void handleQuit(ApplicationEvent event) {
-        Main.handleQuit();
-        event.setHandled(true);
+        event.setHandled(Main.handleQuit());
     }
     public void handleReOpenApplication(ApplicationEvent event) {
     }

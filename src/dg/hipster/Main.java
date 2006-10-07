@@ -47,6 +47,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.util.ResourceBundle;
+import javax.swing.JFrame;
 
 /**
  * Main class of the application.
@@ -114,10 +115,13 @@ public final class Main {
      */
     private void initControllers() {
         if (frame != null) {
+            frame.setDefaultCloseOperation(
+                    JFrame.DO_NOTHING_ON_CLOSE);
             frame.addWindowListener(new WindowAdapter() {
                 public void windowClosing(final WindowEvent e) {
-                    handleQuit();
-                    System.exit(0);
+                    if (handleQuit()) {
+                        System.exit(0);
+                    }
                 }
             });
         }
@@ -184,16 +188,17 @@ public final class Main {
     /**
      * Called when the application being closed down.
      */
-    public static void handleQuit() {
+    public static boolean handleQuit() {
         Rectangle bounds = main.frame.getBounds();
         Settings.getInstance().setWindowLeft(bounds.x);
         Settings.getInstance().setWindowTop(bounds.y);
         Settings.getInstance().setWindowWidth(bounds.width);
         Settings.getInstance().setWindowHeight(bounds.height);
         try {
-            getMainframe().checkIfSave();
+            return getMainframe().checkIfSave();
         } catch (Exception e) {
             e.printStackTrace();
+            return true;
         }
     }
     
