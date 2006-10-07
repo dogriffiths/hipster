@@ -75,8 +75,14 @@ public final class OPMLReader extends DefaultHandler implements IdeaReader {
                 }
                 if (idea == null) {
                     idea = i;
-                } else {
+                } else if (current != null) {
                     current.add(i);
+                } else {
+                    Idea i2 = new Idea("root");
+                    i2.add(idea);
+                    idea = i2;
+                    stack.push(idea);
+                    idea.add(i);
                 }
                 current = i;
                 stack.push(current);
