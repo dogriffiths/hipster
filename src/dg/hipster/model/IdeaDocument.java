@@ -35,8 +35,6 @@
 
 package dg.hipster.model;
 
-import dg.hipster.view.IdeaMap;
-import dg.hipster.view.Mainframe;
 import dg.inx.AbstractModel;
 import java.io.File;
 import java.util.ResourceBundle;
@@ -51,19 +49,19 @@ public class IdeaDocument extends AbstractModel implements IdeaListener {
      */
     protected static ResourceBundle resBundle = ResourceBundle.getBundle(
             "dg/hipster/resource/strings");
-
+    
     private Idea idea;
     private File currentFile;
     private boolean dirty;
     private String title;
     private boolean needsAdjustment;
-
+    
     public IdeaDocument() {
         this.setCurrentFile(null);
         this.setIdea(new Idea(this.getTitle()));
         this.setDirty(false);
     }
-
+    
     public void setIdea(Idea newIdea) {
         Idea oldIdea = this.idea;
         if (oldIdea != null) {
@@ -75,15 +73,15 @@ public class IdeaDocument extends AbstractModel implements IdeaListener {
         }
         firePropertyChange("idea", oldIdea, this.idea);
     }
-
+    
     public Idea getIdea() {
         return this.idea;
     }
-
+    
     public File getCurrentFile() {
         return currentFile;
     }
-
+    
     public void setCurrentFile(File newCurrentFile) {
         File oldFile = this.currentFile;
         this.currentFile = newCurrentFile;
@@ -94,39 +92,39 @@ public class IdeaDocument extends AbstractModel implements IdeaListener {
         }
         firePropertyChange("currentFile", oldFile, this.currentFile);
     }
-
+    
     public boolean isDirty() {
         return dirty;
     }
-
+    
     public void setDirty(boolean dirty) {
         boolean oldDirty = this.dirty;
         this.dirty = dirty;
         firePropertyChange("dirty", oldDirty, this.dirty);
     }
-
+    
     public String getTitle() {
         return this.title;
     }
-
+    
     public void setTitle(String newTitle) {
         String oldTitle = this.title;
         this.title = newTitle;
         firePropertyChange("title", oldTitle, this.title);
     }
-
-    public void ideaChanged(IdeaEvent fe) {
+    
+    public void ideaChanged(IdeaEvent ideaEvent) {
         this.setDirty(true);
         if (this.currentFile == null) {
             setTitle(this.getIdea().getText());
         }
         setNeedsAdjustment(true);
     }
-
+    
     public void setNeedsAdjustment(boolean adjustment) {
         this.needsAdjustment = adjustment;
     }
-
+    
     public boolean isNeedsAdjustment() {
         return this.needsAdjustment;
     }

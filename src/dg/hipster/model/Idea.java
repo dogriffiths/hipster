@@ -107,7 +107,7 @@ public final class Idea extends AbstractModel implements IdeaListener {
         if ((this.text == null) || (!this.text.equals(newText))) {
             this.text = newText;
             this.firePropertyChange("text", oldText, newText);
-            notify("CHANGED");
+            notify(new IdeaEvent(this, IdeaEvent.CHANGED, "CHANGED"));
         }
     }
     
@@ -180,7 +180,7 @@ public final class Idea extends AbstractModel implements IdeaListener {
         if ((this.notes == null) || (!this.notes.equals(newNotes))) {
             this.notes = newNotes;
             this.firePropertyChange("notes", oldNotes, newNotes);
-            notify("CHANGED");
+            notify(new IdeaEvent(this, IdeaEvent.CHANGED, "CHANGED"));
         }
     }
     
@@ -211,7 +211,8 @@ public final class Idea extends AbstractModel implements IdeaListener {
     public synchronized void add(Idea subIdea) {
         subIdeas.add(subIdea);
         subIdea.addIdeaListener(this);
-        notify("ADDED", subIdea, subIdeas.size() - 1, this);
+        notify(new IdeaEvent(this, IdeaEvent.ADDED, "ADDED",
+                subIdea, subIdeas.size() - 1));
     }
     
     /**
@@ -222,7 +223,8 @@ public final class Idea extends AbstractModel implements IdeaListener {
     public synchronized void add(int pos, Idea subIdea) {
         subIdeas.add(pos, subIdea);
         subIdea.addIdeaListener(this);
-        notify("ADDED", subIdea, pos, this);
+        notify(new IdeaEvent(this, IdeaEvent.ADDED, "ADDED",
+                subIdea, pos));
     }
     
     /**
@@ -234,7 +236,8 @@ public final class Idea extends AbstractModel implements IdeaListener {
     public synchronized void remove(Idea subIdea) {
         subIdeas.remove(subIdea);
         subIdea.removeIdeaListener(this);
-        notify("REMOVED", subIdea, this);
+        notify(new IdeaEvent(this, IdeaEvent.REMOVED, "REMOVED",
+                subIdea));
     }
     
     /**
@@ -244,7 +247,8 @@ public final class Idea extends AbstractModel implements IdeaListener {
     public void addLink(Idea other) {
         if (!this.equals(other)) {
             links.add(other);
-            notify("ADDED_LINK", this, other);
+            notify(new IdeaEvent(this, IdeaEvent.ADDED_LINK, "ADDED_LINK",
+                    other));
         }
     }
     
@@ -270,11 +274,13 @@ public final class Idea extends AbstractModel implements IdeaListener {
         }
         if (links.contains(other)) {
             links.remove(other);
-            notify("REMOVED_LINK", this, other);
+            notify(new IdeaEvent(this, IdeaEvent.REMOVED_LINK, "REMOVED_LINK",
+                    other));
         }
         if (other.links.contains(this)) {
             other.links.remove(this);
-            notify("REMOVED_LINK", other, this);
+            notify(new IdeaEvent(other, IdeaEvent.REMOVED_LINK, "REMOVED_LINK",
+                    this));
         }
     }
     
@@ -310,14 +316,14 @@ public final class Idea extends AbstractModel implements IdeaListener {
      * details.
      * @param paras objects providing more information about the change
      */
-    private void notify(String command, Object... paras) {
+    private void notify(IdeaEvent ideaEvent) {
         for (IdeaListener listener: listeners) {
-            listener.ideaChanged(new IdeaEvent(this, command, paras));
+            listener.ideaChanged(ideaEvent);
         }
     }
     
-    public void ideaChanged(IdeaEvent fe) {
-        notify(fe.getCommand(), fe.getParas());
+    public void ideaChanged(IdeaEvent ideaEvent) {
+        notify(ideaEvent);
     }
     
     //

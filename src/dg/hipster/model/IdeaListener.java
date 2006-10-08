@@ -35,12 +35,12 @@
 
 package dg.hipster.model;
 
-import dg.hipster.model.IdeaEvent;
+import java.awt.event.ActionEvent;
 
 /**
  *
  * @author davidg
  */
 public interface IdeaListener {
-    public void ideaChanged(IdeaEvent fe);
+    public void ideaChanged(IdeaEvent ideaEvent);
 }

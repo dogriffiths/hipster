@@ -35,43 +35,49 @@
 
 package dg.hipster.model;
 
+import java.awt.event.ActionEvent;
+
 /**
  *
  * @author davidg
  */
-public final class IdeaEvent {
-    private Object source;
-    private String command;
-    private Object[] paras;
-
-    public IdeaEvent(Object aSource, String aCommand,
-            Object[] theParas) {
-        this.source = aSource;
-        this.command = aCommand;
-        this.paras = theParas;
+public final class IdeaEvent extends ActionEvent {
+    public static final int ADDED = 0;
+    public static final int REMOVED = 1;
+    public static final int ADDED_LINK = 2;
+    public static final int REMOVED_LINK = 3;
+    public static final int CHANGED = 4;
+    private Idea idea;
+    private Object param;
+    
+    public IdeaEvent(Object aSource, int id, String aCommand) {
+        this(aSource, id, aCommand, null, null);
+    }
+    
+    public IdeaEvent(Object aSource, int id, String aCommand, Idea anIdea) {
+        this(aSource, id, aCommand, anIdea, null);
+    }
+    
+    public IdeaEvent(Object aSource, int id, String aCommand, Idea anIdea,
+            Object aParam) {
+        super(aSource, id, aCommand);
+        this.setIdea(anIdea);
+        this.setParam(aParam);
     }
 
-    public Object getSource() {
-        return source;
+    public Idea getIdea() {
+        return idea;
     }
 
-    public void setSource(Object source) {
-        this.source = source;
+    public void setIdea(Idea idea) {
+        this.idea = idea;
     }
 
-    public String getCommand() {
-        return command;
+    public Object getParam() {
+        return param;
     }
 
-    public void setCommand(String command) {
-        this.command = command;
-    }
-
-    public Object[] getParas() {
-        return paras;
-    }
-
-    public void setParas(Object[] paras) {
-        this.paras = paras;
+    public void setParam(Object param) {
+        this.param = param;
     }
 }

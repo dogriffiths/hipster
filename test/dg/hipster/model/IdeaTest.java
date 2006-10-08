@@ -51,11 +51,13 @@ public class IdeaTest extends TestCase {
         idea.add(subIdea0);
         
         assertEquals("Should have fired add event", "ADDED",
-                i.ideaEvent.getCommand());
+                i.ideaEvent.getActionCommand());
+        assertEquals("Should have fired add event", IdeaEvent.ADDED,
+                i.ideaEvent.getID());
         assertEquals("Should have fired add event", subIdea0,
-                i.ideaEvent.getParas()[0]);
+                i.ideaEvent.getIdea());
         assertEquals("Should have fired add event", 0,
-                i.ideaEvent.getParas()[1]);
+                i.ideaEvent.getParam());
         
         i.ideaEvent = null;
         
@@ -96,14 +98,14 @@ public class IdeaTest extends TestCase {
         
         idea.remove(subIdea0);
         assertEquals("Should have fired add event", "REMOVED",
-                i.ideaEvent.getCommand());
+                i.ideaEvent.getActionCommand());
         i.ideaEvent = null;
         
         idea.remove(subIdea1);
         assertEquals("Should have fired add event", "REMOVED",
-                i.ideaEvent.getCommand());
+                i.ideaEvent.getActionCommand());
         assertEquals("Should have fired add event", subIdea1,
-                i.ideaEvent.getParas()[0]);
+                i.ideaEvent.getIdea());
         i.ideaEvent = null;
         
         assertEquals("Should now be just 1 sub-idea",
@@ -116,11 +118,11 @@ public class IdeaTest extends TestCase {
         
         subIdea2.add(subSubIdea0);
         assertEquals("Should have fired add event", "ADDED",
-                i.ideaEvent.getCommand());
+                i.ideaEvent.getActionCommand());
         assertEquals("Should have fired add event", subSubIdea0,
-                i.ideaEvent.getParas()[0]);
+                i.ideaEvent.getIdea());
         assertEquals("Should have fired add event", 0,
-                i.ideaEvent.getParas()[1]);
+                i.ideaEvent.getParam());
     }
     
     /**
@@ -146,16 +148,13 @@ public class IdeaTest extends TestCase {
         idea.add(subIdea0);
         
         assertEquals("Listener should have received an ADDED command",
-                "ADDED", listener0.ie.getCommand());
-        
-        assertEquals("Listener should have 2 paras",
-                3, listener0.ie.getParas().length);
+                "ADDED", listener0.ie.getActionCommand());
         
         assertEquals("1st Para should be the idea added",
-                subIdea0, listener0.ie.getParas()[0]);
+                subIdea0, listener0.ie.getIdea());
         
         assertEquals("2nd Para should be position added",
-                0, listener0.ie.getParas()[1]);
+                0, listener0.ie.getParam());
         
         listener0.ie = null;
         
@@ -168,10 +167,10 @@ public class IdeaTest extends TestCase {
         idea.add(subIdea1);
         
         assertEquals("First listener should have been informed",
-                subIdea1, listener0.ie.getParas()[0]);
+                subIdea1, listener0.ie.getIdea());
         
         assertEquals("Second listener should have been informed",
-                subIdea1, listener1.ie.getParas()[0]);
+                subIdea1, listener1.ie.getIdea());
         
         listener0.ie = null;
         
@@ -185,7 +184,7 @@ public class IdeaTest extends TestCase {
                 null, listener0.ie);
         
         assertEquals("Second listener should have been informed",
-                subIdea2, listener1.ie.getParas()[0]);
+                subIdea2, listener1.ie.getIdea());
         
     }
     
@@ -224,7 +223,9 @@ public class IdeaTest extends TestCase {
         assertEquals("Text should initially be zero-length", "", idea.getText());
         idea.setText("Some text");
         assertEquals("Text should have been updated", "Some text", idea.getText());
-        assertEquals("Should have sent an idea listener event", "CHANGED", i.ideaEvent.getCommand());
+        assertEquals("Should have sent an idea listener event",
+                "CHANGED",
+                i.ideaEvent.getActionCommand());
         i.ideaEvent = null;
         assertEquals("Should have sent a general property change event", 
                 p.propertyChangeEvent.getPropertyName(), 
@@ -378,7 +379,8 @@ public class IdeaTest extends TestCase {
         assertEquals("Notes should initially be zero-length", "", idea.getNotes());
         idea.setNotes("A note");
         assertEquals("Notes should have been updated", "A note", idea.getNotes());
-        assertEquals("Should have sent an idea listener event", "CHANGED", i.ideaEvent.getCommand());
+        assertEquals("Should have sent an idea listener event",
+                "CHANGED", i.ideaEvent.getActionCommand());
     }
     
 //    /**

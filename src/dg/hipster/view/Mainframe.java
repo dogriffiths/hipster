@@ -295,6 +295,7 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
     }
     
     public boolean checkIfSave() throws IOException, ReaderException {
+        ideaMap.stopAdjust();
         IdeaDocument doc = getDocument();
         if (doc != null) {
             if (doc.isDirty()) {

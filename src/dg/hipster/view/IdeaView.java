@@ -90,22 +90,22 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
     }
     
     public void ideaChanged(IdeaEvent fe) {
-        String cmd = fe.getCommand();
-        if ("ADDED".equals(cmd)) {
-            Idea ideaParent = (Idea)fe.getParas()[2];
+        int id = fe.getID();
+        if (id == IdeaEvent.ADDED) {
+            Idea ideaParent = (Idea)fe.getSource();
             if (this.idea.equals(ideaParent)) {
-                Idea subIdea = (Idea) fe.getParas()[0];
-                int pos = (Integer) fe.getParas()[1];
+                Idea subIdea = fe.getIdea();
+                int pos = (Integer)fe.getParam();
                 BranchView subIdeaView = new BranchView(subIdea);
                 double maxAngle = getMaxSubAngle();
                 double angle = (maxAngle + Math.PI) / 2.0;
                 subIdeaView.getIdea().setAngle(angle);
                 add(pos, subIdeaView);
             }
-        } else if ("REMOVED".equals(cmd)) {
-            Idea ideaParent = (Idea)fe.getParas()[1];
+        } else if (id == IdeaEvent.REMOVED) {
+            Idea ideaParent = (Idea)fe.getSource();
             if (this.idea.equals(ideaParent)) {
-                Idea subIdea = (Idea) fe.getParas()[0];
+                Idea subIdea = fe.getIdea();
                 for (int i = 0; i < subViews.size(); i++) {
                     Idea idea = (Idea) subViews.get(i).getIdea();
                     if (idea.equals(subIdea)) {
