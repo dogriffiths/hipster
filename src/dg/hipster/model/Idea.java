@@ -234,10 +234,11 @@ public final class Idea extends AbstractModel implements IdeaListener {
      * @param subIdea sub-idea to be removed.
      */
     public synchronized void remove(Idea subIdea) {
+        int pos = subIdeas.indexOf(subIdea);
         subIdeas.remove(subIdea);
         subIdea.removeIdeaListener(this);
         notify(new IdeaEvent(this, IdeaEvent.REMOVED, "REMOVED",
-                subIdea));
+                subIdea, pos));
     }
     
     /**
@@ -295,7 +296,9 @@ public final class Idea extends AbstractModel implements IdeaListener {
      * @param ideaListener idea listener in question.
      */
     public void addIdeaListener(IdeaListener ideaListener) {
-        listeners.add(ideaListener);
+        if (!listeners.contains(ideaListener)) {
+            listeners.add(ideaListener);
+        }
     }
     
     /**

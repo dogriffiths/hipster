@@ -16,16 +16,20 @@
         <item textName="save" action="saveDocument" key="S"/>
     </menu>
     <menu textName="edit">
-        <item textName="insertChild" action="insertChild"/>
-        <item textName="insertSibling" action="insertSibling"/>
+        <item textName="undo" action="undo" key="Z"/>
+        <item textName="-"/>
         <item textName="cut" action="cutIdea" key="X"/>
         <item textName="copy" action="copyIdea" key="C"/>
         <item textName="paste" action="pasteIdea" key="V"/>
+        <item textName="-"/>
+        <item textName="insertChild" action="insertChild"/>
+        <item textName="insertSibling" action="insertSibling"/>
     </menu>
     <menu textName="view">
         <item textName="zoomIn" action="zoomIn" key="EQUALS"/>
         <item textName="resetZoom" action="resetZoom" key="0"/>
         <item textName="zoomOut" action="zoomOut" key="MINUS"/>
+        <item textName="-"/>
         <item textName="centreView" action="centreView"/>
         <item textName="resetView" action="resetView"/>
     </menu>

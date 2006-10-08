@@ -435,6 +435,15 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
     public void lostOwnership(Clipboard clipboard, Transferable transferable) {
         
     }
+    
+    /**
+     * Undo the last change.
+     */
+    public void undo() {
+        if (this.ideaMap != null) {
+            this.ideaMap.undo();
+        }
+    }
 }
 
 class IdeaSelection implements Transferable {
