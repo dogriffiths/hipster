@@ -684,6 +684,7 @@ public final class IdeaMap extends JComponent implements MapComponent {
     public void undo() {
         if (undoManager != null) {
             undoManager.undo();
+            setSelected(null);
         }
     }
 }
