@@ -35,7 +35,9 @@
 
 package dg.hipster.controller;
 
-import dg.hipster.model.*;
+import dg.hipster.model.Idea;
+import dg.hipster.model.IdeaEvent;
+import dg.hipster.model.IdeaListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Stack;
@@ -49,6 +51,10 @@ public class UndoManager implements IdeaListener, PropertyChangeListener {
      * Root idea of the document being undone.
      */
     private Idea idea;
+    /**
+     * Stack of events that will be undone in reverse
+     * order.
+     */
     private Stack events;
     
     /**
@@ -58,6 +64,14 @@ public class UndoManager implements IdeaListener, PropertyChangeListener {
         events = new Stack();
     }
     
+    /**
+     * Called when ideas are amended. We are only
+     * interested in ADDED and REMOVED events, because
+     * CHANGED events will already be picked up from
+     * the property change listener interface.
+     * @param ideaEvent event recording the change that
+     * has occurred to the idea.
+     */
     public void ideaChanged(IdeaEvent ideaEvent) {
         switch(ideaEvent.getID()) {
             case IdeaEvent.ADDED:
@@ -75,20 +89,40 @@ public class UndoManager implements IdeaListener, PropertyChangeListener {
         }
     }
     
+    /**
+     * Called when a property changes on an idea.
+     * @param propertyChangeEvent event describing the change.
+     */
     public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
         storeEvent(propertyChangeEvent);
     }
-
+    
+    /**
+     * Place an event upon a stack - unless it is
+     * already there. The reason for the check is
+     * to prevent ideas that have erroneously been
+     * subscribed to more than once generating
+     * multiple events.
+     * @param event event to store.
+     */
     private void storeEvent(final Object event) {
         if (events.isEmpty() || (events.peek() != event)) {
             events.push(event);
         }
     }
     
+    /**
+     * Root idea being watched.
+     * @return idea being watched.
+     */
     public Idea getIdea() {
         return idea;
     }
     
+    /**
+     * Root idea being watched.
+     * @param newIdea Root idea being watched.
+     */
     public void setIdea(Idea newIdea) {
         Idea oldIdea = this.idea;
         this.idea = newIdea;
@@ -102,6 +136,12 @@ public class UndoManager implements IdeaListener, PropertyChangeListener {
         }
     }
     
+    /**
+     * Stop listening to the property changes
+     * of an idea - usually
+     * because it has been deleted.
+     * @param anIdea idea to stop listening to.
+     */
     private void stopListeningTo(Idea anIdea) {
         if (anIdea != null) {
             anIdea.removePropertyChangeListener("text", this);
@@ -112,6 +152,11 @@ public class UndoManager implements IdeaListener, PropertyChangeListener {
         }
     }
     
+    /**
+     * Start listening to the property changes of
+     * an idea.
+     * @param anIdea idea to listen to.
+     */
     private void startListeningTo(Idea anIdea) {
         if (anIdea != null) {
             anIdea.addPropertyChangeListener("text", this);
@@ -122,6 +167,9 @@ public class UndoManager implements IdeaListener, PropertyChangeListener {
         }
     }
     
+    /**
+     * Undo the last event recorded.
+     */
     public void undo() {
         if (events.isEmpty()) {
             return;
@@ -136,6 +184,10 @@ public class UndoManager implements IdeaListener, PropertyChangeListener {
         events.pop();
     }
     
+    /**
+     * Undo the specified idea-event.
+     * @param ideaEvent idea-event to undo.
+     */
     private void undo(IdeaEvent ideaEvent) {
         switch(ideaEvent.getID()) {
             case IdeaEvent.ADDED:
@@ -152,6 +204,10 @@ public class UndoManager implements IdeaListener, PropertyChangeListener {
         }
     }
     
+    /**
+     * Undo the specified property-change-event.
+     * @param propertyChangeEvent event to undo.
+     */
     private void undo(PropertyChangeEvent propertyChangeEvent) {
         String propertyName = propertyChangeEvent.getPropertyName();
         Idea idea = (Idea)propertyChangeEvent.getSource();
