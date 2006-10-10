@@ -83,11 +83,7 @@ public class CentreView extends IdeaView {
     
     private void paintAllLinks(Graphics g, IdeaView ideaView) {
         for (BranchView branch : ideaView.getSubViews()) {
-            Point2D fromPoint = branch.getFromPoint();
-            Point2D toPoint = branch.getToPoint();
-            Point c = new Point((int)fromPoint.getX(), (int)fromPoint.getY());
-            Point s = new Point((int)toPoint.getX(), (int)toPoint.getY());
-            branch.paintLinks(c, s, g);
+            branch.paintLinks(g);
             paintAllLinks(g, branch);
         }
     }

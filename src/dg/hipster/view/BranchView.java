@@ -106,10 +106,7 @@ public class BranchView extends IdeaView {
                 textAngle, this.isEditing(), map);
     }
     
-    void paintLinks(final Point c,
-            final Point s, final Graphics g) {
-        Point2D start0 = s;
-        Point2D end0 = c;
+    void paintLinks(final Graphics g) {
         IdeaView rootView = getRootView();
         Stroke oldStroke = ((Graphics2D)g).getStroke();
         float strokeWidth = DEFAULT_STROKE_WIDTH / 2;
@@ -123,7 +120,7 @@ public class BranchView extends IdeaView {
                 Point2D start1 = branch.getFromPoint();
                 Point2D end1 = branch.getEndPoint();
                 ((Graphics2D)g).setStroke(stroke);
-                drawCurve(g, start0, end0, start1, end1);
+                drawCurve(g, fromPoint, toPoint, start1, end1);
                 ((Graphics2D)g).setStroke(oldStroke);
             }
         }
