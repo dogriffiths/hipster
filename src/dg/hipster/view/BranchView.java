@@ -94,7 +94,6 @@ public class BranchView extends IdeaView {
         g.drawLine(c.x, c.y - 1, s.x, s.y - 1);
         g.setColor(colour);
         g.drawLine(c.x, c.y, s.x, s.y);
-        paintLinks(c, s, g);
         ((Graphics2D)g).setStroke(oldStroke);
         if (this.isSelected()) {
             g.setColor(Color.WHITE);
@@ -107,11 +106,15 @@ public class BranchView extends IdeaView {
                 textAngle, this.isEditing(), map);
     }
     
-    private void paintLinks(final Point c,
+    void paintLinks(final Point c,
             final Point s, final Graphics g) {
         Point2D start0 = s;
         Point2D end0 = c;
         IdeaView rootView = getRootView();
+        Stroke oldStroke = ((Graphics2D)g).getStroke();
+        float strokeWidth = DEFAULT_STROKE_WIDTH / 2;
+        Stroke stroke = new BasicStroke(strokeWidth,
+                BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL);
         for (Idea link: this.getIdea().getLinks()) {
             IdeaView linkView = rootView.getViewFor(link);
             if ((linkView != null) && (linkView instanceof BranchView)) {
@@ -119,7 +122,9 @@ public class BranchView extends IdeaView {
                 g.setColor(Color.GRAY);
                 Point2D start1 = branch.getFromPoint();
                 Point2D end1 = branch.getEndPoint();
+                ((Graphics2D)g).setStroke(stroke);
                 drawCurve(g, start0, end0, start1, end1);
+                ((Graphics2D)g).setStroke(oldStroke);
             }
         }
     }

@@ -650,7 +650,7 @@ public final class IdeaMap extends JComponent implements MapComponent {
         g.setColor(Color.GRAY);
         Dimension size = getSize();
         Stroke oldStroke = g.getStroke();
-        float strokeWidth = BranchView.DEFAULT_STROKE_WIDTH;
+        float strokeWidth = BranchView.DEFAULT_STROKE_WIDTH / 2;
         Stroke stroke = new BasicStroke(strokeWidth,
                 BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL);
         g.setStroke(stroke);

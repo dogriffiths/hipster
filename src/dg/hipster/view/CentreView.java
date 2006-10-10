@@ -61,6 +61,7 @@ public class CentreView extends IdeaView {
     
     public void paint(Graphics g, IdeaMap map) {
         initFromTo();
+        paintAllLinks(g, this);
         paintBranches(g, new Point(0, 0), this, getIdea().getAngle(), 0, map);
         Color colour = Color.WHITE;
         if (this.isSelected()) {
@@ -78,6 +79,17 @@ public class CentreView extends IdeaView {
                 ROOT_RADIUS_Y * 2);
         drawString((Graphics2D)g, getIdea().getText(), new Point(0, 0), 4,
                 getIdea().getAngle(), this.isEditing(), map);
+    }
+    
+    private void paintAllLinks(Graphics g, IdeaView ideaView) {
+        for (BranchView branch : ideaView.getSubViews()) {
+            Point2D fromPoint = branch.getFromPoint();
+            Point2D toPoint = branch.getToPoint();
+            Point c = new Point((int)fromPoint.getX(), (int)fromPoint.getY());
+            Point s = new Point((int)toPoint.getX(), (int)toPoint.getY());
+            branch.paintLinks(c, s, g);
+            paintAllLinks(g, branch);
+        }
     }
     
     boolean hits(Point2D p) {
