@@ -237,9 +237,6 @@ public class BranchView extends IdeaView {
     }
     
     public Point2D getFromPoint() {
-        if ((fromPoint == null) || (toPoint == null)) {
-            initFromTo();
-        }
         return this.fromPoint;
     }
     
@@ -248,48 +245,14 @@ public class BranchView extends IdeaView {
     }
     
     public Point2D getToPoint() {
-        if ((fromPoint == null) || (toPoint == null)) {
-            initFromTo();
-        }
         return this.toPoint;
     }
     
     public Point2D getMidPoint() {
-        if ((fromPoint == null) || (toPoint == null)) {
-            initFromTo();
-        }
         return new Point2D.Double(
                 (fromPoint.getX() + toPoint.getX()) / 2,
                 (fromPoint.getY() + toPoint.getY()) / 2
                 );
-    }
-    
-    private void initFromTo() {
-        for (IdeaView subView : getRootView().getSubViews()) {
-            initFromTo(new Point(0, 0), 0.0, subView);
-        }
-    }
-    
-    private static void initFromTo(final Point c2,
-            final double initAngle, final IdeaView aView) {
-        Point c = new Point(c2.x, c2.y);
-        double a = aView.getIdea().getAngle() + initAngle;
-        aView.setRealAngle(a);
-        double len = aView.getIdea().getLength();
-        Point2D p = new Point2D.Double(Math.sin(a) * len,
-                Math.cos(a) * len);
-        if (aView.getParent() instanceof CentreView) {
-            c.x += (int) (Math.sin(a) * ((CentreView)aView.getParent()).ROOT_RADIUS_X);
-            c.y -= (int) (Math.cos(a) * ((CentreView)aView.getParent()).ROOT_RADIUS_Y);
-        }
-        Point s = aView.getView(c, p);
-        for (IdeaView subView : aView.getSubViews()) {
-            initFromTo(s, a, subView);
-        }
-        if (aView instanceof BranchView) {
-            ((BranchView)aView).setFromPoint(c);
-            ((BranchView)aView).setToPoint(s);
-        }
     }
     
     private void paintBezier(Graphics g, Point[] coordlist) {
