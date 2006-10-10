@@ -39,6 +39,8 @@ import dg.hipster.model.IdeaDocument;
 import dg.hipster.model.Idea;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.HashMap;
+import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Transformer;
@@ -57,24 +59,25 @@ import org.w3c.dom.Element;
 public final class OPMLWriter implements IdeaWriter {
     private DocumentBuilder db;
     private Writer out;
-
+    
     public OPMLWriter(Writer out) {
         this.out = out;
     }
-
+    
     public void write(IdeaDocument document) throws IOException {
         save(document);
         out.flush();
         out.close();
     }
-
+    
     private void save(final IdeaDocument document) throws IOException {
         Idea idea = document.getIdea();
+        index(idea);
         try {
-
+            
             db = DocumentBuilderFactory.newInstance(
                     ).newDocumentBuilder();
-
+            
             Document xmlDocument = db.newDocument();
             xmlDocument.setXmlVersion("1.0");
             Element opml = xmlDocument.createElement("opml");
@@ -87,7 +90,7 @@ public final class OPMLWriter implements IdeaWriter {
             Element body = xmlDocument.createElement("body");
             opml.appendChild(body);
             appendIdea(xmlDocument, body, idea);
-
+            
             Transformer transformer = null;
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             try {
@@ -106,10 +109,12 @@ public final class OPMLWriter implements IdeaWriter {
             e.printStackTrace();
         }
     }
-
+    
     private void appendIdea(Document document, Element element, Idea idea) throws IOException {
         Element ideaElement = document.createElement("outline");
+        int i = ideaIndex.get(idea);
         ideaElement.setAttribute("text", idea.getText());
+        ideaElement.setAttribute("id", "" + i);
         ideaElement.setAttribute("angle", "" + idea.getAngle());
         String notes = idea.getNotes();
         if ((notes != null) && (notes.length() != 0)) {
@@ -118,6 +123,34 @@ public final class OPMLWriter implements IdeaWriter {
         element.appendChild(ideaElement);
         for (Idea subIdea: idea.getSubIdeas()) {
             appendIdea(document, ideaElement, subIdea);
+        }
+        for (Idea link: idea.getLinks()) {
+            appendLink(document, ideaElement, idea, link);
+        }
+    }
+    
+    private void appendLink(Document document, Element element, Idea idea, Idea link) throws IOException {
+        Element linkElement = document.createElement("outline");
+        int i = ideaIndex.get(idea);
+        linkElement.setAttribute("text", link.getText());
+        linkElement.setAttribute("type", "link");
+        linkElement.setAttribute("url", "#" + ideaIndex.get(link));
+        element.appendChild(linkElement);
+    }
+    
+    private Map<Idea, Integer> ideaIndex;
+    int count;
+    
+    private void index(Idea idea) {
+        ideaIndex = new HashMap<Idea, Integer>();
+        count = 0;
+        indexWithSubs(idea);
+    }
+    
+    private void indexWithSubs(Idea idea) {
+        ideaIndex.put(idea, count++);
+        for (Idea subIdea : idea.getSubIdeas()) {
+            indexWithSubs(subIdea);
         }
     }
 }

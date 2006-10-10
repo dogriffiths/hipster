@@ -58,16 +58,16 @@ public class BranchView extends IdeaView {
      * Default width of the stroke used to render branches.
      */
     public static final float DEFAULT_STROKE_WIDTH = 20.0f;
-
+    
     /** Creates a new instance of BranchView */
     public BranchView() {
         this(null);
     }
-
+    
     public BranchView(Idea anIdea) {
         super(anIdea);
     }
-
+    
     void paint(final Graphics g, final Point c2,
             final double initAngle, final int depth,
             final IdeaMap map, final CentreView rootView, final IdeaView aView) {
@@ -118,7 +118,7 @@ public class BranchView extends IdeaView {
         drawString((Graphics2D)g, this.getIdea().getText(), midp, 4,
                 textAngle, this.isEditing(), map);
     }
-
+    
     private void paintLinks(final Point c, final CentreView rootView, final Point s, final Graphics g) {
         Point2D start0 = s;
         Point2D end0 = c;
@@ -133,31 +133,31 @@ public class BranchView extends IdeaView {
             }
         }
     }
-
+    
     private void drawCurve(final Graphics g, final Point2D start0,
             final Point2D end0, final Point2D start1, final Point2D end1) {
         if ((start1 != null) && (end1 != null)
         && (start0 != null) && (end0 != null)) {
             Point[] p = new Point[4];
-
+            
             Point s0 = intPoint(start0);
             Point s1 = intPoint(start1);
             Point e0 = intPoint(end0);
             Point e1 = intPoint(end1);
-
+            
             Point v0 = minus(s0, e0);
             Point v1 = minus(s1, e1);
             Point n0 = normal(v0);
             Point n1 = normal(v1);
-
+            
             p[0] = mid(s0, e0);
             p[3] = mid(s1, e1);
-
+            
             p[1] = plus(p[0], n0);
             if (dot(minus(s0, p[1]), n0) * dot(minus(s0, s1), n0) < 0) {
                 p[1] = minus(p[0], n0);
             }
-
+            
             p[2] = plus(p[3], n1);
             if (dot(minus(s1, p[2]), n1) * dot(minus(s1, s0), n1) < 0) {
                 p[2] = minus(p[3], n1);
@@ -165,31 +165,31 @@ public class BranchView extends IdeaView {
             paintBezier(g, p);
         }
     }
-
+    
     private static Point normal(Point p) {
         return new Point(-p.y, p.x);
     }
-
+    
     private static int dot(Point p0, Point p1) {
         return p0.x * p1.x + p0.y * p1.y;
     }
-
+    
     private static Point plus(Point p0, Point p1) {
         return new Point(p0.x + p1.x, p0.y + p1.y);
     }
-
+    
     private static Point minus(Point p0, Point p1) {
         return new Point(p0.x - p1.x, p0.y - p1.y);
     }
-
+    
     private static Point intPoint(Point2D p) {
         return new Point((int) p.getX(), (int) p.getY());
     }
-
+    
     private static Point mid(Point p0, Point p1) {
         return new Point((p0.x + p1.x) / 2, (p0.y + p1.y) / 2);
     }
-
+    
     boolean hits(Point2D p) {
         Point2D fromPoint = this.getFromPoint();
         Point2D toPoint = this.getToPoint();
@@ -202,59 +202,96 @@ public class BranchView extends IdeaView {
         double vy1 = toPoint.getY();
         double vx2 = p.getX();
         double vy2 = p.getY();
-
+        
         double minX = Math.min(vx0, vx1) - thickness / 2;
         double maxX = Math.max(vx0, vx1) + thickness / 2;
         double minY = Math.min(vy0, vy1) - thickness / 2;
         double maxY = Math.max(vy0, vy1) + thickness / 2;
-
+        
         if ((vx2 > maxX) || (vx2 < minX)) {
             return false;
         }
         if ((vy2 > maxY) || (vy2 < minY)) {
             return false;
         }
-
+        
         // Calculate magnitude of the normal to the line-segment
         double magNormal = Math.sqrt(
                 ((vx1 - vx0) * (vx1 - vx0)) + ((vy1 - vy0) * (vy1 - vy0))
                 );
-
+        
         // Calculate (signed) distance of the point from the line-segment
         double distance = (
                 ((vx2 - vx0) * (vy0 - vy1)) + ((vy2 - vy0) * (vx1 - vx0))
                 ) / magNormal;
-
+        
         // Check if the
         if (Math.abs(distance) <= (thickness / 2)) {
             return true;
         }
         return false;
     }
-
+    
     void setFromPoint(Point2D f) {
         this.fromPoint = f;
     }
-
+    
     public Point2D getFromPoint() {
+        if ((fromPoint == null) || (toPoint == null)) {
+            initFromTo();
+        }
         return this.fromPoint;
     }
-
+    
     void setToPoint(Point2D t) {
         this.toPoint = t;
     }
-
+    
     public Point2D getToPoint() {
+        if ((fromPoint == null) || (toPoint == null)) {
+            initFromTo();
+        }
         return this.toPoint;
     }
-
+    
     public Point2D getMidPoint() {
+        if ((fromPoint == null) || (toPoint == null)) {
+            initFromTo();
+        }
         return new Point2D.Double(
                 (fromPoint.getX() + toPoint.getX()) / 2,
                 (fromPoint.getY() + toPoint.getY()) / 2
                 );
     }
-
+    
+    private void initFromTo() {
+        for (IdeaView subView : getRootView().getSubViews()) {
+            initFromTo(new Point(0, 0), 0.0, subView);
+        }
+    }
+    
+    private static void initFromTo(final Point c2,
+            final double initAngle, final IdeaView aView) {
+        Point c = new Point(c2.x, c2.y);
+        double a = aView.getIdea().getAngle() + initAngle;
+        aView.setRealAngle(a);
+        double len = aView.getIdea().getLength();
+        Point2D p = new Point2D.Double(Math.sin(a) * len,
+                Math.cos(a) * len);
+        if (aView.getParent() instanceof CentreView) {
+            c.x += (int) (Math.sin(a) * ((CentreView)aView.getParent()).ROOT_RADIUS_X);
+            c.y -= (int) (Math.cos(a) * ((CentreView)aView.getParent()).ROOT_RADIUS_Y);
+        }
+        Point s = aView.getView(c, p);
+        for (IdeaView subView : aView.getSubViews()) {
+            initFromTo(s, a, subView);
+        }
+        if (aView instanceof BranchView) {
+            ((BranchView)aView).setFromPoint(c);
+            ((BranchView)aView).setToPoint(s);
+        }
+    }
+    
     private void paintBezier(Graphics g, Point[] coordlist) {
         double x1,x2,y1,y2;
         x1 = coordlist[0].x;

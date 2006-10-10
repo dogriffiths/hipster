@@ -44,6 +44,7 @@ public class OPMLWriterTest extends TestCase {
         idea.add(subIdea0WithQuotes);
         Idea subIdea1 = new Idea("Test");
         idea.add(subIdea1);
+        subIdea0WithQuotes.addLink(subIdea1);
         
         ByteArrayOutputStream out = new ByteArrayOutputStream(1024);
         
@@ -62,9 +63,11 @@ public class OPMLWriterTest extends TestCase {
                 + "<title/>"
                 + "</head>"
                 + "<body>"
-                + "<outline angle=\"0.0\" text=\"R&amp;D\">"
-                + "<outline angle=\"0.0\" text=\"&quot;Idea&quot;\"/>"
-                + "<outline angle=\"0.0\" text=\"Test\"/>"
+                + "<outline angle=\"0.0\" id=\"0\" text=\"R&amp;D\">"
+                + "<outline angle=\"0.0\" id=\"1\" text=\"&quot;Idea&quot;\">"
+                + "<outline text=\"Test\" type=\"link\" url=\"#2\"/>"
+                + "</outline>"
+                + "<outline angle=\"0.0\" id=\"2\" text=\"Test\"/>"
                 + "</outline>"
                 + "</body>"
                 + "</opml>";

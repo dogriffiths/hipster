@@ -38,6 +38,10 @@ package dg.hipster.io;
 import dg.hipster.model.IdeaDocument;
 import dg.hipster.model.Idea;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -54,6 +58,10 @@ public final class OPMLReader extends DefaultHandler implements IdeaReader {
     private Idea current;
     private boolean anglesRead = false;
     private Stack<Idea> stack = new Stack<Idea>();
+    private Map<Integer, Idea> ideaIndex = new HashMap<Integer, Idea>();
+    private List<Idea> links = new ArrayList<Idea>();
+    private List<Integer> linkTos = new ArrayList<Integer>();
+    
     public void startElement(String namespaceURI,
             String sName, // simple name (localName)
             String qName, // qualified name
@@ -61,31 +69,51 @@ public final class OPMLReader extends DefaultHandler implements IdeaReader {
             throws SAXException {
         if ("outline".equals(qName)) {
             if (attrs != null) {
-                String text = attrs.getValue("text");
-                Idea i = new Idea(text);
-                String notes = attrs.getValue("notes");
-                if (notes == null) {
-                    notes = "";
-                }
-                i.setNotes(notes);
-                String angleString = attrs.getValue("angle");
-                if ((angleString != null) && (angleString.length() > 0)) {
-                    i.setAngle(Double.valueOf(angleString));
-                    anglesRead = true;
-                }
-                if (idea == null) {
-                    idea = i;
-                } else if (current != null) {
-                    current.add(i);
+                String type = attrs.getValue("type");
+                if (type != null) {
+                    type = type.toUpperCase();
                 } else {
-                    Idea i2 = new Idea("root");
-                    i2.add(idea);
-                    idea = i2;
-                    stack.push(idea);
-                    idea.add(i);
+                    type = "";
                 }
-                current = i;
-                stack.push(current);
+                if (!type.equals("LINK")) {
+                    String text = attrs.getValue("text");
+                    Idea i = new Idea(text);
+                    String id = attrs.getValue("id");
+                    if ((id != null) && (id.length() > 0)) {
+                        ideaIndex.put(new Integer(id), i);
+                    }
+                    String notes = attrs.getValue("notes");
+                    if (notes == null) {
+                        notes = "";
+                    }
+                    i.setNotes(notes);
+                    String angleString = attrs.getValue("angle");
+                    if ((angleString != null) && (angleString.length() > 0)) {
+                        i.setAngle(Double.valueOf(angleString));
+                        anglesRead = true;
+                    }
+                    if (idea == null) {
+                        idea = i;
+                    } else if (current != null) {
+                        current.add(i);
+                    } else {
+                        Idea i2 = new Idea("root");
+                        i2.add(idea);
+                        idea = i2;
+                        stack.push(idea);
+                        idea.add(i);
+                    }
+                    current = i;
+                    stack.push(current);
+                } else {
+                    String url = attrs.getValue("url");
+                    if (url.startsWith("#")) {
+                        String indexNo = url.substring(1);
+                        links.add(current);
+                        linkTos.add(new Integer(indexNo));
+                    }
+                    stack.push(null);
+                }
             }
         }
     }
@@ -107,10 +135,21 @@ public final class OPMLReader extends DefaultHandler implements IdeaReader {
         try {
             SAXParser p = SAXParserFactory.newInstance().newSAXParser();
             p.parse(in, this);
+            addLinks();
         } catch(Exception e) {
             throw new ReaderException("Unable to read OPML", e);
         }
     }
+    
+    private void addLinks() {
+        for (int i = 0; i < links.size(); i++) {
+            Idea linkFrom = links.get(i);
+            int linkIndex = linkTos.get(i);
+            Idea linkTo = ideaIndex.get(linkIndex);
+            linkFrom.addLink(linkTo);
+        }
+    }
+    
     public IdeaDocument getDocument() {
         IdeaDocument document = new IdeaDocument();
         document.setIdea(idea);
