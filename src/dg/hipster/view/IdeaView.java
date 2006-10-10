@@ -243,9 +243,6 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
             final IdeaView aView, final double initAngle,
             final int depth,
             final IdeaMap map, final CentreView rootView) {
-        if (this == getRootView()) {
-            initFromTo();
-        }
         List<BranchView> views = aView.getSubViews();
         synchronized(views) {
             for (BranchView view: views) {
@@ -394,33 +391,5 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
     
     public double getRealAngle() {
         return this.realAngle;
-    }
-    
-    private void initFromTo() {
-        for (IdeaView subView : getRootView().getSubViews()) {
-            initFromTo(new Point(0, 0), 0.0, subView);
-        }
-    }
-    
-    private static void initFromTo(final Point c2,
-            final double initAngle, final IdeaView aView) {
-        Point c = new Point(c2.x, c2.y);
-        double a = aView.getIdea().getAngle() + initAngle;
-        aView.setRealAngle(a);
-        double len = aView.getIdea().getLength();
-        Point2D p = new Point2D.Double(Math.sin(a) * len,
-                Math.cos(a) * len);
-        if (aView.getParent() instanceof CentreView) {
-            c.x += (int) (Math.sin(a) * ((CentreView)aView.getParent()).ROOT_RADIUS_X);
-            c.y -= (int) (Math.cos(a) * ((CentreView)aView.getParent()).ROOT_RADIUS_Y);
-        }
-        Point s = aView.getView(c, p);
-        for (IdeaView subView : aView.getSubViews()) {
-            initFromTo(s, a, subView);
-        }
-        if (aView instanceof BranchView) {
-            ((BranchView)aView).setFromPoint(c);
-            ((BranchView)aView).setToPoint(s);
-        }
     }
 }
