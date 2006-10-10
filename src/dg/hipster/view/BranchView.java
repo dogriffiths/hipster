@@ -106,6 +106,103 @@ public class BranchView extends IdeaView {
                 textAngle, this.isEditing(), map);
     }
     
+    boolean hits(Point2D p) {
+        Point2D fromPoint = this.getFromPoint();
+        Point2D toPoint = this.getToPoint();
+        if ((fromPoint == null) || (toPoint == null)) {
+            return false;
+        }
+        double vx0 = fromPoint.getX();
+        double vy0 = fromPoint.getY();
+        double vx1 = toPoint.getX();
+        double vy1 = toPoint.getY();
+        double vx2 = p.getX();
+        double vy2 = p.getY();
+        
+        double minX = Math.min(vx0, vx1) - thickness / 2;
+        double maxX = Math.max(vx0, vx1) + thickness / 2;
+        double minY = Math.min(vy0, vy1) - thickness / 2;
+        double maxY = Math.max(vy0, vy1) + thickness / 2;
+        
+        if ((vx2 > maxX) || (vx2 < minX)) {
+            return false;
+        }
+        if ((vy2 > maxY) || (vy2 < minY)) {
+            return false;
+        }
+        
+        // Calculate magnitude of the normal to the line-segment
+        double magNormal = Math.sqrt(
+                ((vx1 - vx0) * (vx1 - vx0)) + ((vy1 - vy0) * (vy1 - vy0))
+                );
+        
+        // Calculate (signed) distance of the point from the line-segment
+        double distance = (
+                ((vx2 - vx0) * (vy0 - vy1)) + ((vy2 - vy0) * (vx1 - vx0))
+                ) / magNormal;
+        
+        // Check if the
+        if (Math.abs(distance) <= (thickness / 2)) {
+            return true;
+        }
+        return false;
+    }
+    
+    void setFromPoint(Point2D f) {
+        this.fromPoint = f;
+    }
+    
+    public Point2D getFromPoint() {
+        return this.fromPoint;
+    }
+    
+    void setToPoint(Point2D t) {
+        this.toPoint = t;
+    }
+    
+    public Point2D getToPoint() {
+        return this.toPoint;
+    }
+    
+    private void paintBezier(Graphics g, Point[] coordlist) {
+        double x1,x2,y1,y2;
+        x1 = coordlist[0].x;
+        y1 = coordlist[0].y;
+        double k = 0.025;
+        for(double t = k;t <= 1 + k;t += k){
+            x2=(coordlist[0].x + t * (-coordlist[0].x * 3 + t * (3 * coordlist[0].x
+                    - coordlist[0].x * t)))+t*(3*coordlist[1].x+t*(-6*coordlist[1].x+
+                    coordlist[1].x*3*t))+t*t*(coordlist[2].x*3-coordlist[2].x*3*t)+
+                    coordlist[3].x*t*t*t;
+            y2=(coordlist[0].y+t*(-coordlist[0].y*3+t*(3*coordlist[0].y-
+                    coordlist[0].y*t)))+t*(3*coordlist[1].y+t*(-6*coordlist[1].y+
+                    coordlist[1].y*3*t))+t*t*(coordlist[2].y*3-coordlist[2].y*3*t)+
+                    coordlist[3].y*t*t*t;
+            g.drawLine((int) x1,(int) y1,(int) x2,(int) y2);
+            x1 = x2;
+            y1 = y2;
+        }
+    }
+    
+    void initFromTo(final Point c, final double initAngle) {
+        double a = this.getIdea().getAngle() + initAngle;
+        this.setRealAngle(a);
+        double len = this.getIdea().getLength();
+        Point2D p = new Point2D.Double(Math.sin(a) * len,
+                Math.cos(a) * len);
+        Point s = this.getView(c, p);
+        for (BranchView subView : this.getSubViews()) {
+            subView.initFromTo(s, a);
+        }
+        this.setFromPoint(c);
+        this.setToPoint(s);
+    }
+    
+    
+    //
+    // Links code
+    //
+    
     void paintLinks(final Graphics g) {
         IdeaView rootView = getRootView();
         Stroke oldStroke = ((Graphics2D)g).getStroke();
@@ -123,6 +220,9 @@ public class BranchView extends IdeaView {
                 drawCurve(g, fromPoint, toPoint, start1, end1);
                 ((Graphics2D)g).setStroke(oldStroke);
             }
+        }
+        for (BranchView branch : this.getSubViews()) {
+            branch.paintLinks(g);
         }
     }
     
@@ -182,102 +282,10 @@ public class BranchView extends IdeaView {
         return new Point((p0.x + p1.x) / 2, (p0.y + p1.y) / 2);
     }
     
-    boolean hits(Point2D p) {
-        Point2D fromPoint = this.getFromPoint();
-        Point2D toPoint = this.getToPoint();
-        if ((fromPoint == null) || (toPoint == null)) {
-            return false;
-        }
-        double vx0 = fromPoint.getX();
-        double vy0 = fromPoint.getY();
-        double vx1 = toPoint.getX();
-        double vy1 = toPoint.getY();
-        double vx2 = p.getX();
-        double vy2 = p.getY();
-        
-        double minX = Math.min(vx0, vx1) - thickness / 2;
-        double maxX = Math.max(vx0, vx1) + thickness / 2;
-        double minY = Math.min(vy0, vy1) - thickness / 2;
-        double maxY = Math.max(vy0, vy1) + thickness / 2;
-        
-        if ((vx2 > maxX) || (vx2 < minX)) {
-            return false;
-        }
-        if ((vy2 > maxY) || (vy2 < minY)) {
-            return false;
-        }
-        
-        // Calculate magnitude of the normal to the line-segment
-        double magNormal = Math.sqrt(
-                ((vx1 - vx0) * (vx1 - vx0)) + ((vy1 - vy0) * (vy1 - vy0))
-                );
-        
-        // Calculate (signed) distance of the point from the line-segment
-        double distance = (
-                ((vx2 - vx0) * (vy0 - vy1)) + ((vy2 - vy0) * (vx1 - vx0))
-                ) / magNormal;
-        
-        // Check if the
-        if (Math.abs(distance) <= (thickness / 2)) {
-            return true;
-        }
-        return false;
-    }
-    
-    void setFromPoint(Point2D f) {
-        this.fromPoint = f;
-    }
-    
-    public Point2D getFromPoint() {
-        return this.fromPoint;
-    }
-    
-    void setToPoint(Point2D t) {
-        this.toPoint = t;
-    }
-    
-    public Point2D getToPoint() {
-        return this.toPoint;
-    }
-    
     public Point2D getMidPoint() {
         return new Point2D.Double(
                 (fromPoint.getX() + toPoint.getX()) / 2,
                 (fromPoint.getY() + toPoint.getY()) / 2
                 );
-    }
-    
-    private void paintBezier(Graphics g, Point[] coordlist) {
-        double x1,x2,y1,y2;
-        x1 = coordlist[0].x;
-        y1 = coordlist[0].y;
-        double k = 0.025;
-        for(double t = k;t <= 1 + k;t += k){
-            x2=(coordlist[0].x + t * (-coordlist[0].x * 3 + t * (3 * coordlist[0].x
-                    - coordlist[0].x * t)))+t*(3*coordlist[1].x+t*(-6*coordlist[1].x+
-                    coordlist[1].x*3*t))+t*t*(coordlist[2].x*3-coordlist[2].x*3*t)+
-                    coordlist[3].x*t*t*t;
-            y2=(coordlist[0].y+t*(-coordlist[0].y*3+t*(3*coordlist[0].y-
-                    coordlist[0].y*t)))+t*(3*coordlist[1].y+t*(-6*coordlist[1].y+
-                    coordlist[1].y*3*t))+t*t*(coordlist[2].y*3-coordlist[2].y*3*t)+
-                    coordlist[3].y*t*t*t;
-            g.drawLine((int) x1,(int) y1,(int) x2,(int) y2);
-            x1 = x2;
-            y1 = y2;
-        }
-    }
-    
-    void initFromTo(final Point c, final double initAngle) {
-        double a = this.getIdea().getAngle() + initAngle;
-        this.setRealAngle(a);
-        double len = this.getIdea().getLength();
-        Point2D p = new Point2D.Double(Math.sin(a) * len,
-                Math.cos(a) * len);
-        Point s = this.getView(c, p);
-        for (BranchView subView : this.getSubViews()) {
-            subView.initFromTo(s, a);
-        }
-        this.setFromPoint(c);
-        this.setToPoint(s);
     }
 }
