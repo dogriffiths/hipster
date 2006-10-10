@@ -241,12 +241,11 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
     
     void paintBranches(final Graphics g, final Point c2,
             final IdeaView aView, final double initAngle,
-            final int depth,
-            final IdeaMap map, final CentreView rootView) {
+            final int depth, final IdeaMap map) {
         List<BranchView> views = aView.getSubViews();
         synchronized(views) {
             for (BranchView view: views) {
-                view.paint(g, c2, initAngle, depth, map, rootView, aView);
+                view.paint(g, depth, map);
             }
         }
     }

@@ -61,7 +61,7 @@ public class CentreView extends IdeaView {
     
     public void paint(Graphics g, IdeaMap map) {
         initFromTo();
-        paintBranches(g, new Point(0, 0), this, getIdea().getAngle(), 0, map, this);
+        paintBranches(g, new Point(0, 0), this, getIdea().getAngle(), 0, map);
         Color colour = Color.WHITE;
         if (this.isSelected()) {
             colour = invert(colour);
@@ -87,30 +87,13 @@ public class CentreView extends IdeaView {
     }
     
     private void initFromTo() {
-        for (IdeaView subView : getRootView().getSubViews()) {
-            initFromTo(new Point(0, 0), 0.0, subView);
-        }
-    }
-    
-    private static void initFromTo(final Point c2,
-            final double initAngle, final IdeaView aView) {
-        Point c = new Point(c2.x, c2.y);
-        double a = aView.getIdea().getAngle() + initAngle;
-        aView.setRealAngle(a);
-        double len = aView.getIdea().getLength();
-        Point2D p = new Point2D.Double(Math.sin(a) * len,
-                Math.cos(a) * len);
-        if (aView.getParent() instanceof CentreView) {
-            c.x += (int) (Math.sin(a) * ((CentreView)aView.getParent()).ROOT_RADIUS_X);
-            c.y -= (int) (Math.cos(a) * ((CentreView)aView.getParent()).ROOT_RADIUS_Y);
-        }
-        Point s = aView.getView(c, p);
-        for (IdeaView subView : aView.getSubViews()) {
-            initFromTo(s, a, subView);
-        }
-        if (aView instanceof BranchView) {
-            ((BranchView)aView).setFromPoint(c);
-            ((BranchView)aView).setToPoint(s);
+        for (BranchView subView : getSubViews()) {
+            double a = subView.getIdea().getAngle();
+            Point start = new Point(
+                    (int) (Math.sin(a) * this.ROOT_RADIUS_X),
+                    (int) (-Math.cos(a) * this.ROOT_RADIUS_Y)
+                    );
+            subView.initFromTo(start, 0.0);
         }
     }
 }

@@ -68,29 +68,17 @@ public class BranchView extends IdeaView {
         super(anIdea);
     }
     
-    void paint(final Graphics g, final Point c2,
-            final double initAngle, final int depth,
-            final IdeaMap map, final CentreView rootView, final IdeaView aView) {
-        Point c = new Point(c2.x, c2.y);
-        double a = this.getIdea().getAngle() + initAngle;
-        setRealAngle(a);
-        double len = this.getIdea().getLength();
-        Point2D p = new Point2D.Double(Math.sin(a) * len,
-                Math.cos(a) * len);
-        if (aView instanceof CentreView) {
-            c.x += (int) (Math.sin(a) * rootView.ROOT_RADIUS_X);
-            c.y -= (int) (Math.cos(a) * rootView.ROOT_RADIUS_Y);
-        }
-        Point s = getView(c, p);
-        paintBranches(g, s, this, a, depth + 1, map, rootView);
+    void paint(final Graphics g, final int depth, final IdeaMap map) {
+        double a = getRealAngle();
+        Point c = new Point((int)fromPoint.getX(), (int)fromPoint.getY());
+        Point s = new Point((int)toPoint.getX(), (int)toPoint.getY());
+        paintBranches(g, s, this, a, depth + 1, map);
         Color colour = COLOURS[depth % COLOURS.length];
         if (this.isSelected()) {
             colour = invert(colour);
         }
         Color upper = colour.brighter().brighter();
         Color lower = colour.darker().darker();
-        setFromPoint(c);
-        setToPoint(s);
         Stroke oldStroke = ((Graphics2D)g).getStroke();
         float strokeWidth = DEFAULT_STROKE_WIDTH - (depth * 2);
         if (strokeWidth < (DEFAULT_STROKE_WIDTH / 2)) {
@@ -106,7 +94,7 @@ public class BranchView extends IdeaView {
         g.drawLine(c.x, c.y - 1, s.x, s.y - 1);
         g.setColor(colour);
         g.drawLine(c.x, c.y, s.x, s.y);
-        paintLinks(c, rootView, s, g);
+        paintLinks(c, s, g);
         ((Graphics2D)g).setStroke(oldStroke);
         if (this.isSelected()) {
             g.setColor(Color.WHITE);
@@ -119,9 +107,11 @@ public class BranchView extends IdeaView {
                 textAngle, this.isEditing(), map);
     }
     
-    private void paintLinks(final Point c, final CentreView rootView, final Point s, final Graphics g) {
+    private void paintLinks(final Point c,
+            final Point s, final Graphics g) {
         Point2D start0 = s;
         Point2D end0 = c;
+        IdeaView rootView = getRootView();
         for (Idea link: this.getIdea().getLinks()) {
             IdeaView linkView = rootView.getViewFor(link);
             if ((linkView != null) && (linkView instanceof BranchView)) {
@@ -273,5 +263,19 @@ public class BranchView extends IdeaView {
             x1 = x2;
             y1 = y2;
         }
+    }
+    
+    void initFromTo(final Point c, final double initAngle) {
+        double a = this.getIdea().getAngle() + initAngle;
+        this.setRealAngle(a);
+        double len = this.getIdea().getLength();
+        Point2D p = new Point2D.Double(Math.sin(a) * len,
+                Math.cos(a) * len);
+        Point s = this.getView(c, p);
+        for (BranchView subView : this.getSubViews()) {
+            subView.initFromTo(s, a);
+        }
+        this.setFromPoint(c);
+        this.setToPoint(s);
     }
 }
