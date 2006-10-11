@@ -258,6 +258,13 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
                 hit = hit2;
             }
         }
+        if (hit == null) {
+            for (LinkView linkView : linkViews) {
+                if (linkView.hits(p)) {
+                    return linkView;
+                }
+            }
+        }
         return hit;
     }
     
@@ -309,7 +316,7 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
     /**
      * Search this view and it's child-views and return any that have
      * an aLink matching the one given.
-     * 
+     *
      * @param anIdea aLink we are looking for.
      * @return view matching the aLink, or null if none.
      */

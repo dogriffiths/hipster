@@ -35,19 +35,21 @@
 
 package dg.hipster;
 
+import java.awt.geom.Point2D;
+
 
 /**
  * Functions that may be useful in various classes.
  * @author dgriffiths
  */
 public final class Utilities {
-
+    
     /**
      * Creates a new instance of Utilities.
      */
     private Utilities() {
     }
-
+    
     /**
      * Whether two objects are equal, without throwing
      * a null pointer exception.
@@ -63,5 +65,53 @@ public final class Utilities {
             return false;
         }
         return object0.equals(object1);
+    }
+    
+    /**
+     * Whether a point is on a line of a given thickness.
+     *@param p point in question.
+     *@param fromPoint one end of line.
+     *@param toPoint other end of line.
+     *@param thickness thickness of the line.
+     */
+    public static boolean hitsLine(final Point2D p, final Point2D fromPoint,
+            final Point2D toPoint, final double thickness) {
+        if ((fromPoint == null) || (toPoint == null)) {
+            return false;
+        }
+        double vx0 = fromPoint.getX();
+        double vy0 = fromPoint.getY();
+        double vx1 = toPoint.getX();
+        double vy1 = toPoint.getY();
+        double vx2 = p.getX();
+        double vy2 = p.getY();
+        
+        double minX = Math.min(vx0, vx1) - thickness / 2;
+        double maxX = Math.max(vx0, vx1) + thickness / 2;
+        double minY = Math.min(vy0, vy1) - thickness / 2;
+        double maxY = Math.max(vy0, vy1) + thickness / 2;
+        
+        if ((vx2 > maxX) || (vx2 < minX)) {
+            return false;
+        }
+        if ((vy2 > maxY) || (vy2 < minY)) {
+            return false;
+        }
+        
+        // Calculate magnitude of the normal to the line-segment
+        double magNormal = Math.sqrt(
+                ((vx1 - vx0) * (vx1 - vx0)) + ((vy1 - vy0) * (vy1 - vy0))
+                );
+        
+        // Calculate (signed) distance of the point from the line-segment
+        double distance = (
+                ((vx2 - vx0) * (vy0 - vy1)) + ((vy2 - vy0) * (vx1 - vx0))
+                ) / magNormal;
+        
+        // Check if the
+        if (Math.abs(distance) <= (thickness / 2)) {
+            return true;
+        }
+        return false;
     }
 }
