@@ -205,25 +205,34 @@ public class BranchView extends IdeaView {
     
     void paintLinks(final Graphics g) {
         IdeaView rootView = getRootView();
-        Stroke oldStroke = ((Graphics2D)g).getStroke();
-        float strokeWidth = DEFAULT_STROKE_WIDTH / 2;
-        Stroke stroke = new BasicStroke(strokeWidth,
-                BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL);
         for (Idea link: this.getIdea().getLinks()) {
             IdeaView linkView = rootView.getViewFor(link);
             if ((linkView != null) && (linkView instanceof BranchView)) {
-                BranchView branch = (BranchView) linkView;
-                g.setColor(Color.GRAY);
-                Point2D start1 = branch.getFromPoint();
-                Point2D end1 = branch.getEndPoint();
-                ((Graphics2D)g).setStroke(stroke);
-                drawCurve(g, fromPoint, toPoint, start1, end1);
-                ((Graphics2D)g).setStroke(oldStroke);
+                paintLink(g, linkView);
             }
         }
         for (BranchView branch : this.getSubViews()) {
             branch.paintLinks(g);
         }
+    }
+
+    private void paintLink(final Graphics g, final IdeaView linkView) {
+        BranchView branch = (BranchView) linkView;
+        Stroke oldStroke = ((Graphics2D)g).getStroke();
+        float strokeWidth = DEFAULT_STROKE_WIDTH / 2;
+        Stroke stroke = new BasicStroke(strokeWidth,
+                BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL);
+        g.setColor(Color.GRAY);
+        Point2D start1 = branch.getFromPoint();
+        Point2D end1 = branch.getEndPoint();
+        ((Graphics2D)g).setStroke(stroke);
+        drawCurve(g, fromPoint, toPoint, start1, end1);
+        ((Graphics2D)g).setStroke(oldStroke);
+        int circleRadius = (int)(DEFAULT_STROKE_WIDTH * 3 / 4);
+        Point2D midPoint = this.getMidPoint();
+        g.fillOval((int)midPoint.getX() - circleRadius,
+                (int)midPoint.getY() - circleRadius,
+                circleRadius * 2, circleRadius * 2);
     }
     
     private void drawCurve(final Graphics g, final Point2D start0,
