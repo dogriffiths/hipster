@@ -83,17 +83,17 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
      */
     protected static ResourceBundle resBundle = ResourceBundle.getBundle(
             "dg/hipster/resource/strings");
-    
+
     /**
      * Main idea processor component.
      */
     private IdeaMap ideaMap;
     //private IdeaDocument document;
-    
+
     /** Creates a new instance of Mainframe */
     public Mainframe() {
         super();
-        
+
         Settings s = Settings.getInstance();
         setBounds(s.getWindowLeft(), s.getWindowTop(),
                 s.getWindowWidth(), s.getWindowHeight());
@@ -105,7 +105,7 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
             e.printStackTrace();
         }
     }
-    
+
     /**
      * Lay the window out.
      */
@@ -120,7 +120,7 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
         this.setJMenuBar(createMenu());
         this.setIconImage(createIcon());
     }
-    
+
     private Image createIcon() {
         String imageName = "/dg/hipster/resource/hipster_icon.png";
         java.net.URL url = getClass().getResource(imageName);
@@ -129,7 +129,7 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
         }
         return Toolkit.getDefaultToolkit().getImage(url);
     }
-    
+
     private JMenuBar createMenu() {
         XMLMenuBar menuBar = new XMLMenuBar(this,
                 "/dg/hipster/view/mainframeMenu.xml", resBundle);
@@ -158,13 +158,13 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
         }
         return menuBar;
     }
-    
+
     /**
      * Set up the data.
      */
     private void buildModel() {
     }
-    
+
     public void setDocument(final IdeaDocument document) {
         document.addPropertyChangeListener(this);
         this.ideaMap.setDocument(document);
@@ -176,26 +176,26 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
         }
         resetView();
     }
-    
+
     private IdeaDocument getDocument() {
         return this.ideaMap.getDocument();
     }
-    
+
     public void setDirty(boolean dirty) {
         this.getRootPane().putClientProperty("windowModified",
                 Boolean.valueOf(dirty));
     }
-    
+
     public IdeaMap getIdeaMap() {
         return this.ideaMap;
     }
-    
+
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getSource() == this.getDocument()) {
             this.documentUpdated();
         }
     }
-    
+
     private void documentUpdated() {
         String docTitle = this.getDocument().getTitle();
         if (Main.isMac()) {
@@ -206,23 +206,23 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
         }
         this.setDirty(this.getDocument().isDirty());
     }
-    
+
     public void zoomIn() {
         ideaMap.zoomIn();
     }
-    
+
     public void zoomOut() {
         ideaMap.zoomOut();
     }
-    
+
     public void editSelected() {
         ideaMap.edit();
     }
-    
+
     public void unEditSelected() {
         ideaMap.unEdit();
     }
-    
+
     public void newDocument() throws IOException, ReaderException {
         if (!checkIfSave()) {
             return;
@@ -230,7 +230,7 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
         this.setDocument(new IdeaDocument());
         this.editSelected();
     }
-    
+
     public void openDocument() throws IOException, ReaderException {
         if (!checkIfSave()) {
             return;
@@ -238,18 +238,18 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
         FileDialog chooser = new FileDialog(this,
                 resBundle.getString("open.opml.file"),
                 FileDialog.LOAD);
-        
+
         chooser.setFilenameFilter(new FilenameFilter(){
             public boolean accept(File directory, String file) {
                 String filename = file.toUpperCase();
                 return filename.endsWith(".OPML");
             }
         });
-        
+
         chooser.setVisible(true);
-        
+
         String filename = chooser.getFile();
-        
+
         if (filename != null) {
             String absPath = chooser.getDirectory() + chooser.getFile();
             ReaderFactory factory = ReaderFactory.getInstance();
@@ -257,15 +257,15 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
             this.setDocument(document);
         }
     }
-    
+
     public void saveAsDocument() throws IOException, ReaderException {
         saveDocument(this.getDocument(), null);
     }
-    
+
     public void saveDocument() throws IOException, ReaderException {
         saveDocument(this.getDocument(), this.getDocument().getCurrentFile());
     }
-    
+
     public void saveDocument(IdeaDocument document, File f)
     throws IOException, ReaderException {
         File file = f;
@@ -279,21 +279,21 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
                     resBundle.getString("save.opml.file"),
                     FileDialog.SAVE);
             chooser.setFile(filename.substring(pos + 1));
-            
+
             chooser.setVisible(true);
-            
+
             if (chooser.getFile() != null) {
                 file = new File(chooser.getDirectory() + chooser.getFile());
             }
         }
-        
-        
+
+
         if (file != null) {
             Idea idea = document.getIdea();
             WriterFactory.getInstance().write(file, document);
         }
     }
-    
+
     public boolean checkIfSave() throws IOException, ReaderException {
         ideaMap.stopAdjust();
         IdeaDocument doc = getDocument();
@@ -312,19 +312,19 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
         }
         return true;
     }
-    
+
     public void fileExit() {
         System.exit(0);
     }
-    
+
     public void editPreferences() {
         Main.showPreferences();
     }
-    
+
     public void helpAbout() {
         Main.showAbout();
     }
-    
+
     public void helpManual() {
         if (Main.isMac()) {
             try {
@@ -346,7 +346,7 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
             showUrlInWindows((new File(manualIndex)).toString());
         }
     }
-    
+
     private void showUrlInWindows(String u) {
         try {
             BrowserLauncher.openURL((new File(u)).toURL().toString());
@@ -356,7 +356,7 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
             ioe.printStackTrace();
         }
     }
-    
+
     public void homePage() {
         try {
             BrowserLauncher.openURL("http://code.google.com/p/hipster/");
@@ -366,18 +366,18 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
             ioe.printStackTrace();
         }
     }
-    
+
     public void insertChild() {
         getIdeaMap().insertChild();
     }
-    
+
     public void insertSibling() {
         getIdeaMap().insertSibling();
     }
-    
+
     public void focusGained(final FocusEvent evt) {
     }
-    
+
     public void focusLost(final FocusEvent evt) {
         this.unEditSelected();
     }
@@ -387,41 +387,41 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
     public void resetView() {
         ideaMap.resetView();
     }
-    
+
     /**
      * Centre the view.
      */
     public void centreView() {
         ideaMap.centreView();
     }
-    
+
     /**
      * Centre the view.
      */
     public void resetZoom() {
         ideaMap.resetZoom();
     }
-    
+
     /**
      * Toggle the properties panel.
      */
     public void togglePropertiesPanel() {
         this.ideaMap.setPropertiesVisible(!this.ideaMap.getPropertiesVisible());
     }
-    
+
     public void copyIdea() {
         DataFlavor ideaFlavour = new DataFlavor(Idea.class, "Idea");
         getToolkit().getSystemClipboard().setContents(
                 new IdeaSelection(ideaMap.getSelected().clone()), this);
     }
-    
+
     public void cutIdea() {
         DataFlavor ideaFlavour = new DataFlavor(Idea.class, "Idea");
         getToolkit().getSystemClipboard().setContents(
                 new IdeaSelection(ideaMap.getSelected().clone()), this);
         ideaMap.deleteSelected();
     }
-    
+
     public void pasteIdea() {
         DataFlavor ideaFlavour = new DataFlavor(Idea.class, "Idea");
         try {
@@ -431,11 +431,11 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
         } catch (Exception e) {
         }
     }
-    
+
     public void lostOwnership(Clipboard clipboard, Transferable transferable) {
-        
+
     }
-    
+
     /**
      * Undo the last change.
      */
@@ -448,19 +448,19 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
 
 class IdeaSelection implements Transferable {
     private Idea idea;
-    
+
     public IdeaSelection(Idea anIdea) {
         this.idea = anIdea;
     }
-    
+
     public DataFlavor[] getTransferDataFlavors() {
         return new DataFlavor[] {new DataFlavor(Idea.class, "Idea")};
     }
-    
+
     public boolean isDataFlavorSupported(DataFlavor dataFlavor) {
         return (dataFlavor.getDefaultRepresentationClass().equals(Idea.class));
     }
-    
+
     public Idea getTransferData(DataFlavor dataFlavor) {
         return idea;
     }

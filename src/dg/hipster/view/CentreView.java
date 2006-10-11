@@ -49,21 +49,21 @@ import java.awt.geom.Point2D;
 public class CentreView extends IdeaView {
     public static int ROOT_RADIUS_X = 70;
     public static int ROOT_RADIUS_Y = 40;
-    
+
     /** Creates a new instance of CentreView */
     public CentreView() {
         this(null);
     }
-    
+
     public CentreView(Idea anIdea) {
         super(anIdea);
     }
-    
+
     public void paint(Graphics g, IdeaMap map) {
         initFromTo();
-        for (BranchView branch : this.getSubViews()) {
-            branch.paintLinks(g);
-        }
+//        for (BranchView branch : this.getSubViews()) {
+            this.paintLinks(g);
+//        }
         paintBranches(g, new Point(0, 0), this, getIdea().getAngle(), 0, map);
         Color colour = Color.WHITE;
         if (this.isSelected()) {
@@ -82,13 +82,13 @@ public class CentreView extends IdeaView {
         drawString((Graphics2D)g, getIdea().getText(), new Point(0, 0), 4,
                 getIdea().getAngle(), this.isEditing(), map);
     }
-    
+
     boolean hits(Point2D p) {
         int x = (int) p.getX() * ROOT_RADIUS_Y / ROOT_RADIUS_X;
         int y = (int) p.getY();
         return ((x * x) + (y * y)) < (ROOT_RADIUS_Y * ROOT_RADIUS_Y);
     }
-    
+
     private void initFromTo() {
         for (BranchView subView : getSubViews()) {
             double a = subView.getIdea().getAngle();

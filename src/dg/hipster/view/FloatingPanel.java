@@ -83,7 +83,7 @@ public final class FloatingPanel extends JPanel  {
      * Edges of the panel.
      */
     private Shape boundary;
-    
+
     /**
      * Default constructor.
      */
@@ -109,7 +109,7 @@ public final class FloatingPanel extends JPanel  {
         layout.putConstraint(SpringLayout.WEST, contentPane, 3,
                 SpringLayout.WEST, this);
     }
-    
+
     /**
      * Text that will appear at the top of the panel.
      * @param text string to use at the top of the panel.
@@ -117,7 +117,7 @@ public final class FloatingPanel extends JPanel  {
     public void setCaption(String text) {
         caption.setText(text);
     }
-    
+
     /**
      * Text that will appear at the top of the panel.
      * @return text at the top of the panel.
@@ -125,7 +125,7 @@ public final class FloatingPanel extends JPanel  {
     public String getCaption() {
         return caption.getText();
     }
-    
+
     /**
      * Draw the component on the given graphics object.
      * @param g object to draw on.
@@ -142,7 +142,7 @@ public final class FloatingPanel extends JPanel  {
         g.setColor(Color.BLACK);
         g.drawLine(0, size.height - 1, size.width, size.height - 1);
     }
-    
+
     /**
      * Resize the panel, depending upon the size
      * of the content.
@@ -151,7 +151,7 @@ public final class FloatingPanel extends JPanel  {
         Dimension panSize = contentPane.getPreferredSize();
         setSize(panSize.width + 6, panSize.height + 25);
     }
-    
+
     /**
      * Resize the panel.
      * @param width new width.
@@ -162,7 +162,7 @@ public final class FloatingPanel extends JPanel  {
         boundary = new RoundRectangle2D.Double(0, 0, width, height, RADIUS,
                 RADIUS);
     }
-    
+
     /**
      * Section of the pane that content should be
      * added to.

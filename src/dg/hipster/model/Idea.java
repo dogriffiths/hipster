@@ -44,7 +44,7 @@ import java.util.Vector;
  *
  * @author davidg
  */
-public final class Idea extends AbstractModel implements IdeaListener {
+public class Idea extends AbstractModel implements IdeaListener {
     private double length;
     private double angle;
     private double v;
@@ -60,7 +60,7 @@ public final class Idea extends AbstractModel implements IdeaListener {
     /**
      * List of sub-ideas.
      */
-    private Vector<Idea> links = new Vector<Idea>();
+    private Vector<IdeaLink> links = new Vector<IdeaLink>();
     /**
      * List of objects that are observing this idea.
      */
@@ -69,14 +69,14 @@ public final class Idea extends AbstractModel implements IdeaListener {
      * Longer notes.
      */
     private String notes = "";
-    
+
     /**
      * No args constructor.
      */
     public Idea() {
-        
+
     }
-    
+
     /**
      * Constructor for an idea with the given text.
      * @param text zhort text description of the idea
@@ -84,11 +84,11 @@ public final class Idea extends AbstractModel implements IdeaListener {
     public Idea(String text) {
         setText(text);
     }
-    
+
     //
     // PROPERTIES
     //
-    
+
     /**
      * Get the short text description of this idea.
      * @return short text string, using for idea maps
@@ -96,7 +96,7 @@ public final class Idea extends AbstractModel implements IdeaListener {
     public String getText() {
         return text;
     }
-    
+
     /**
      * Specify the short newText description of this idea.
      *
@@ -110,7 +110,7 @@ public final class Idea extends AbstractModel implements IdeaListener {
             notify(new IdeaEvent(this, IdeaEvent.CHANGED, "CHANGED"));
         }
     }
-    
+
     /**
      * The length of this idea.
      *@return length in points.
@@ -118,7 +118,7 @@ public final class Idea extends AbstractModel implements IdeaListener {
     public double getLength() {
         return length;
     }
-    
+
     /**
      * The length of this idea.
      *@param length length in points.
@@ -130,7 +130,7 @@ public final class Idea extends AbstractModel implements IdeaListener {
             this.firePropertyChange("length", oldLength, newLength);
         }
     }
-    
+
     /**
      * The angle of this idea relative to its parent.
      *@return angle in radians.
@@ -138,7 +138,7 @@ public final class Idea extends AbstractModel implements IdeaListener {
     public double getAngle() {
         return angle;
     }
-    
+
     /**
      * The angle of this idea relative to its parent.
      *@param angle angle in radians.
@@ -150,7 +150,7 @@ public final class Idea extends AbstractModel implements IdeaListener {
             this.firePropertyChange("angle", oldAngle, newAngle);
         }
     }
-    
+
     /**
      * The velocity of this idea's end-point during animation.
      *@return the velocity.
@@ -158,7 +158,7 @@ public final class Idea extends AbstractModel implements IdeaListener {
     public double getV() {
         return v;
     }
-    
+
     /**
      * The velocity of this idea's end-point during animation.
      *@param v the velocity.
@@ -170,11 +170,11 @@ public final class Idea extends AbstractModel implements IdeaListener {
             this.firePropertyChange("v", oldV, newV);
         }
     }
-    
+
     public String getNotes() {
         return notes;
     }
-    
+
     public void setNotes(String newNotes) {
         String oldNotes = this.notes;
         if ((this.notes == null) || (!this.notes.equals(newNotes))) {
@@ -183,7 +183,7 @@ public final class Idea extends AbstractModel implements IdeaListener {
             notify(new IdeaEvent(this, IdeaEvent.CHANGED, "CHANGED"));
         }
     }
-    
+
     /**
      * Get a list of the sub-ideas for this idea.
      *@return list of idea objects
@@ -191,19 +191,19 @@ public final class Idea extends AbstractModel implements IdeaListener {
     public List<Idea> getSubIdeas() {
         return (List<Idea>)subIdeas.clone();
     }
-    
+
     /**
      * Get the list of links that this idea is connected to.
      * @return list of links to related ideas.
      */
-    public List<Idea> getLinks() {
-        return (List<Idea>)links.clone();
+    public List<IdeaLink> getLinks() {
+        return (List<IdeaLink>)links.clone();
     }
-    
+
     //
     // Collection methods.
     //
-    
+
     /**
      * Add a sub-idea to this idea.
      * @param subIdea sub-idea to add
@@ -214,7 +214,7 @@ public final class Idea extends AbstractModel implements IdeaListener {
         notify(new IdeaEvent(this, IdeaEvent.ADDED, "ADDED",
                 subIdea, subIdeas.size() - 1));
     }
-    
+
     /**
      * Add a sub-idea to this idea at the given position.
      * @param pos position in the list of sub-ideas to insert
@@ -226,7 +226,7 @@ public final class Idea extends AbstractModel implements IdeaListener {
         notify(new IdeaEvent(this, IdeaEvent.ADDED, "ADDED",
                 subIdea, pos));
     }
-    
+
     /**
      * Remove the given sub-idea from this idea. No
      * exception is raised if the idea given is
@@ -240,36 +240,25 @@ public final class Idea extends AbstractModel implements IdeaListener {
         notify(new IdeaEvent(this, IdeaEvent.REMOVED, "REMOVED",
                 subIdea, pos));
     }
-    
+
     /**
      * Add a one-way link to another idea.
      *@param other idea to link to.
      */
-    public void addLink(Idea other) {
-        if (!this.equals(other)) {
+    public void addLink(IdeaLink other) {
+        if ((other != null) && (!this.equals(other.getTo()))
+        && (this.equals(other.getFrom()))) {
             links.add(other);
             notify(new IdeaEvent(this, IdeaEvent.ADDED_LINK, "ADDED_LINK",
                     other));
         }
     }
-    
-    /**
-     * Add a two-way link to another idea.
-     *@param other idea to link to.
-     */
-    public void addBiLink(Idea other) {
-        if (other == null) {
-            return;
-        }
-        this.addLink(other);
-        other.addLink(this);
-    }
-    
+
     /**
      * Remove a link to another idea.
      *@param other idea to link to.
      */
-    public void removeLink(Idea other) {
+    public void removeLink(IdeaLink other) {
         if (other == null) {
             return;
         }
@@ -278,17 +267,12 @@ public final class Idea extends AbstractModel implements IdeaListener {
             notify(new IdeaEvent(this, IdeaEvent.REMOVED_LINK, "REMOVED_LINK",
                     other));
         }
-        if (other.links.contains(this)) {
-            other.links.remove(this);
-            notify(new IdeaEvent(other, IdeaEvent.REMOVED_LINK, "REMOVED_LINK",
-                    this));
-        }
     }
-    
+
     //
     // Idea-listener methods.
     //
-    
+
     /**
      * Add an idea listener to this idea. The idea listener
      * will be informed when anything changes about this
@@ -300,7 +284,7 @@ public final class Idea extends AbstractModel implements IdeaListener {
             listeners.add(ideaListener);
         }
     }
-    
+
     /**
      * The given idea-listener will no longer be
      * notified of changes to this idea. No exception
@@ -311,7 +295,7 @@ public final class Idea extends AbstractModel implements IdeaListener {
     public void removeIdeaListener(IdeaListener ideaListener) {
         listeners.remove(ideaListener);
     }
-    
+
     /**
      * Notify all listeners that something has changed. The parameters
      * provide more detail about the change.
@@ -324,15 +308,15 @@ public final class Idea extends AbstractModel implements IdeaListener {
             listener.ideaChanged(ideaEvent);
         }
     }
-    
+
     public void ideaChanged(IdeaEvent ideaEvent) {
         notify(ideaEvent);
     }
-    
+
     //
     // Other methods.
     //
-    
+
     /**
      * String version of this idea. It will be the short text
      * description, followed by a recursive list of the
@@ -342,7 +326,7 @@ public final class Idea extends AbstractModel implements IdeaListener {
     public String toString() {
         return this.text + subIdeas.toString();
     }
-    
+
     /**
      * Create a clone of this idea.
      */

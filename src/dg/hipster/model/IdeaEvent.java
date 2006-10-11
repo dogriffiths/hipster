@@ -49,15 +49,15 @@ public final class IdeaEvent extends ActionEvent {
     public static final int CHANGED = 4;
     private Idea idea;
     private Object param;
-    
+
     public IdeaEvent(Object aSource, int id, String aCommand) {
         this(aSource, id, aCommand, null, null);
     }
-    
+
     public IdeaEvent(Object aSource, int id, String aCommand, Idea anIdea) {
         this(aSource, id, aCommand, anIdea, null);
     }
-    
+
     public IdeaEvent(Object aSource, int id, String aCommand, Idea anIdea,
             Object aParam) {
         super(aSource, id, aCommand);

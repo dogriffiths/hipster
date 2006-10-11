@@ -10,6 +10,7 @@ package dg.hipster.io;
 import dg.hipster.model.IdeaDocument;
 import junit.framework.*;
 import dg.hipster.model.Idea;
+import dg.hipster.model.IdeaLink;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStreamWriter;
 
@@ -44,7 +45,7 @@ public class OPMLWriterTest extends TestCase {
         idea.add(subIdea0WithQuotes);
         Idea subIdea1 = new Idea("Test");
         idea.add(subIdea1);
-        subIdea0WithQuotes.addLink(subIdea1);
+        subIdea0WithQuotes.addLink(new IdeaLink(subIdea0WithQuotes, subIdea1));
         
         ByteArrayOutputStream out = new ByteArrayOutputStream(1024);
         

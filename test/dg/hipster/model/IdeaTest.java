@@ -242,23 +242,18 @@ public class IdeaTest extends TestCase {
         Idea idea2 = new Idea("idea2");
         assertEquals("Wrong number of links by default", 0, idea.getLinks().size());
         assertEquals("Wrong number of links on idea2 by default", 0, idea2.getLinks().size());
-        idea.addLink(idea);
+        idea.addLink(new IdeaLink(idea, idea));
         assertEquals("Shouldn't allow a link to itself", 0, idea.getLinks().size());
-        idea.addLink(idea2);
+        IdeaLink ideaLink0 = new IdeaLink(idea, idea2);
+        idea.addLink(ideaLink0);
         assertEquals("Wrong number of links", 1, idea.getLinks().size());
         assertEquals("Wrong number of links on idea2", 0, idea2.getLinks().size());
-        idea.removeLink(new Idea("none"));
+        idea.removeLink(new IdeaLink(new Idea("none"), null));
         assertEquals("Wrong number of links after remove", 1, idea.getLinks().size());
         assertEquals("Wrong number of links idea2 after remove", 0, idea2.getLinks().size());
-        idea.removeLink(idea2);
+        idea.removeLink(ideaLink0);
         assertEquals("Wrong number of links after remove 2", 0, idea.getLinks().size());
         assertEquals("Wrong number of links idea2 after remove 2", 0, idea2.getLinks().size());
-        idea.addBiLink(idea2);
-        assertEquals("Wrong number of links after bi-link", 1, idea.getLinks().size());
-        assertEquals("Wrong number of links on idea2 after bi-link", 1, idea2.getLinks().size());
-        idea2.removeLink(idea);
-        assertEquals("Wrong number of links after remove bi-link", 0, idea.getLinks().size());
-        assertEquals("Wrong number of links on idea2 after remove bi-link", 0, idea2.getLinks().size());
     }
     
     public void testToString() {

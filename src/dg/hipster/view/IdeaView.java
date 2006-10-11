@@ -37,6 +37,7 @@ package dg.hipster.view;
 
 import dg.hipster.model.Idea;
 import dg.hipster.model.IdeaEvent;
+import dg.hipster.model.IdeaLink;
 import dg.hipster.model.IdeaListener;
 import java.awt.Color;
 import java.awt.FontMetrics;
@@ -55,6 +56,7 @@ import java.util.Vector;
  */
 public abstract class IdeaView implements IdeaListener, MapComponent {
     Vector<BranchView> subViews = new Vector<BranchView>();
+    Vector<LinkView> linkViews = new Vector<LinkView>();
     private Idea idea;
     private boolean selected;
     private boolean editing;
@@ -110,6 +112,23 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
                     Idea idea = (Idea) subViews.get(i).getIdea();
                     if (idea.equals(subIdea)) {
                         subViews.remove(i);
+                        break;
+                    }
+                }
+            }
+        } else if (id == IdeaEvent.ADDED_LINK) {
+            Idea ideaParent = (Idea)fe.getSource();
+            LinkView linkView = new LinkView((IdeaLink)fe.getIdea());
+            linkView.parent = this;
+            linkViews.add(linkView);
+        } else if (id == IdeaEvent.REMOVED_LINK) {
+            Idea ideaParent = (Idea)fe.getSource();
+            if (this.idea.equals(ideaParent)) {
+                IdeaLink link = (IdeaLink)fe.getIdea();
+                for (int i = 0; i < linkViews.size(); i++) {
+                    IdeaLink idea = (IdeaLink) linkViews.get(i).getIdea();
+                    if (link.equals(idea)) {
+                        linkViews.remove(i);
                         break;
                     }
                 }
@@ -185,6 +204,11 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
                 }
                 //subView.getIdea().setAngle(subAngle);
                 add(subView);
+                for (IdeaLink link : subIdea.getLinks()) {
+                    LinkView linkView = new LinkView(link);
+                    subView.linkViews.add(linkView);
+                    linkView.parent = subView;
+                }
                 i++;
             }
             newIdea.addIdeaListener(this);
@@ -280,6 +304,34 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
             }
         }
         return null;
+    }
+    
+    /**
+     * Search this view and it's child-views and return any that have
+     * an aLink matching the one given.
+     * 
+     * @param anIdea aLink we are looking for.
+     * @return view matching the aLink, or null if none.
+     */
+    public LinkView getLinkViewFor(IdeaLink aLink) {
+        for (LinkView linkView: this.linkViews) {
+            if ((linkView.getLink() != null) && (linkView.getLink().equals(aLink))) {
+                return linkView;
+            }
+        }
+        return null;
+    }
+    
+    void paintLinks(final Graphics g) {
+        for (IdeaLink link: this.getIdea().getLinks()) {
+            LinkView linkView = this.getLinkViewFor(link);
+            if (linkView != null) {
+                linkView.paintLink(g);
+            }
+        }
+        for (BranchView branch : this.getSubViews()) {
+            branch.paintLinks(g);
+        }
     }
     
     /**

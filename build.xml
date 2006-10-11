@@ -107,6 +107,9 @@
         <condition property="isWindows">
             <os family="windows"/>
         </condition>
+        <tstamp>
+            <format property="now" pattern="MMMM d yyyy hh:mm aa"/>
+        </tstamp>
     </target>
     
     <!--                    -->
@@ -250,5 +253,16 @@
     
     <target name="exeWin" depends="exeInit" if="isWindows">
         <ant antfile="platforms/windows/build.xml" target="exeWin"/>
+    </target>
+    
+    <target name="-pre-compile">
+        <delete file="src/dg/hipster/resource/buildinfo.properties"/>
+        <copy todir="src/dg/hipster/resource" filtering="true">
+            <fileset dir="etc" includes="**/buildinfo.properties" />
+            <filterset begintoken="%" endtoken="!">
+                <filter token="BUILD_INFO" value="${now}"/>
+                <filter token="BUILD_USER" value="${user.name}"/>
+            </filterset>
+        </copy>
     </target>
 </project>

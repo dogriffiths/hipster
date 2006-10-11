@@ -37,6 +37,7 @@ package dg.hipster.io;
 
 import dg.hipster.model.IdeaDocument;
 import dg.hipster.model.Idea;
+import dg.hipster.model.IdeaLink;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -146,7 +147,7 @@ public final class OPMLReader extends DefaultHandler implements IdeaReader {
             Idea linkFrom = links.get(i);
             int linkIndex = linkTos.get(i);
             Idea linkTo = ideaIndex.get(linkIndex);
-            linkFrom.addLink(linkTo);
+            linkFrom.addLink(new IdeaLink(linkFrom, linkTo));
         }
     }
     

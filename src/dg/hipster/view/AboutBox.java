@@ -65,6 +65,8 @@ public final class AboutBox extends JFrame implements ActionListener {
     protected Font titleFont, bodyFont;
     protected static ResourceBundle resBundle = ResourceBundle.getBundle(
             "dg/hipster/resource/strings");
+    protected static ResourceBundle buildInfoBundle = ResourceBundle.getBundle(
+            "dg/hipster/resource/buildinfo");
 
     public AboutBox() {
         super(resBundle.getString("aboutbox.title"));
@@ -95,11 +97,14 @@ public final class AboutBox extends JFrame implements ActionListener {
         aboutLabel[labCount] = new JLabel(resBundle.getString("copyright")
         + padding);
         aboutLabel[labCount++].setFont(bodyFont);
-        aboutLabel[labCount] = new JLabel("JDK " + System.getProperty("java.version")
+        aboutLabel[labCount] = new JLabel(buildInfoBundle.getString("build.id")
         + padding);
         aboutLabel[labCount++].setFont(bodyFont);
-        aboutLabel[labCount] = new JLabel(resBundle.getString("version")
+        aboutLabel[labCount] = new JLabel("Built by: "
+                + buildInfoBundle.getString("build.user")
         + padding);
+        aboutLabel[labCount++].setFont(bodyFont);
+        aboutLabel[labCount] = new JLabel(padding);
         aboutLabel[labCount++].setFont(bodyFont);
 
         GridLayout layout = new GridLayout(labCount, 1);

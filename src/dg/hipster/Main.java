@@ -71,11 +71,11 @@ public final class Main {
      */
     private static ResourceBundle resBundle = ResourceBundle.getBundle(
             "dg/hipster/resource/strings");
-    
+
     static {
         System.setProperty("apple.laf.useScreenMenuBar", "true");
     }
-    
+
     /**
      * The method executed at application start.
      * @param args the command line arguments
@@ -95,21 +95,21 @@ public final class Main {
         getMainframe().setDocument(document);
         main.setVisible(true);
     }
-    
+
     /**
      * Default constructor of the application. Left as package-private
      * for unit-testing.
      */
     Main() {
     }
-    
+
     /**
      * Set up the interface.
      */
     private void initView() {
         frame = new Mainframe();
     }
-    
+
     /**
      * Connect the controllers to the interface.
      */
@@ -129,7 +129,7 @@ public final class Main {
             loadMacPlugins();
         }
     }
-    
+
     /**
      * Load plugins for integration with the Macintosh environment.
      */
@@ -140,7 +140,7 @@ public final class Main {
             cnfe.printStackTrace();
         }
     }
-    
+
     /**
      * Make the application visible. Will put the app into edit
      * mode.
@@ -152,7 +152,7 @@ public final class Main {
             frame.editSelected();
         }
     }
-    
+
     /**
      * True if we are running on a Mac.
      * @return true if the current platform is a Mac, false otherwise
@@ -161,7 +161,7 @@ public final class Main {
         String osName = System.getProperty("os.name");
         return ((osName != null) && (osName.indexOf("Mac") != -1));
     }
-    
+
     /**
      * True if we are running on Windows.
      * @return true if the current platform is Windows, false otherwise
@@ -170,21 +170,21 @@ public final class Main {
         String osName = System.getProperty("os.name");
         return ((osName != null) && (osName.indexOf("Windows") != -1));
     }
-    
+
     /**
      * Display the about box.
      */
     public static void showAbout() {
         main.aboutBox.setVisible(true);
     }
-    
+
     /**
      * Display the preferences dialog.
      */
     public static void showPreferences() {
         GuiUtilities.showInfo("preferences.placeholder");
     }
-    
+
     /**
      * Called when the application being closed down.
      */
@@ -201,7 +201,7 @@ public final class Main {
             return true;
         }
     }
-    
+
     /**
      * Get the main application frme.
      * @return main application frame.
