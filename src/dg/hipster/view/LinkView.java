@@ -89,8 +89,11 @@ public class LinkView extends IdeaView {
         float strokeWidth = BranchView.DEFAULT_STROKE_WIDTH / 2;
         Stroke stroke = new BasicStroke(strokeWidth,
                 BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL);
+        BranchView parent = (BranchView)this.getParent();
         if (this.isSelected()) {
             g.setColor(Color.BLACK);
+        } else if ((parent != null) && parent.isSelected()) {
+            g.setColor(Color.DARK_GRAY);
         } else {
             g.setColor(Color.GRAY);
         }
