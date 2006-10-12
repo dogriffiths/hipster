@@ -1,0 +1,70 @@
+Apologies for this being a manual install, but until I get a copy of
+the Big Boy's Book of Linux, I won't be able to create an RPM.
+
+For now - you got this text file :-)
+
+Basic setup
+-----------
+
+Unzip the contents of this zip file into a new application directory.
+Personally, I would use /usr/local/hipster. You will probably need to be
+root to create this directory, or use the "sudo" command if you don't have
+a root account.
+
+Next, you will need to make the main "hipster" script executable. I would
+do this by opening a terminal and typing the following:
+
+cd /usr/local/hipster
+chmod 755 hipster
+
+Check the setup
+---------------
+
+You can check whether the installation is working by typing:
+
+/usr/local/hipster/hipster
+
+Oh, the humanity! - What to do if it doesn't work
+-------------------------------------------------
+
+Assuming you have Java installed, hipster should start up. If it doesn't,
+chances are it can't find Java. You will need to go to:
+
+http://www.java.com
+
+unless, by the time you read this, Sun have done the sane and sensible thing
+and have open sourced Java and put it in a nice God Fearing repository
+that we can all use.
+
+If you are sure you have Java installed, try setting an environment variable
+to specify it's location:
+
+JAVA_HOME=/usr/java/jdk1.5.0 # This is where I have Java
+export JAVA_HOME
+
+Then try typing:
+
+/usr/local/hipster/hipster
+
+again. If it doesn't work now, then I've screwed up. Buy a dart board
+and put my picture on it.
+
+Hooking it into your X environment
+----------------------------------
+
+How you do this, depends upon your desktop environment. You will
+need to create some sort of menu shortcut with:
+
+/usr/local/hipster/hipster
+
+as the executable (you may need to add a JAVA_HOME variable to
+your GUI's environment script, if you needed that fix above). I put
+an icon in:
+
+/usr/local/hipster/chrome/icons
+
+that you might want to use.
+
+David Griffiths
+Hipster-in-Chief
+12th October 2006.

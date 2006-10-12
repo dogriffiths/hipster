@@ -338,6 +338,9 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
         } else {
             String pwd = System.getProperty("launch4j.exedir");
             if ((pwd == null) || (pwd.length() == 0)) {
+                pwd = System.getProperty("hipster.library.dir");
+            }
+            if ((pwd == null) || (pwd.length() == 0)) {
                 pwd = System.getProperty("user.dir");
             }
             String manualIndex = pwd + File.separatorChar + "manual"

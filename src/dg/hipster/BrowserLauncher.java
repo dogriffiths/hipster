@@ -584,7 +584,7 @@ public final class BrowserLauncher {
                 break;
             case OTHER:
             default:
-                browser = "netscape";
+                browser = "firefox";
                 break;
         }
         return browser;
