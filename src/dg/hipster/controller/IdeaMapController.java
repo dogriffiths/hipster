@@ -37,6 +37,7 @@ package dg.hipster.controller;
 
 import dg.hipster.BrowserLauncher;
 import dg.hipster.Main;
+import dg.hipster.Utilities;
 import dg.hipster.io.ReaderFactory;
 import dg.hipster.model.Idea;
 import dg.hipster.model.IdeaDocument;
@@ -168,7 +169,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
                         }
                         boolean err = false;
                         File f = (File)((Collection)os).iterator().next();
-                        boolean isOpml = f.getName().toUpperCase().endsWith(".opml");
+                        boolean isOpml = f.getName().toUpperCase().endsWith(".OPML");
                         if (isOpml) {
                             ReaderFactory factory = ReaderFactory.getInstance();
                             IdeaDocument document = factory.read(f);
@@ -188,7 +189,8 @@ public final class IdeaMapController implements KeyListener, FocusListener,
                         } else if (ideaView != null) {
                             Idea idea = new Idea(f.getName());
                             idea.setDescription(f.toString());
-                            idea.setUrl(f.toURL().toExternalForm());
+                            String url = Utilities.toStringUrl(f);
+                            idea.setUrl(url);
                             ideaView.getIdea().add(idea);
                         } else {
                             event.rejectDrop();
@@ -203,7 +205,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
                         if (isURLFormatted) {
                             // DnD from firefox introduces a \n followed by the anchor label (like "RSS feed")
                             // that appears on the page. Hence, use only the substring upto the \n
-                            int linebreakIndex = s.indexOf('\n');
+                            int linebreakIndex = s.lastIndexOf('\n');
                             String insertText = null;
                             Idea idea = new Idea(s);
                             if(linebreakIndex != -1) {

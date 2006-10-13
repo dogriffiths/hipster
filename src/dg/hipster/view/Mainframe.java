@@ -37,6 +37,7 @@ package dg.hipster.view;
 
 import dg.hipster.BrowserLauncher;
 import dg.hipster.Main;
+import dg.hipster.Utilities;
 import dg.hipster.io.ReaderException;
 import dg.hipster.io.ReaderFactory;
 import dg.hipster.io.WriterFactory;
@@ -63,6 +64,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
+import java.util.Collection;
 import java.util.ResourceBundle;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -427,12 +429,44 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
     
     public void pasteIdea() {
         DataFlavor ideaFlavour = new DataFlavor(Idea.class, "Idea");
+        Clipboard cb = getToolkit().getSystemClipboard();
         try {
-            if (getToolkit().getSystemClipboard().isDataFlavorAvailable(ideaFlavour)){
+            if (cb.isDataFlavorAvailable(ideaFlavour)){
                 Idea idea = (Idea)getToolkit().getSystemClipboard(
                         ).getContents(this).getTransferData(ideaFlavour);
                 ideaMap.getSelected().add(idea.clone());
-            } else if (getToolkit().getSystemClipboard().isDataFlavorAvailable(
+            } else if (cb.isDataFlavorAvailable(
+                    DataFlavor.javaFileListFlavor)){
+                boolean err = false;
+                final Object os = getToolkit().getSystemClipboard(
+                        ).getContents(this).getTransferData(
+                        DataFlavor.javaFileListFlavor);
+                File f = (File)((Collection)os).iterator().next();
+                boolean isOpml = f.getName().toUpperCase().endsWith(".OPML");
+                if (isOpml) {
+                    ReaderFactory factory = ReaderFactory.getInstance();
+                    IdeaDocument document = factory.read(f);
+                    if (ideaMap.getSelected() != null) {
+                        int answer = JOptionPane.showConfirmDialog(ideaMap,
+                                resBundle.getString("insert_drag_question"),
+                                resBundle.getString("app.name"),
+                                JOptionPane.YES_NO_CANCEL_OPTION);
+                        if (answer == JOptionPane.YES_OPTION) {
+                            ideaMap.getSelected().add(document.getIdea());
+                        } else if (answer == JOptionPane.NO_OPTION) {
+                            this.setDocument(document);
+                        }
+                    } else {
+                        Main.getMainframe().setDocument(document);
+                    }
+                } else if (ideaMap.getSelected() != null) {
+                    Idea idea = new Idea(f.getName());
+                    idea.setDescription(f.toString());
+                    String url = Utilities.toStringUrl(f);
+                    idea.setUrl(url);
+                    ideaMap.getSelected().add(idea);
+                }
+            } else if (cb.isDataFlavorAvailable(
                     DataFlavor.stringFlavor)){
                 String s = getToolkit().getSystemClipboard(
                         ).getContents(this).getTransferData(

@@ -36,6 +36,8 @@
 package dg.hipster;
 
 import java.awt.geom.Point2D;
+import java.io.File;
+import java.net.MalformedURLException;
 
 
 /**
@@ -69,10 +71,11 @@ public final class Utilities {
     
     /**
      * Whether a point is on a line of a given thickness.
-     *@param p point in question.
-     *@param fromPoint one end of line.
-     *@param toPoint other end of line.
-     *@param thickness thickness of the line.
+     * @param p point in question.
+     * @param fromPoint one end of line.
+     * @param toPoint other end of line.
+     * @param thickness thickness of the line.
+     * @return true if on the line, false otherwise.
      */
     public static boolean hitsLine(final Point2D p, final Point2D fromPoint,
             final Point2D toPoint, final double thickness) {
@@ -113,5 +116,24 @@ public final class Utilities {
             return true;
         }
         return false;
+    }
+    
+    /**
+     * Convert a file into a string URL.
+     * @return string version of a URL, with spaces converted.
+     * @param f file to get URL for.
+     * @throws java.net.MalformedURLException if the file cannot be converted to a URL - should
+     * not happen.
+     */
+    public static String toStringUrl(final File f)
+    throws MalformedURLException {
+        String url = f.toURL().toString();
+        url = url.trim();
+        while(url.indexOf(' ') != -1) {
+            int pos = url.indexOf(' ');
+            url = url.substring(0, pos) + "%20"
+                    + url.substring(pos + 1);
+        }
+        return url;
     }
 }
