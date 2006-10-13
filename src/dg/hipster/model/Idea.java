@@ -54,6 +54,14 @@ public class Idea extends AbstractModel implements IdeaListener {
      */
     private String text = "";
     /**
+     * Description - probably used to over-ride shorter name in exports.
+     */
+    private String description = "";
+    /**
+     * URL to hyperlink to.
+     */
+    private String url = "";
+    /**
      * List of sub-ideas.
      */
     private Vector<Idea> subIdeas = new Vector<Idea>();
@@ -340,6 +348,22 @@ public class Idea extends AbstractModel implements IdeaListener {
             idea.add(subIdea.clone());
         }
         return idea;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }
 

@@ -121,6 +121,15 @@ public final class OPMLWriter implements IdeaWriter {
         if ((notes != null) && (notes.length() != 0)) {
             ideaElement.setAttribute("notes", idea.getNotes());
         }
+        String description = idea.getDescription();
+        if ((description != null) && (description.length() != 0)) {
+            ideaElement.setAttribute("description", idea.getDescription());
+        }
+        String url = idea.getUrl();
+        if ((url != null) && (url.length() != 0)) {
+            ideaElement.setAttribute("type", "link");
+            ideaElement.setAttribute("url", idea.getUrl());
+        }
         element.appendChild(ideaElement);
         for (Idea subIdea: idea.getSubIdeas()) {
             appendIdea(document, ideaElement, subIdea);

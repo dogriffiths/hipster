@@ -60,7 +60,7 @@ public final class OPMLReader extends DefaultHandler implements IdeaReader {
     private boolean anglesRead = false;
     private Stack<Idea> stack = new Stack<Idea>();
     private Map<Integer, Idea> ideaIndex = new HashMap<Integer, Idea>();
-    private List<Idea> links = new ArrayList<Idea>();
+    private List<IdeaLink> links = new ArrayList<IdeaLink>();
     private List<Integer> linkTos = new ArrayList<Integer>();
     
     public void startElement(String namespaceURI,
@@ -76,9 +76,14 @@ public final class OPMLReader extends DefaultHandler implements IdeaReader {
                 } else {
                     type = "";
                 }
-                if (!type.equals("LINK")) {
+                String url = attrs.getValue("url");
+                if (url == null) {
+                    url = "";
+                }
+                if (!url.startsWith("#")) {
                     String text = attrs.getValue("text");
                     Idea i = new Idea(text);
+                    i.setUrl(url);
                     String id = attrs.getValue("id");
                     if ((id != null) && (id.length() > 0)) {
                         ideaIndex.put(new Integer(id), i);
@@ -88,6 +93,11 @@ public final class OPMLReader extends DefaultHandler implements IdeaReader {
                         notes = "";
                     }
                     i.setNotes(notes);
+                    String description = attrs.getValue("description");
+                    if (description == null) {
+                        description = "";
+                    }
+                    i.setDescription(description);
                     String angleString = attrs.getValue("angle");
                     if ((angleString != null) && (angleString.length() > 0)) {
                         i.setAngle(Double.valueOf(angleString));
@@ -107,12 +117,18 @@ public final class OPMLReader extends DefaultHandler implements IdeaReader {
                     current = i;
                     stack.push(current);
                 } else {
-                    String url = attrs.getValue("url");
-                    if (url.startsWith("#")) {
-                        String indexNo = url.substring(1);
-                        links.add(current);
-                        linkTos.add(new Integer(indexNo));
+                    String indexNo = url.substring(1);
+                    System.out.println("linking from " + current);
+                    System.out.println("current class = " + current.getClass());
+                    IdeaLink link = new IdeaLink(current, null);
+                    System.out.println("link initially " + link);
+                    String description = attrs.getValue("description");
+                    if (description == null) {
+                        description = "";
                     }
+                    link.setDescription(description);
+                    links.add(link);
+                    linkTos.add(new Integer(indexNo));
                     stack.push(null);
                 }
             }
@@ -144,10 +160,15 @@ public final class OPMLReader extends DefaultHandler implements IdeaReader {
     
     private void addLinks() {
         for (int i = 0; i < links.size(); i++) {
-            Idea linkFrom = links.get(i);
+            IdeaLink link = links.get(i);
+            System.out.println("0 link = " + link);
             int linkIndex = linkTos.get(i);
             Idea linkTo = ideaIndex.get(linkIndex);
-            linkFrom.addLink(new IdeaLink(linkFrom, linkTo));
+            System.out.println("linkTo = " + linkTo);
+            link.setTo(linkTo);
+            System.out.println("1 link = " + link);
+            link.getFrom().addLink(link);
+            System.out.println("2 link = " + link);
         }
     }
     

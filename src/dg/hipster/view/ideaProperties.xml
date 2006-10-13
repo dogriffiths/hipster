@@ -10,13 +10,24 @@
 
 <panel>
   <row>
-    <label value="Text:" margin-bottom="2" margin-right="7" width="10"/>
+    <label value="Text:" margin-bottom="2" margin-right="7" width="20"
+        align="right"/>
     <text value="#text" margin-bottom="4"/>
+  </row>
+  <row>
+    <label value="Description:" margin-bottom="2" margin-right="7" width="20"
+        align="right"/>
+    <text value="#description" margin-bottom="4"/>
+  </row>
+  <row>
+    <label value="URL:" margin-bottom="2" margin-right="7" width="20"
+        align="right"/>
+    <text value="#url" margin-bottom="4"/>
   </row>
   <row>
     <label value="Notes:" margin-bottom="2"/>
   </row>
   <row>
-    <textArea value="#notes" margin-bottom="2" rows="5" cols="20"/>
+    <textArea value="#notes" margin-bottom="2" rows="5" cols="30"/>
   </row>
 </panel>
