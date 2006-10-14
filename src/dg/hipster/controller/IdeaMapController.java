@@ -188,8 +188,13 @@ public final class IdeaMapController implements KeyListener, FocusListener,
                                 Main.getMainframe().setDocument(document);
                             }
                         } else if (ideaView != null) {
-                            Idea idea = new Idea(getMetaTitle(f));
-                            idea.setDescription(f.toString());
+                            FileMetaData metadata = new FileMetaData(f);
+                            Idea idea = new Idea(metadata.get("kMDItemTitle"));
+                            idea.setNotes(metadata.get("kMDItemComment",
+                                    "kMDItemCopyright"));
+                            idea.setDescription(
+                                    metadata.get("kMDItemDisplayName")
+                                    );
                             String url = Utilities.toStringUrl(f);
                             idea.setUrl(url);
                             ideaView.getIdea().add(idea);
@@ -580,44 +585,88 @@ public final class IdeaMapController implements KeyListener, FocusListener,
             }
         }
     }
+}
+
+/**
+ * Meta-data about a given file.
+ */
+class FileMetaData {
+    /**
+     * Map used to store meta-data attributes and values.
+     */
+    private Map<String, String> data;
     
-    private String getMetaTitle(File f) {
-        if (!Main.isMac()) {
-            return f.getName();
-        }
-        Process process = null;
-        DataInputStream in = null;
-        try {
-            process = Runtime.getRuntime().exec(new String[]{
-                "mdls", f.toString()
-            }, null,f.getParentFile());
-            
-            in = new DataInputStream(process.getInputStream());
-            String line = null;
-            while ((line = in.readLine()) != null) {
-                System.out.println("line = " + line);
-                if (line.startsWith("kMDItemTitle")) {
-                    int pos0 = line.indexOf('"');
+    /**
+     * Constructor for meta-data of a given file.
+     */
+    FileMetaData(File f) {
+        data = new HashMap<String, String>();
+        data.put("kMDItemTitle", f.getName());
+        if (Main.isMac()) {
+            Process process = null;
+            DataInputStream in = null;
+            try {
+                process = Runtime.getRuntime().exec(new String[]{
+                    "mdls", f.toString()
+                }, null,f.getParentFile());
+                
+                in = new DataInputStream(process.getInputStream());
+                String line = null;
+                while ((line = in.readLine()) != null) {
+                    int pos0 = line.indexOf('=');
                     if (pos0 != -1) {
-                        int pos1 = line.indexOf('"', pos0 + 2);
-                        if (pos1 != 0) {
-                            return line.substring(pos0 + 1, pos1);
+                        String mdAttr = line.substring(0, pos0).trim();
+                        int pos1 = line.indexOf('"');
+                        if (pos1 != -1) {
+                            int pos2 = line.indexOf('"', pos1 + 2);
+                            if (pos2 != 0) {
+                                data.put(mdAttr,
+                                        line.substring(pos1 + 1, pos2));
+                            }
                         }
                     }
                 }
-            }
-            
-        } catch(Exception e) {
-            // Oh well...
-        } finally {
-            try {
-                in.close();
-            } catch(Exception e2) {
-                // Oh well... part 2
+                
+            } catch(Exception e) {
+                // Oh well...
+            } finally {
+                try {
+                    in.close();
+                } catch(Exception e2) {
+                    // Oh well... part 2
+                }
             }
         }
-        return f.getName();
+    }
+    
+    /**
+     * Return the value of the requested parameters, separated by
+     * newlines.
+     *@param names - list of attribute names.
+     *@return multi-line string.
+     */
+    public String get(String... names) {
+        String result = "";
+        for (String name : names) {
+            String s = get(name);
+            if (s.length() > 0) {
+                result += s + "\n";
+            }
+        }
+        return result;
+    }
+    
+    /**
+     * Get a single meta-data attribute, with names matching
+     * those on the Mac platform.
+     *@param name - attribute name.
+     *@return string value of the attribute.
+     */
+    public String get(String name) {
+        String result = data.get(name);
+        if (result == null) {
+            result = "";
+        }
+        return result;
     }
 }
-
-
