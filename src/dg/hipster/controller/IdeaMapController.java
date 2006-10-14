@@ -67,6 +67,7 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.Point2D;
+import java.io.DataInputStream;
 import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
@@ -187,7 +188,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
                                 Main.getMainframe().setDocument(document);
                             }
                         } else if (ideaView != null) {
-                            Idea idea = new Idea(f.getName());
+                            Idea idea = new Idea(getMetaTitle(f));
                             idea.setDescription(f.toString());
                             String url = Utilities.toStringUrl(f);
                             idea.setUrl(url);
@@ -578,6 +579,44 @@ public final class IdeaMapController implements KeyListener, FocusListener,
                 }
             }
         }
+    }
+    
+    private String getMetaTitle(File f) {
+        if (!Main.isMac()) {
+            return f.getName();
+        }
+        Process process = null;
+        DataInputStream in = null;
+        try {
+            process = Runtime.getRuntime().exec(new String[]{
+                "mdls", f.toString()
+            }, null,f.getParentFile());
+            
+            in = new DataInputStream(process.getInputStream());
+            String line = null;
+            while ((line = in.readLine()) != null) {
+                System.out.println("line = " + line);
+                if (line.startsWith("kMDItemTitle")) {
+                    int pos0 = line.indexOf('"');
+                    if (pos0 != -1) {
+                        int pos1 = line.indexOf('"', pos0 + 2);
+                        if (pos1 != 0) {
+                            return line.substring(pos0 + 1, pos1);
+                        }
+                    }
+                }
+            }
+            
+        } catch(Exception e) {
+            // Oh well...
+        } finally {
+            try {
+                in.close();
+            } catch(Exception e2) {
+                // Oh well... part 2
+            }
+        }
+        return f.getName();
     }
 }
 
