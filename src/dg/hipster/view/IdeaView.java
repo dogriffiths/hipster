@@ -40,12 +40,15 @@ import dg.hipster.model.IdeaEvent;
 import dg.hipster.model.IdeaLink;
 import dg.hipster.model.IdeaListener;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.font.TextAttribute;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
+import java.text.AttributedString;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
@@ -380,10 +383,19 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
         if (!editing) {
             
             if ((graphics2d != null) && (string != null)) {
-                graphics2d.drawString(string, xc - offsetX, yc - offsetY);
+                AttributedString as = new AttributedString(string);
+                as.addAttribute(TextAttribute.FONT, graphics2d.getFont());
+                boolean isHyperlink = (this.getIdea().getUrl().length() > 0);
+                if (isHyperlink) {
+                    as.addAttribute(TextAttribute.UNDERLINE,
+                            TextAttribute.UNDERLINE_ON);
+                }
+                graphics2d.drawString(as.getIterator(), xc - offsetX,
+                        yc - offsetY);
             }
         } else {
-            Graphics2D g2d = (Graphics2D)graphics2d.create(xc - offsetX - 5, yc + offsetY - 5,
+            Graphics2D g2d = (Graphics2D)graphics2d.create(xc - offsetX - 5,
+                    yc + offsetY - 5,
                     (int) realTextWidth + 10, (int) realTextHeight + 10);
             map.getTextField().paint(g2d);
             g2d.dispose();

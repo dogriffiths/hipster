@@ -118,10 +118,7 @@ public final class OPMLReader extends DefaultHandler implements IdeaReader {
                     stack.push(current);
                 } else {
                     String indexNo = url.substring(1);
-                    System.out.println("linking from " + current);
-                    System.out.println("current class = " + current.getClass());
                     IdeaLink link = new IdeaLink(current, null);
-                    System.out.println("link initially " + link);
                     String description = attrs.getValue("description");
                     if (description == null) {
                         description = "";
@@ -161,14 +158,10 @@ public final class OPMLReader extends DefaultHandler implements IdeaReader {
     private void addLinks() {
         for (int i = 0; i < links.size(); i++) {
             IdeaLink link = links.get(i);
-            System.out.println("0 link = " + link);
             int linkIndex = linkTos.get(i);
             Idea linkTo = ideaIndex.get(linkIndex);
-            System.out.println("linkTo = " + linkTo);
             link.setTo(linkTo);
-            System.out.println("1 link = " + link);
             link.getFrom().addLink(link);
-            System.out.println("2 link = " + link);
         }
     }
     
