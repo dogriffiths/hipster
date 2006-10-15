@@ -430,8 +430,16 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
     public void pasteIdea() {
         DataFlavor ideaFlavour = new DataFlavor(Idea.class, "Idea");
         Clipboard cb = getToolkit().getSystemClipboard();
+        boolean isIdea = false;
+        // Weird hack because the ideaFlavour appears in the list of 
+        // available flavors, but isDataFlavorAvailable returns false...
+        for (DataFlavor f : cb.getAvailableDataFlavors()) {
+            if (f.equals(ideaFlavour)) {
+                isIdea = true;
+            }
+        }
         try {
-            if (cb.isDataFlavorAvailable(ideaFlavour)){
+            if (isIdea){
                 Idea idea = (Idea)getToolkit().getSystemClipboard(
                         ).getContents(this).getTransferData(ideaFlavour);
                 ideaMap.getSelected().add(idea.clone());

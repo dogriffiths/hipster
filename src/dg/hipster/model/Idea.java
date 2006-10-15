@@ -343,6 +343,8 @@ public class Idea extends AbstractModel implements IdeaListener {
         idea.setAngle(getAngle());
         idea.setLength(getLength());
         idea.setNotes(getNotes());
+        idea.setDescription(getDescription());
+        idea.setUrl(getUrl());
         idea.setV(getV());
         for (Idea subIdea : this.subIdeas) {
             idea.add(subIdea.clone());
