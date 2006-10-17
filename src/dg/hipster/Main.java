@@ -187,6 +187,7 @@ public final class Main {
 
     /**
      * Called when the application being closed down.
+     *@return true if OK to continue with shutdown.
      */
     public static boolean handleQuit() {
         Rectangle bounds = main.frame.getBounds();

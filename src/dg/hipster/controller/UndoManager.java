@@ -56,12 +56,18 @@ public class UndoManager implements IdeaListener, PropertyChangeListener {
      * order.
      */
     private Stack events;
+    /**
+     * Stack of events that will be re-done in reverse
+     * order.
+     */
+    private Stack redoEvents;
 
     /**
      * Creates a new instance of UndoManager.
      */
     public UndoManager() {
         events = new Stack();
+        redoEvents = new Stack();
     }
 
     /**
@@ -78,11 +84,13 @@ public class UndoManager implements IdeaListener, PropertyChangeListener {
                 Idea newIdea = ideaEvent.getIdea();
                 startListeningTo(newIdea);
                 storeEvent(ideaEvent);
+                redoEvents.clear();
                 break;
             case IdeaEvent.REMOVED:
                 Idea oldIdea = ideaEvent.getIdea();
                 stopListeningTo(oldIdea);
                 storeEvent(ideaEvent);
+                redoEvents.clear();
                 break;
             default:
                 // Do nothing
@@ -95,6 +103,7 @@ public class UndoManager implements IdeaListener, PropertyChangeListener {
      */
     public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
         storeEvent(propertyChangeEvent);
+        redoEvents.clear();
     }
 
     /**
@@ -175,6 +184,8 @@ public class UndoManager implements IdeaListener, PropertyChangeListener {
             return;
         }
         Object lastEvent = events.pop();
+        redoEvents.push(lastEvent);
+        Stack currentRedo = (Stack)redoEvents.clone();
         if (lastEvent instanceof IdeaEvent) {
             undo((IdeaEvent)lastEvent);
         } else if (lastEvent instanceof PropertyChangeEvent) {
@@ -182,6 +193,29 @@ public class UndoManager implements IdeaListener, PropertyChangeListener {
         }
         // Now remove the event that would have resulted from the undo
         events.pop();
+        // Reset the redo events back, because they will have been cleared.
+        redoEvents = currentRedo;
+    }
+
+    /**
+     * Redo the last event recorded.
+     */
+    public void redo() {
+        if (redoEvents.isEmpty()) {
+            return;
+        }
+        Object lastEvent = redoEvents.pop();
+        Stack currentRedo = (Stack)redoEvents.clone();
+        events.push(lastEvent);
+        if (lastEvent instanceof IdeaEvent) {
+            redo((IdeaEvent)lastEvent);
+        } else if (lastEvent instanceof PropertyChangeEvent) {
+            redo((PropertyChangeEvent)lastEvent);
+        }
+        // Now remove the event that would have resulted from the redo
+        events.pop();
+        // Reset the redo events back, because they will have been cleared.
+        redoEvents = currentRedo;
     }
 
     /**
@@ -205,6 +239,26 @@ public class UndoManager implements IdeaListener, PropertyChangeListener {
     }
 
     /**
+     * Redo the specified idea-event.
+     * @param ideaEvent idea-event to undo.
+     */
+    private void redo(IdeaEvent ideaEvent) {
+        switch(ideaEvent.getID()) {
+            case IdeaEvent.REMOVED:
+                Idea parent0 = (Idea)ideaEvent.getSource();
+                parent0.remove(ideaEvent.getIdea());
+                break;
+            case IdeaEvent.ADDED:
+                Idea parent1 = (Idea)ideaEvent.getSource();
+                parent1.add((Integer)ideaEvent.getParam(),
+                        ideaEvent.getIdea());
+                break;
+            default:
+                throw new RuntimeException("Cannot redo: " + ideaEvent);
+        }
+    }
+
+    /**
      * Undo the specified property-change-event.
      * @param propertyChangeEvent event to undo.
      */
@@ -215,6 +269,20 @@ public class UndoManager implements IdeaListener, PropertyChangeListener {
             idea.setText((String)propertyChangeEvent.getOldValue());
         } else if (propertyName.equals("notes")) {
             idea.setNotes((String)propertyChangeEvent.getOldValue());
+        }
+    }
+
+    /**
+     * Redo the specified property-change-event.
+     * @param propertyChangeEvent event to undo.
+     */
+    private void redo(PropertyChangeEvent propertyChangeEvent) {
+        String propertyName = propertyChangeEvent.getPropertyName();
+        Idea idea = (Idea)propertyChangeEvent.getSource();
+        if (propertyName.equals("text")) {
+            idea.setText((String)propertyChangeEvent.getNewValue());
+        } else if (propertyName.equals("notes")) {
+            idea.setNotes((String)propertyChangeEvent.getNewValue());
         }
     }
 }

@@ -42,7 +42,6 @@ import dg.hipster.Main;
 import dg.hipster.io.ReaderException;
 import dg.hipster.io.ReaderFactory;
 import dg.hipster.model.IdeaDocument;
-import dg.hipster.view.GuiUtilities;
 import java.io.File;
 
 /**
@@ -61,16 +60,16 @@ public final class MacAppListener implements ApplicationListener {
     public MacAppListener() {
     }
 
-    public void handleAbout(ApplicationEvent event)  {
+    public void handleAbout(final ApplicationEvent event)  {
         Main.showAbout();
         event.setHandled(true);
     }
-    public void handleOpenApplication(ApplicationEvent event) {
+    public void handleOpenApplication(final ApplicationEvent event) {
         if (event.getFilename() != null) {
             handleOpenFile(event);
         }
     }
-    public void handleOpenFile(ApplicationEvent event) {
+    public void handleOpenFile(final ApplicationEvent event) {
         File f = new File(event.getFilename());
         try {
             IdeaDocument document = ReaderFactory.getInstance().read(f);
@@ -80,15 +79,15 @@ public final class MacAppListener implements ApplicationListener {
         }
         event.setHandled(true);
     }
-    public void handlePreferences(ApplicationEvent event) {
+    public void handlePreferences(final ApplicationEvent event) {
         Main.showPreferences();
         event.setHandled(true);
     }
-    public void handlePrintFile(ApplicationEvent event) {
+    public void handlePrintFile(final ApplicationEvent event) {
     }
-    public void handleQuit(ApplicationEvent event) {
+    public void handleQuit(final ApplicationEvent event) {
         event.setHandled(Main.handleQuit());
     }
-    public void handleReOpenApplication(ApplicationEvent event) {
+    public void handleReOpenApplication(final ApplicationEvent event) {
     }
 }

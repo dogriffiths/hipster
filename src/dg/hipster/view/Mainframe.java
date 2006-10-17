@@ -69,6 +69,7 @@ import java.util.ResourceBundle;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
@@ -141,10 +142,10 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
                 KeyEvent.VK_S,
                 ActionEvent.SHIFT_MASK
                 + Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        JMenu editMenu = menuBar.getMenu("edit");
         if (!Main.isMac()) {
             fileMenu.addSeparator();
             menuBar.createItem("exit", fileMenu, "fileExit");
-            JMenu editMenu = menuBar.getMenu("edit");
             menuBar.createItem("preferences", editMenu, "editPreferences");
             JMenu helpMenu = menuBar.getMenu("help");
             menuBar.createItem("manual", helpMenu, "helpManual",
@@ -158,6 +159,11 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
                     ActionEvent.SHIFT_MASK
                     + Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         }
+        JMenuItem itemRedo = editMenu.getItem(1);
+        itemRedo.setAccelerator(KeyStroke.getKeyStroke(
+                KeyEvent.VK_Z,
+                ActionEvent.SHIFT_MASK
+                + Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         return menuBar;
     }
     
@@ -431,7 +437,7 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
         DataFlavor ideaFlavour = new DataFlavor(Idea.class, "Idea");
         Clipboard cb = getToolkit().getSystemClipboard();
         boolean isIdea = false;
-        // Weird hack because the ideaFlavour appears in the list of 
+        // Weird hack because the ideaFlavour appears in the list of
         // available flavors, but isDataFlavorAvailable returns false...
         for (DataFlavor f : cb.getAvailableDataFlavors()) {
             if (f.equals(ideaFlavour)) {
@@ -514,6 +520,15 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
     public void undo() {
         if (this.ideaMap != null) {
             this.ideaMap.undo();
+        }
+    }
+    
+    /**
+     * Redo the last undone change.
+     */
+    public void redo() {
+        if (this.ideaMap != null) {
+            this.ideaMap.redo();
         }
     }
 }

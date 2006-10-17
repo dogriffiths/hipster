@@ -45,13 +45,13 @@ import java.net.MalformedURLException;
  * @author dgriffiths
  */
 public final class Utilities {
-    
+
     /**
      * Creates a new instance of Utilities.
      */
     private Utilities() {
     }
-    
+
     /**
      * Whether two objects are equal, without throwing
      * a null pointer exception.
@@ -68,7 +68,7 @@ public final class Utilities {
         }
         return object0.equals(object1);
     }
-    
+
     /**
      * Whether a point is on a line of a given thickness.
      * @param p point in question.
@@ -88,48 +88,48 @@ public final class Utilities {
         double vy1 = toPoint.getY();
         double vx2 = p.getX();
         double vy2 = p.getY();
-        
+
         double minX = Math.min(vx0, vx1) - thickness / 2;
         double maxX = Math.max(vx0, vx1) + thickness / 2;
         double minY = Math.min(vy0, vy1) - thickness / 2;
         double maxY = Math.max(vy0, vy1) + thickness / 2;
-        
+
         if ((vx2 > maxX) || (vx2 < minX)) {
             return false;
         }
         if ((vy2 > maxY) || (vy2 < minY)) {
             return false;
         }
-        
+
         // Calculate magnitude of the normal to the line-segment
         double magNormal = Math.sqrt(
                 ((vx1 - vx0) * (vx1 - vx0)) + ((vy1 - vy0) * (vy1 - vy0))
                 );
-        
+
         // Calculate (signed) distance of the point from the line-segment
         double distance = (
                 ((vx2 - vx0) * (vy0 - vy1)) + ((vy2 - vy0) * (vx1 - vx0))
                 ) / magNormal;
-        
+
         // Check if the
         if (Math.abs(distance) <= (thickness / 2)) {
             return true;
         }
         return false;
     }
-    
+
     /**
      * Convert a file into a string URL.
      * @return string version of a URL, with spaces converted.
      * @param f file to get URL for.
-     * @throws java.net.MalformedURLException if the file cannot be converted to a URL - should
-     * not happen.
+     * @throws java.net.MalformedURLException if the file cannot be converted
+     * to a URL - should not happen.
      */
     public static String toStringUrl(final File f)
     throws MalformedURLException {
         String url = f.toURL().toString();
         url = url.trim();
-        while(url.indexOf(' ') != -1) {
+        while (url.indexOf(' ') != -1) {
             int pos = url.indexOf(' ');
             url = url.substring(0, pos) + "%20"
                     + url.substring(pos + 1);

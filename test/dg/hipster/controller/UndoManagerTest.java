@@ -86,6 +86,11 @@ public class UndoManagerTest extends TestCase {
         assertEquals("Fourth undo did not work", "new notes0", idea.getNotes());
         undoManager.undo();
         assertEquals("Fifth undo did not work", "original notes", idea.getNotes());
+        undoManager.redo();
+        assertEquals("First redo did not work", "new notes0", idea.getNotes());
+        idea.setNotes("burble");
+        undoManager.redo();
+        assertEquals("Second redo should have changed nothing", "burble", idea.getNotes());
     }
     
     /**
@@ -108,6 +113,12 @@ public class UndoManagerTest extends TestCase {
         assertEquals("Wrong number of child for subIdea1", 1, subIdea1.getSubIdeas().size());
         undoManager.undo();
         assertEquals("Wrong number of child for subIdea1 after undo", 0, subIdea1.getSubIdeas().size());
+        undoManager.redo();
+        assertEquals("Wrong number of child for subIdea1 after first redo", 1, subIdea1.getSubIdeas().size());
+        subIdea1.add(new Idea("stuff"));
+        assertEquals("Wrong number of child for subIdea1 before second redo", 2, subIdea1.getSubIdeas().size());
+        undoManager.redo();
+        assertEquals("Wrong number of child for subIdea1 after second redo", 2, subIdea1.getSubIdeas().size());
     }
     
     /**

@@ -87,7 +87,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
     /**
      * Internationalization strings.
      */
-    protected static ResourceBundle resBundle = ResourceBundle.getBundle(
+    private static ResourceBundle resBundle = ResourceBundle.getBundle(
             "dg/hipster/resource/strings");
     /**
      * Idea map being controlled.
@@ -110,7 +110,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
      * Factor to zoom by with each mouse-wheel click.
      */
     static final double ZOOM_PER_CLICK = 0.8;
-    
+
     /**
      * Creates a new instance of IdeaMapController.
      *@param newIdeaMap Idea map to control.
@@ -125,7 +125,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
         this.ideaMap.addMouseMotionListener(this);
         this.ideaMap.addMouseWheelListener(
                 new MouseWheelListener() {
-            public void mouseWheelMoved(MouseWheelEvent e) {
+            public void mouseWheelMoved(final MouseWheelEvent e) {
                 int rotation = e.getWheelRotation();
                 ideaMap.zoom(Math.pow(ZOOM_PER_CLICK, rotation));
             }
@@ -140,126 +140,37 @@ public final class IdeaMapController implements KeyListener, FocusListener,
                 unEditCurrent();
             }
             public void focusGained(final FocusEvent fe) {
-                
+
             }
         });
         this.ideaMap.requestFocusInWindow();
         this.mapMover = new MapMover(this.ideaMap);
-        DropTargetListener dtl = new DropTargetListener() {
-            public void dragEnter(DropTargetDragEvent dtde) {
-            }
-            public void dragExit(DropTargetEvent dtde) {
-            }
-            public void dragOver(DropTargetDragEvent event) {
-            }
-            public void dropActionChanged(DropTargetDragEvent dtde) {
-            }
-            public void drop(final DropTargetDropEvent event) {
-                try {
-                    Transferable transferable = event.getTransferable();
-                    IdeaView ideaView = ideaMap.getViewAt(
-                            ideaMap.getMapPoint(event.getLocation()));
-                    if (transferable.isDataFlavorSupported(
-                            DataFlavor.javaFileListFlavor)){
-                        event.acceptDrop(DnDConstants.ACTION_COPY);
-                        final Object os = transferable.getTransferData(
-                                DataFlavor.javaFileListFlavor);
-                        if(!(os instanceof java.util.Collection)) {
-                            event.rejectDrop();
-                            return;
-                        }
-                        boolean err = false;
-                        File f = (File)((Collection)os).iterator().next();
-                        boolean isOpml = f.getName().toUpperCase().endsWith(".OPML");
-                        if (isOpml) {
-                            ReaderFactory factory = ReaderFactory.getInstance();
-                            IdeaDocument document = factory.read(f);
-                            if (ideaView != null) {
-                                int answer = JOptionPane.showConfirmDialog(ideaMap,
-                                        resBundle.getString("insert_drag_question"),
-                                        resBundle.getString("app.name"),
-                                        JOptionPane.YES_NO_CANCEL_OPTION);
-                                if (answer == JOptionPane.YES_OPTION) {
-                                    ideaView.getIdea().add(document.getIdea());
-                                } else if (answer == JOptionPane.NO_OPTION) {
-                                    Main.getMainframe().setDocument(document);
-                                }
-                            } else {
-                                Main.getMainframe().setDocument(document);
-                            }
-                        } else if (ideaView != null) {
-                            FileMetaData metadata = new FileMetaData(f);
-                            Idea idea = new Idea(metadata.get("kMDItemTitle"));
-                            idea.setNotes(metadata.get("kMDItemComment",
-                                    "kMDItemCopyright"));
-                            idea.setDescription(
-                                    metadata.get("kMDItemDisplayName")
-                                    );
-                            String url = Utilities.toStringUrl(f);
-                            idea.setUrl(url);
-                            ideaView.getIdea().add(idea);
-                        } else {
-                            event.rejectDrop();
-                        }
-                        event.getDropTargetContext().dropComplete(true);
-                    } else if (transferable.isDataFlavorSupported(
-                            DataFlavor.stringFlavor)){
-                        event.acceptDrop(DnDConstants.ACTION_COPY);
-                        String s = transferable.getTransferData(
-                                DataFlavor.stringFlavor).toString();
-                        boolean isURLFormatted = (s.indexOf(':') >= 2);
-                        if (isURLFormatted) {
-                            // DnD from firefox introduces a \n followed by the anchor label (like "RSS feed")
-                            // that appears on the page. Hence, use only the substring upto the \n
-                            int linebreakIndex = s.lastIndexOf('\n');
-                            String insertText = null;
-                            Idea idea = new Idea(s);
-                            if(linebreakIndex != -1) {
-                                insertText = s.substring(0,linebreakIndex);
-                                idea.setText(s.substring(linebreakIndex + 1));
-                            } else {
-                                //DnD from IE and other browsers;use the string as it is.
-                                insertText = s;
-                            }
-                            idea.setUrl(insertText);
-                            ideaView.getIdea().add(idea);
-                        } else {
-                            event.rejectDrop();
-                        }
-                    } else {
-                        event.rejectDrop();
-                    }
-                } catch (Throwable t) {
-                    t.printStackTrace();
-                    event.rejectDrop();
-                }
-            }
-        };
+        DropTargetListener dtl = new DragAndDropController(this.ideaMap);
         DropTarget dt = new DropTarget(ideaMap, dtl);
         dt.setActive(true);
     }
-    
+
     /**
      * Stop the automatic adjustment process.
      */
     public void stopAdjust() {
         mapMover.stopAdjust();
     }
-    
+
     /**
      * Start the automatic adjustment process.
      */
     public void startAdjust() {
         mapMover.startAdjust();
     }
-    
+
     /**
      * Switch the current idea view out of editing mode.
      */
     private void unEditCurrent() {
         this.ideaMap.unEdit();
     }
-    
+
     /**
      * Called when a mouse is pressed and released on
      * the idea map.
@@ -282,8 +193,8 @@ public final class IdeaMapController implements KeyListener, FocusListener,
             }
         }
     }
-    
-    
+
+
     /**
      * Called when a mouse is pressed on the idea map.
      * @param evt event describing the mouse press.
@@ -297,7 +208,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
             selectIdeaViewAt(p, shouldEdit);
         }
     }
-    
+
     private void selectIdeaViewAt(final Point2D p, final boolean shouldEdit) {
         IdeaView hit = this.ideaMap.getViewAt(p);
         if (hit != null) {
@@ -313,7 +224,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
             }
         }
     }
-    
+
     /**
      * Called when a mouse is released over the idea map.
      * @param evt event describing the mouse release.
@@ -327,31 +238,31 @@ public final class IdeaMapController implements KeyListener, FocusListener,
         mapMover.setFixedBranch(null);
         this.ideaMap.clearRubberBand();
     }
-    
+
     /**
      * Called when a mouse exits the idea map.
      * @param evt event describing the mouse exit.
      */
     public void mouseExited(final MouseEvent evt) {
-        
+
     }
-    
+
     /**
      * Called when a mouse enters the idea map.
      * @param evt event describing the mouse entry.
      */
     public void mouseEntered(final MouseEvent evt) {
-        
+
     }
-    
+
     /**
      * Called when a mouse moves over the idea map.
      * @param evt event describing the mouse movement.
      */
     public void mouseMoved(final MouseEvent evt) {
-        
+
     }
-    
+
     /**
      * Called when a mouse is dragged over the idea map.
      * @param evt event describing the mouse drag.
@@ -368,7 +279,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
             this.ideaMap.drawLinkRubberBand(evt.getPoint());
         }
     }
-    
+
     private void dragMapTo(final Point p) {
         if ((p == null) || (downPoint == null)) {
             return;
@@ -383,19 +294,19 @@ public final class IdeaMapController implements KeyListener, FocusListener,
                 offset.y + yDiff));
         downPoint = p;
     }
-    
+
     public void focusGained(final FocusEvent evt) {
     }
-    
+
     public void focusLost(final FocusEvent evt) {
     }
-    
+
     public void keyReleased(final KeyEvent evt) {
     }
-    
+
     public void keyTyped(final KeyEvent evt) {
     }
-    
+
     public void keyPressed(final KeyEvent evt) {
         switch(evt.getKeyCode()) {
             case KeyEvent.VK_SPACE:
@@ -438,7 +349,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
                 // Do nothing
         }
     }
-    
+
     private void selectDown() {
         final IdeaView selected = this.ideaMap.getSelectedView();
         if (selected == null) {
@@ -461,7 +372,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
             this.ideaMap.setSelected(nextView.getIdea());
         }
     }
-    
+
     private void selectUp() {
         final IdeaView selected = this.ideaMap.getSelectedView();
         if (selected == null) {
@@ -484,7 +395,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
             this.ideaMap.setSelected(nextView.getIdea());
         }
     }
-    
+
     private void selectSibling(final int diff) {
         final IdeaView selected = this.ideaMap.getSelectedView();
         if (selected == null) {
@@ -496,7 +407,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
         }
         this.ideaMap.setSelected(previous.getIdea());
     }
-    
+
     private void selectRight() {
         final IdeaView selected = this.ideaMap.getSelectedView();
         if (selected == null) {
@@ -519,7 +430,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
             this.ideaMap.setSelected(nextView.getIdea());
         }
     }
-    
+
     private void selectLeft() {
         final IdeaView selected = this.ideaMap.getSelectedView();
         if (selected == null) {
@@ -542,7 +453,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
             this.ideaMap.setSelected(nextView.getIdea());
         }
     }
-    
+
     private Map<Point2D, IdeaView> endPoints(final IdeaView ideaView) {
         Map<Point2D, IdeaView> results = new HashMap<Point2D, IdeaView>();
         List<BranchView> subViews = ideaView.getSubViews();
@@ -572,7 +483,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
         }
         return results;
     }
-    
+
     private void createLinkTo(final Point2D p) {
         if (this.ideaMap != null) {
             IdeaView hit = this.ideaMap.getViewAt(p);
@@ -596,7 +507,7 @@ class FileMetaData {
      * Map used to store meta-data attributes and values.
      */
     private Map<String, String> data;
-    
+
     /**
      * Constructor for meta-data of a given file.
      */
@@ -610,7 +521,7 @@ class FileMetaData {
                 process = Runtime.getRuntime().exec(new String[]{
                     "mdls", f.toString()
                 }, null,f.getParentFile());
-                
+
                 in = new DataInputStream(process.getInputStream());
                 String line = null;
                 while ((line = in.readLine()) != null) {
@@ -627,7 +538,7 @@ class FileMetaData {
                         }
                     }
                 }
-                
+
             } catch(Exception e) {
                 // Oh well...
             } finally {
@@ -639,7 +550,7 @@ class FileMetaData {
             }
         }
     }
-    
+
     /**
      * Return the value of the requested parameters, separated by
      * newlines.
@@ -656,7 +567,7 @@ class FileMetaData {
         }
         return result;
     }
-    
+
     /**
      * Get a single meta-data attribute, with names matching
      * those on the Mac platform.
@@ -669,5 +580,104 @@ class FileMetaData {
             result = "";
         }
         return result;
+    }
+}
+
+class DragAndDropController implements DropTargetListener {
+    /**
+     * Internationalization strings.
+     */
+    private static ResourceBundle resBundle = ResourceBundle.getBundle(
+            "dg/hipster/resource/strings");
+
+    private IdeaMap ideaMap;
+
+    public DragAndDropController(final IdeaMap anIdeaMap) {
+        this.ideaMap = anIdeaMap;
+    }
+    public void dragEnter(final DropTargetDragEvent dtde) {
+    }
+    public void dragExit(final DropTargetEvent dtde) {
+    }
+    public void dragOver(final DropTargetDragEvent event) {
+    }
+    public void dropActionChanged(final DropTargetDragEvent dtde) {
+    }
+    public void drop(final DropTargetDropEvent event) {
+        try {
+            Transferable transferable = event.getTransferable();
+            IdeaView ideaView = ideaMap.getViewAt(
+                    ideaMap.getMapPoint(event.getLocation()));
+            if (transferable.isDataFlavorSupported(
+                    DataFlavor.javaFileListFlavor)){
+                event.acceptDrop(DnDConstants.ACTION_COPY);
+                final Object os = transferable.getTransferData(
+                        DataFlavor.javaFileListFlavor);
+                if(!(os instanceof java.util.Collection)) {
+                    event.rejectDrop();
+                    return;
+                }
+                boolean err = false;
+                File f = (File)((Collection)os).iterator().next();
+                boolean isOpml = f.getName().toUpperCase().endsWith(".OPML");
+                if (isOpml) {
+                    ReaderFactory factory = ReaderFactory.getInstance();
+                    IdeaDocument document = factory.read(f);
+                    if (ideaView != null) {
+                        int answer = JOptionPane.showConfirmDialog(ideaMap,
+                                resBundle.getString("insert_drag_question"),
+                                resBundle.getString("app.name"),
+                                JOptionPane.YES_NO_CANCEL_OPTION);
+                        if (answer == JOptionPane.YES_OPTION) {
+                            ideaView.getIdea().add(document.getIdea());
+                        } else if (answer == JOptionPane.NO_OPTION) {
+                            Main.getMainframe().setDocument(document);
+                        }
+                    } else {
+                        Main.getMainframe().setDocument(document);
+                    }
+                } else if (ideaView != null) {
+                    FileMetaData metadata = new FileMetaData(f);
+                    Idea idea = new Idea(metadata.get("kMDItemTitle"));
+                    idea.setNotes(metadata.get("kMDItemComment",
+                            "kMDItemCopyright"));
+                    idea.setDescription(
+                            metadata.get("kMDItemDisplayName")
+                            );
+                    String url = Utilities.toStringUrl(f);
+                    idea.setUrl(url);
+                    ideaView.getIdea().add(idea);
+                } else {
+                    event.rejectDrop();
+                }
+                event.getDropTargetContext().dropComplete(true);
+            } else if (transferable.isDataFlavorSupported(
+                    DataFlavor.stringFlavor)){
+                event.acceptDrop(DnDConstants.ACTION_COPY);
+                String s = transferable.getTransferData(
+                        DataFlavor.stringFlavor).toString();
+                boolean isURLFormatted = (s.indexOf(':') >= 2);
+                if (isURLFormatted) {
+                    int linebreakIndex = s.lastIndexOf('\n');
+                    String insertText = null;
+                    Idea idea = new Idea(s);
+                    if(linebreakIndex != -1) {
+                        insertText = s.substring(0,linebreakIndex);
+                        idea.setText(s.substring(linebreakIndex + 1));
+                    } else {
+                        insertText = s;
+                    }
+                    idea.setUrl(insertText);
+                    ideaView.getIdea().add(idea);
+                } else {
+                    event.rejectDrop();
+                }
+            } else {
+                event.rejectDrop();
+            }
+        } catch (Throwable t) {
+            t.printStackTrace();
+            event.rejectDrop();
+        }
     }
 }

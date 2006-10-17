@@ -17,6 +17,7 @@
     </menu>
     <menu textName="edit">
         <item textName="undo" action="undo" key="Z"/>
+        <item textName="redo" action="redo"/>
         <item textName="-"/>
         <item textName="cut" action="cutIdea" key="X"/>
         <item textName="copy" action="copyIdea" key="C"/>
