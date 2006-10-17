@@ -576,7 +576,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
     private void createLinkTo(final Point2D p) {
         if (this.ideaMap != null) {
             IdeaView hit = this.ideaMap.getViewAt(p);
-            if (hit != null) {
+            if ((hit != null) && (hit instanceof BranchView)) {
                 Idea selectedIdea = this.ideaMap.getSelected();
                 if (selectedIdea != null) {
                     Idea hitIdea = hit.getIdea();

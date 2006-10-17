@@ -114,7 +114,11 @@ public class LinkView extends IdeaView {
         IdeaLink link = getLink();
         BranchView fromBranch = (BranchView) getRootView().getViewFor(
                 link.getFrom());
-        BranchView branch = (BranchView) getRootView().getViewFor(link.getTo());
+        IdeaView toView = getRootView().getViewFor(link.getTo());
+        if (!(toView instanceof BranchView)) {
+            return;
+        }
+        BranchView branch = (BranchView) toView;
         Point2D start0 = fromBranch.getFromPoint();
         Point2D end0 = fromBranch.getToPoint();
         Point2D start1 = branch.getFromPoint();
