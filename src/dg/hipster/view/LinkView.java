@@ -140,6 +140,12 @@ public class LinkView extends IdeaView {
             p[0] = mid(s0, e0);
             p[3] = mid(s1, e1);
             
+            double distBetweenMids = length(minus(p[0], p[3]));
+            double n0Length = length(n0);
+            n0 = scale(n0, distBetweenMids / n0Length / 3);
+            double n1Length = length(n1);
+            n1 = scale(n1, distBetweenMids / n1Length / 3);
+            
             p[1] = plus(p[0], n0);
             if (dot(minus(s0, p[1]), n0) * dot(minus(s0, s1), n0) < 0) {
                 p[1] = minus(p[0], n0);
@@ -206,5 +212,13 @@ public class LinkView extends IdeaView {
     
     private static Point mid(Point p0, Point p1) {
         return new Point((p0.x + p1.x) / 2, (p0.y + p1.y) / 2);
+    }
+    
+    private static int length(Point p0) {
+        return (int)Math.hypot(p0.x, p0.y);
+    }
+    
+    private static Point scale(Point p, double scale) {
+        return new Point((int)(p.x * scale), (int)(p.y * scale));
     }
 }
