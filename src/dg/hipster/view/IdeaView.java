@@ -73,16 +73,16 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
     public IdeaView(Idea anIdea) {
         setIdea(anIdea);
     }
-    
-    public double getMinSubAngle() {
-        double minAngle = Math.PI;
-        for (IdeaView subView: subViews) {
-            if (subView.getIdea().getAngle() < minAngle) {
-                minAngle = subView.getIdea().getAngle();
-            }
-        }
-        return minAngle;
-    }
+//    
+//    public double getMinSubAngle() {
+//        double minAngle = Math.PI;
+//        for (IdeaView subView: subViews) {
+//            if (subView.getIdea().getAngle() < minAngle) {
+//                minAngle = subView.getIdea().getAngle();
+//            }
+//        }
+//        return minAngle;
+//    }
     
     public double getMaxSubAngle() {
         double maxAngle = -Math.PI;
@@ -114,7 +114,7 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
                 for (int i = 0; i < subViews.size(); i++) {
                     Idea idea = (Idea) subViews.get(i).getIdea();
                     if (idea.equals(subIdea)) {
-                        subViews.remove(i);
+                        remove((BranchView)subViews.get(i));
                         break;
                     }
                 }
@@ -167,17 +167,17 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
         return parentView.getSubViews().get(siblingPos);
     }
     
-    public synchronized void add(BranchView subView) {
+    private synchronized void add(BranchView subView) {
         subView.parent = this;
         subViews.add(subView);
     }
     
-    public synchronized void add(int pos, BranchView subView) {
+    private synchronized void add(int pos, BranchView subView) {
         subView.parent = this;
         subViews.add(pos, subView);
     }
     
-    public synchronized void remove(BranchView subView) {
+    private synchronized void remove(BranchView subView) {
         subView.parent = null;
         subViews.remove(subView);
     }
