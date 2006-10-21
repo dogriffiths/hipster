@@ -13,6 +13,7 @@ import dg.hipster.model.Idea;
 import dg.hipster.model.IdeaLink;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStreamWriter;
+import java.util.Date;
 
 /**
  *
@@ -45,6 +46,8 @@ public class OPMLWriterTest extends TestCase {
         idea.add(subIdea0WithQuotes);
         Idea subIdea1 = new Idea("Test");
         idea.add(subIdea1);
+        idea.setStartDate(OPMLWriter.DATE_FORMAT.parse("Sat, 21 Oct 2006 07:47:00 BST"));
+        idea.setEndDate(OPMLWriter.DATE_FORMAT.parse("Sun, 22 Oct 2006 07:37:00 BST"));
         subIdea0WithQuotes.addLink(new IdeaLink(subIdea0WithQuotes, subIdea1));
         
         ByteArrayOutputStream out = new ByteArrayOutputStream(1024);
@@ -64,7 +67,11 @@ public class OPMLWriterTest extends TestCase {
                 + "<title/>"
                 + "</head>"
                 + "<body>"
-                + "<outline angle=\"0.0\" id=\"0\" text=\"R&amp;D\">"
+                + "<outline angle=\"0.0\""
+                + " endDate=\"Sun, 22 Oct 2006 07:37:00 BST\""
+                + " id=\"0\""
+                + " startDate=\"Sat, 21 Oct 2006 07:47:00 BST\""
+                + " text=\"R&amp;D\">"
                 + "<outline angle=\"0.0\" id=\"1\" text=\"&quot;Idea&quot;\">"
                 + "<outline text=\"Test\" type=\"link\" url=\"#2\"/>"
                 + "</outline>"

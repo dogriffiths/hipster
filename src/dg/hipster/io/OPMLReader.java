@@ -39,6 +39,7 @@ import dg.hipster.model.IdeaDocument;
 import dg.hipster.model.Idea;
 import dg.hipster.model.IdeaLink;
 import java.io.InputStream;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -68,67 +69,80 @@ public final class OPMLReader extends DefaultHandler implements IdeaReader {
             String qName, // qualified name
             Attributes attrs)
             throws SAXException {
-        if ("outline".equals(qName)) {
-            if (attrs != null) {
-                String type = attrs.getValue("type");
-                if (type != null) {
-                    type = type.toUpperCase();
-                } else {
-                    type = "";
-                }
-                String url = attrs.getValue("url");
-                if (url == null) {
-                    url = "";
-                }
-                if (!url.startsWith("#")) {
-                    String text = attrs.getValue("text");
-                    Idea i = new Idea(text);
-                    i.setUrl(url);
-                    String id = attrs.getValue("id");
-                    if ((id != null) && (id.length() > 0)) {
-                        ideaIndex.put(new Integer(id), i);
-                    }
-                    String notes = attrs.getValue("notes");
-                    if (notes == null) {
-                        notes = "";
-                    }
-                    i.setNotes(notes);
-                    String description = attrs.getValue("description");
-                    if (description == null) {
-                        description = "";
-                    }
-                    i.setDescription(description);
-                    String angleString = attrs.getValue("angle");
-                    if ((angleString != null) && (angleString.length() > 0)) {
-                        i.setAngle(Double.valueOf(angleString));
-                        anglesRead = true;
-                    }
-                    if (idea == null) {
-                        idea = i;
-                    } else if (current != null) {
-                        current.add(i);
+        try {
+            if ("outline".equals(qName)) {
+                if (attrs != null) {
+                    String type = attrs.getValue("type");
+                    if (type != null) {
+                        type = type.toUpperCase();
                     } else {
-                        Idea i2 = new Idea("root");
-                        i2.add(idea);
-                        idea = i2;
-                        stack.push(idea);
-                        idea.add(i);
+                        type = "";
                     }
-                    current = i;
-                    stack.push(current);
-                } else {
-                    String indexNo = url.substring(1);
-                    IdeaLink link = new IdeaLink(current, null);
-                    String description = attrs.getValue("description");
-                    if (description == null) {
-                        description = "";
+                    String url = attrs.getValue("url");
+                    if (url == null) {
+                        url = "";
                     }
-                    link.setDescription(description);
-                    links.add(link);
-                    linkTos.add(new Integer(indexNo));
-                    stack.push(null);
+                    if (!url.startsWith("#")) {
+                        String text = attrs.getValue("text");
+                        Idea i = new Idea(text);
+                        i.setUrl(url);
+                        String id = attrs.getValue("id");
+                        if ((id != null) && (id.length() > 0)) {
+                            ideaIndex.put(new Integer(id), i);
+                        }
+                        String notes = attrs.getValue("notes");
+                        if (notes == null) {
+                            notes = "";
+                        }
+                        i.setNotes(notes);
+                        String description = attrs.getValue("description");
+                        if (description == null) {
+                            description = "";
+                        }
+                        String startDateString = attrs.getValue("startDate");
+                        if (startDateString != null) {
+                            i.setStartDate(OPMLWriter.DATE_FORMAT.parse(
+                                    startDateString));
+                        }
+                        String endDateString = attrs.getValue("endDate");
+                        if (endDateString != null) {
+                            i.setEndDate(OPMLWriter.DATE_FORMAT.parse(
+                                    endDateString));
+                        }
+                        String angleString = attrs.getValue("angle");
+                        if ((angleString != null) && (angleString.length() > 0)) {
+                            i.setAngle(Double.valueOf(angleString));
+                            anglesRead = true;
+                        }
+                        if (idea == null) {
+                            idea = i;
+                        } else if (current != null) {
+                            current.add(i);
+                        } else {
+                            Idea i2 = new Idea("root");
+                            i2.add(idea);
+                            idea = i2;
+                            stack.push(idea);
+                            idea.add(i);
+                        }
+                        current = i;
+                        stack.push(current);
+                    } else {
+                        String indexNo = url.substring(1);
+                        IdeaLink link = new IdeaLink(current, null);
+                        String description = attrs.getValue("description");
+                        if (description == null) {
+                            description = "";
+                        }
+                        link.setDescription(description);
+                        links.add(link);
+                        linkTos.add(new Integer(indexNo));
+                        stack.push(null);
+                    }
                 }
             }
+        } catch(ParseException pe) {
+            throw new SAXException("Cannot parse element", pe);
         }
     }
     public void endElement(String namespaceURI,

@@ -33,7 +33,6 @@
 package dg.inx;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -43,8 +42,11 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.SpinnerDateModel;
+import javax.swing.SpinnerModel;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
@@ -61,27 +63,27 @@ import org.xml.sax.SAXException;
  */
 public class XMLPanel extends JPanel {
     private Controller c;
-
+    
     public XMLPanel(AbstractModel model, String viewXML) {
         this.setBackground(null);
         this.setForeground(null);
         c = new Controller(model);
-
+        
         GridBagLayout gbl = new GridBagLayout();
         GridBagConstraints con = new GridBagConstraints();
-
+        
         setLayout(gbl);
-
+        
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         InputStream in = null;
         try {
             in = XMLPanel.class.getResourceAsStream(viewXML);
             Document document = factory.newDocumentBuilder().parse(in);
-
+            
             // docElement should point at the <commPort> element
             Element docElement = (Element) document.getElementsByTagName(
                     "panel").item(0);
-
+            
             // Loop through each <statstic> element within <statistics> element
             NodeList rowList = docElement.getElementsByTagName("row");
             for (int i = 0; i < rowList.getLength(); i++) {
@@ -152,6 +154,9 @@ public class XMLPanel extends JPanel {
                         } else if ("text".equals(name)) {
                             con.weighty = 0.0;
                             add(makeText(c, colElement.getAttribute("value"), gbl, con));
+                        } else if ("date".equals(name)) {
+                            con.weighty = 0.0;
+                            add(makeDate(c, colElement.getAttribute("value"), gbl, con));
                         } else if ("checkBox".equals(name)) {
                             con.weighty = 0.0;
                             add(makeCheckBox(c, colElement.getAttribute("value"), gbl, con,
@@ -170,7 +175,7 @@ public class XMLPanel extends JPanel {
                     }
                 }
             }
-
+            
         } catch(IOException ioe) {
             ioe.printStackTrace();
         } catch(ParserConfigurationException pce) {
@@ -186,11 +191,11 @@ public class XMLPanel extends JPanel {
             }
         }
     }
-
+    
     public Controller getController() {
         return this.c;
     }
-
+    
     private JLabel makeLabel(String text, GridBagLayout gbl,
             GridBagConstraints con) {
         JLabel label = new JLabel(text);
@@ -199,7 +204,7 @@ public class XMLPanel extends JPanel {
         gbl.setConstraints(label, con);
         return label;
     }
-
+    
     private static JTextField makeText(Controller c, String source,
             GridBagLayout gbl, GridBagConstraints con) {
         JTextField txt = new JTextField();
@@ -214,7 +219,23 @@ public class XMLPanel extends JPanel {
         }
         return txt;
     }
-
+    
+    private static JSpinner makeDate(Controller c, String source,
+            GridBagLayout gbl, GridBagConstraints con) {
+        JSpinner dt = new JSpinner();
+        SpinnerModel sm = new SpinnerDateModel();
+        dt.setModel(sm);
+        dt.getEditor().setForeground(null);
+        dt.getEditor().setBackground(new Color(55, 55, 55));
+        gbl.setConstraints(dt, con);
+        if (source.startsWith("#")) {
+            c.bind(dt, source.substring(1));
+        } else {
+            dt.setValue(source);
+        }
+        return dt;
+    }
+    
     private static JTextArea makeTextArea(Controller c, String source,
             GridBagLayout gbl, GridBagConstraints con, int rows, int cols) {
         JTextArea txt = new JTextArea();
@@ -234,7 +255,7 @@ public class XMLPanel extends JPanel {
         txt.setAutoscrolls(true);
         return txt;
     }
-
+    
     private static JCheckBox makeCheckBox(Controller c, String source,
             GridBagLayout gbl, GridBagConstraints con, String label) {
         JCheckBox chk = new JCheckBox();

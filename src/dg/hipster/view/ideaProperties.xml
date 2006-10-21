@@ -20,6 +20,16 @@
     <text value="#description" margin-bottom="4" width="10"/>
   </row>
   <row>
+    <label value="Start:" margin-bottom="2" margin-right="7" width="1"
+        align="right"/>
+    <date value="#startDate" margin-bottom="4" width="10"/>
+  </row>
+  <row>
+    <label value="End:" margin-bottom="2" margin-right="7" width="1"
+        align="right"/>
+    <date value="#endDate" margin-bottom="4" width="10"/>
+  </row>
+  <row>
     <label value="URL:" margin-bottom="2" margin-right="7" width="1"
         align="right"/>
     <text value="#url" margin-bottom="4" width="10"/>

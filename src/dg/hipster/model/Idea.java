@@ -36,6 +36,7 @@
 package dg.hipster.model;
 
 import dg.inx.AbstractModel;
+import java.util.Date;
 import java.util.List;
 import java.util.Vector;
 
@@ -62,6 +63,14 @@ public class Idea extends AbstractModel implements IdeaListener {
      */
     private String url = "";
     /**
+     * Start date for this idea.
+     */
+    private Date startDate;
+    /**
+     * Start date for this idea.
+     */
+    private Date endDate;
+    /**
      * List of sub-ideas.
      */
     private Vector<Idea> subIdeas = new Vector<Idea>();
@@ -77,14 +86,14 @@ public class Idea extends AbstractModel implements IdeaListener {
      * Longer notes.
      */
     private String notes = "";
-
+    
     /**
      * No args constructor.
      */
     public Idea() {
-
+        
     }
-
+    
     /**
      * Constructor for an idea with the given text.
      * @param text zhort text description of the idea
@@ -92,11 +101,11 @@ public class Idea extends AbstractModel implements IdeaListener {
     public Idea(String text) {
         setText(text);
     }
-
+    
     //
     // PROPERTIES
     //
-
+    
     /**
      * Get the short text description of this idea.
      * @return short text string, using for idea maps
@@ -104,7 +113,7 @@ public class Idea extends AbstractModel implements IdeaListener {
     public String getText() {
         return text;
     }
-
+    
     /**
      * Specify the short newText description of this idea.
      *
@@ -118,7 +127,7 @@ public class Idea extends AbstractModel implements IdeaListener {
             notify(new IdeaEvent(this, IdeaEvent.CHANGED, "CHANGED"));
         }
     }
-
+    
     /**
      * The length of this idea.
      *@return length in points.
@@ -126,7 +135,7 @@ public class Idea extends AbstractModel implements IdeaListener {
     public double getLength() {
         return length;
     }
-
+    
     /**
      * The length of this idea.
      *@param length length in points.
@@ -138,7 +147,7 @@ public class Idea extends AbstractModel implements IdeaListener {
             this.firePropertyChange("length", oldLength, newLength);
         }
     }
-
+    
     /**
      * The angle of this idea relative to its parent.
      *@return angle in radians.
@@ -146,7 +155,7 @@ public class Idea extends AbstractModel implements IdeaListener {
     public double getAngle() {
         return angle;
     }
-
+    
     /**
      * The angle of this idea relative to its parent.
      *@param angle angle in radians.
@@ -158,7 +167,7 @@ public class Idea extends AbstractModel implements IdeaListener {
             this.firePropertyChange("angle", oldAngle, newAngle);
         }
     }
-
+    
     /**
      * The velocity of this idea's end-point during animation.
      *@return the velocity.
@@ -166,7 +175,7 @@ public class Idea extends AbstractModel implements IdeaListener {
     public double getV() {
         return v;
     }
-
+    
     /**
      * The velocity of this idea's end-point during animation.
      *@param v the velocity.
@@ -178,11 +187,11 @@ public class Idea extends AbstractModel implements IdeaListener {
             this.firePropertyChange("v", oldV, newV);
         }
     }
-
+    
     public String getNotes() {
         return notes;
     }
-
+    
     public void setNotes(String newNotes) {
         String oldNotes = this.notes;
         if ((this.notes == null) || (!this.notes.equals(newNotes))) {
@@ -191,7 +200,7 @@ public class Idea extends AbstractModel implements IdeaListener {
             notify(new IdeaEvent(this, IdeaEvent.CHANGED, "CHANGED"));
         }
     }
-
+    
     /**
      * Get a list of the sub-ideas for this idea.
      *@return list of idea objects
@@ -199,7 +208,7 @@ public class Idea extends AbstractModel implements IdeaListener {
     public List<Idea> getSubIdeas() {
         return (List<Idea>)subIdeas.clone();
     }
-
+    
     /**
      * Get the list of links that this idea is connected to.
      * @return list of links to related ideas.
@@ -207,11 +216,11 @@ public class Idea extends AbstractModel implements IdeaListener {
     public List<IdeaLink> getLinks() {
         return (List<IdeaLink>)links.clone();
     }
-
+    
     //
     // Collection methods.
     //
-
+    
     /**
      * Add a sub-idea to this idea.
      * @param subIdea sub-idea to add
@@ -222,7 +231,7 @@ public class Idea extends AbstractModel implements IdeaListener {
         notify(new IdeaEvent(this, IdeaEvent.ADDED, "ADDED",
                 subIdea, subIdeas.size() - 1));
     }
-
+    
     /**
      * Add a sub-idea to this idea at the given position.
      * @param pos position in the list of sub-ideas to insert
@@ -234,7 +243,7 @@ public class Idea extends AbstractModel implements IdeaListener {
         notify(new IdeaEvent(this, IdeaEvent.ADDED, "ADDED",
                 subIdea, pos));
     }
-
+    
     /**
      * Remove the given sub-idea from this idea. No
      * exception is raised if the idea given is
@@ -248,7 +257,7 @@ public class Idea extends AbstractModel implements IdeaListener {
         notify(new IdeaEvent(this, IdeaEvent.REMOVED, "REMOVED",
                 subIdea, pos));
     }
-
+    
     /**
      * Add a one-way link to another idea.
      *@param other idea to link to.
@@ -261,7 +270,7 @@ public class Idea extends AbstractModel implements IdeaListener {
                     other));
         }
     }
-
+    
     /**
      * Remove a link to another idea.
      *@param other idea to link to.
@@ -276,11 +285,11 @@ public class Idea extends AbstractModel implements IdeaListener {
                     other));
         }
     }
-
+    
     //
     // Idea-listener methods.
     //
-
+    
     /**
      * Add an idea listener to this idea. The idea listener
      * will be informed when anything changes about this
@@ -292,7 +301,7 @@ public class Idea extends AbstractModel implements IdeaListener {
             listeners.add(ideaListener);
         }
     }
-
+    
     /**
      * The given idea-listener will no longer be
      * notified of changes to this idea. No exception
@@ -303,7 +312,7 @@ public class Idea extends AbstractModel implements IdeaListener {
     public void removeIdeaListener(IdeaListener ideaListener) {
         listeners.remove(ideaListener);
     }
-
+    
     /**
      * Notify all listeners that something has changed. The parameters
      * provide more detail about the change.
@@ -316,15 +325,15 @@ public class Idea extends AbstractModel implements IdeaListener {
             listener.ideaChanged(ideaEvent);
         }
     }
-
+    
     public void ideaChanged(IdeaEvent ideaEvent) {
         notify(ideaEvent);
     }
-
+    
     //
     // Other methods.
     //
-
+    
     /**
      * String version of this idea. It will be the short text
      * description, followed by a recursive list of the
@@ -334,7 +343,7 @@ public class Idea extends AbstractModel implements IdeaListener {
     public String toString() {
         return this.text + subIdeas.toString();
     }
-
+    
     /**
      * Create a clone of this idea.
      */
@@ -344,6 +353,8 @@ public class Idea extends AbstractModel implements IdeaListener {
         idea.setLength(getLength());
         idea.setNotes(getNotes());
         idea.setDescription(getDescription());
+        idea.setStartDate(getStartDate());
+        idea.setEndDate(getEndDate());
         idea.setUrl(getUrl());
         idea.setV(getV());
         for (Idea subIdea : this.subIdeas) {
@@ -351,21 +362,37 @@ public class Idea extends AbstractModel implements IdeaListener {
         }
         return idea;
     }
-
+    
     public String getUrl() {
         return url;
     }
-
+    
     public void setUrl(String url) {
         this.url = url;
     }
-
+    
     public String getDescription() {
         return description;
     }
-
+    
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
+    }
+
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
     }
 }
 
