@@ -105,7 +105,9 @@ public class Controller {
             }
             Object value = modelGetter.invoke(model, null);
             Object[] values = {value};
-            viewSetter.invoke(view, values);
+            if (value != null) {
+                viewSetter.invoke(view, values);
+            }
             bindImpl(view, viewProperty, model, modelProperty);
             bindImpl(model, modelProperty, view, viewProperty);
         } catch(Exception e) {
@@ -125,7 +127,9 @@ public class Controller {
             }
             Object value = modelGetter.invoke(model, null);
             Object[] values = {value};
-            viewSetter.invoke(view, values);
+            if (value != null) {
+                viewSetter.invoke(view, values);
+            }
             bindImpl(view, viewProperty, model, modelProperty);
             bindImpl(model, modelProperty, (ItemSelectable) view, viewProperty);
         } catch(Exception e) {
@@ -145,7 +149,9 @@ public class Controller {
             }
             Object value = modelGetter.invoke(model, null);
             Object[] values = {value};
-            viewSetter.invoke(view, values);
+            if (value != null) {
+                viewSetter.invoke(view, values);
+            }
             bindImpl(view, viewProperty, model, modelProperty);
             bindImpl(model, modelProperty, (ItemSelectable) view, viewProperty);
         } catch(Exception e) {
@@ -165,7 +171,9 @@ public class Controller {
             }
             Object value = modelGetter.invoke(model, null);
             Object[] values = {value};
-            viewSetter.invoke(view, values);
+            if (value != null) {
+                viewSetter.invoke(view, values);
+            }
             bindImpl(view, viewProperty, model, modelProperty);
             bindImpl(model, modelProperty, view, viewProperty);
         } catch(Exception e) {
@@ -185,7 +193,9 @@ public class Controller {
             }
             Object value = modelGetter.invoke(model, null);
             Object[] values = {value};
-            viewSetter.invoke(view, values);
+            if (value != null) {
+                viewSetter.invoke(view, values);
+            }
             bindImpl(view, viewProperty, model, modelProperty);
             bindImpl(model, modelProperty, view, viewProperty);
         } catch(Exception e) {
@@ -228,7 +238,9 @@ public class Controller {
             }
             Object value = modelGetter.invoke(model, null);
             Object[] values = {value};
-            viewSetter.invoke(view, values);
+            if (value != null) {
+                viewSetter.invoke(view, values);
+            }
             bindImpl(view, viewProperty, model, modelProperty);
             bindImpl(model, modelProperty, view, viewProperty);
         } catch(Exception e) {
