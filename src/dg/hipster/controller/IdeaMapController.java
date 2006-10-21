@@ -209,6 +209,12 @@ public final class IdeaMapController implements KeyListener, FocusListener,
         }
     }
 
+    /**
+     * Select the ideaView (if any) that is at the given point.
+     * @param p point to consider.
+     * @param shouldEdit true if the view should go into edit mode,
+     * false otherwise.
+     */
     private void selectIdeaViewAt(final Point2D p, final boolean shouldEdit) {
         IdeaView hit = this.ideaMap.getViewAt(p);
         if (hit != null) {
@@ -280,6 +286,12 @@ public final class IdeaMapController implements KeyListener, FocusListener,
         }
     }
 
+    /**
+     * Drag the map so that the point that the mouse was
+     * first pressed at is moved to the given point.
+     * @param p point that the down point should be moved
+     * to.
+     */
     private void dragMapTo(final Point p) {
         if ((p == null) || (downPoint == null)) {
             return;
@@ -295,18 +307,41 @@ public final class IdeaMapController implements KeyListener, FocusListener,
         downPoint = p;
     }
 
+    /**
+     * Called the idea map gains the focus.
+     * @param evt event describing the capture of the focus.
+     */
     public void focusGained(final FocusEvent evt) {
     }
 
+    /**
+     * Calledwhen the idea map loses the focus.
+     * @param evt event describing the loss of focus.
+     */
     public void focusLost(final FocusEvent evt) {
     }
 
+    /**
+     * Called the a key is released when the idea map
+     * has the focus.
+     * @param evt event describing the release of the key.
+     */
     public void keyReleased(final KeyEvent evt) {
     }
 
+    /**
+     * Called whe a key is typed when the idea map
+     * has the focus.
+     * @param evt event describing the typing of the key.
+     */
     public void keyTyped(final KeyEvent evt) {
     }
 
+    /**
+     * Called whe a key is pressed down when the idea map
+     * has the focus.
+     * @param evt event describing the pressing of the key.
+     */
     public void keyPressed(final KeyEvent evt) {
         switch(evt.getKeyCode()) {
             case KeyEvent.VK_SPACE:
@@ -350,6 +385,10 @@ public final class IdeaMapController implements KeyListener, FocusListener,
         }
     }
 
+    /**
+     * Select the idea that appears below the current
+     * one in the idea map.
+     */
     private void selectDown() {
         final IdeaView selected = this.ideaMap.getSelectedView();
         if (selected == null) {
@@ -362,7 +401,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
         // Find the most Westerly
         double y = Double.NEGATIVE_INFINITY;
         IdeaView nextView = null;
-        for (Point2D endPoint: viewMap.keySet()) {
+        for (Point2D endPoint : viewMap.keySet()) {
             if (endPoint.getY() > y) {
                 y = endPoint.getY();
                 nextView = viewMap.get(endPoint);
@@ -373,6 +412,10 @@ public final class IdeaMapController implements KeyListener, FocusListener,
         }
     }
 
+    /**
+     * Select the idea that appears above the current
+     * one in the idea map.
+     */
     private void selectUp() {
         final IdeaView selected = this.ideaMap.getSelectedView();
         if (selected == null) {
@@ -396,6 +439,14 @@ public final class IdeaMapController implements KeyListener, FocusListener,
         }
     }
 
+    /**
+     * Select the sibling given by the different (clockwise
+     * is positive). Calling this method with +1 will select
+     * the sibling idea immediately clockwise of the current
+     * one.
+     * @param diff offset of the sibling idea, in a clockwise
+     * direction.
+     */
     private void selectSibling(final int diff) {
         final IdeaView selected = this.ideaMap.getSelectedView();
         if (selected == null) {
@@ -408,6 +459,10 @@ public final class IdeaMapController implements KeyListener, FocusListener,
         this.ideaMap.setSelected(previous.getIdea());
     }
 
+    /**
+     * Select the idea immediately to the right of the current
+     * one in the idea map.
+     */
     private void selectRight() {
         final IdeaView selected = this.ideaMap.getSelectedView();
         if (selected == null) {
@@ -431,6 +486,10 @@ public final class IdeaMapController implements KeyListener, FocusListener,
         }
     }
 
+    /**
+     * Select the idea immediately to the left of the
+     * current one in the idea map.
+     */
     private void selectLeft() {
         final IdeaView selected = this.ideaMap.getSelectedView();
         if (selected == null) {
@@ -454,6 +513,15 @@ public final class IdeaMapController implements KeyListener, FocusListener,
         }
     }
 
+    /**
+     * Get a map of endpoints of the ideas that are
+     * immediately connected to the given one. This is
+     * useful when deciding which ideas lie to the
+     * left or right of the current one.
+     * @param ideaView central view that the others will
+     * be connected to.
+     * @return map of point->views.
+     */
     private Map<Point2D, IdeaView> endPoints(final IdeaView ideaView) {
         Map<Point2D, IdeaView> results = new HashMap<Point2D, IdeaView>();
         List<BranchView> subViews = ideaView.getSubViews();
@@ -484,6 +552,11 @@ public final class IdeaMapController implements KeyListener, FocusListener,
         return results;
     }
 
+    /**
+     * Create a link from the currently selected idea
+     * to the view at the given point.
+     * @param p point where a view may lie.
+     */
     private void createLinkTo(final Point2D p) {
         if (this.ideaMap != null) {
             IdeaView hit = this.ideaMap.getViewAt(p);
@@ -510,8 +583,9 @@ class FileMetaData {
 
     /**
      * Constructor for meta-data of a given file.
+     * @param f file we are interested in.
      */
-    FileMetaData(File f) {
+    FileMetaData(final File f) {
         data = new HashMap<String, String>();
         data.put("kMDItemTitle", f.getName());
         if (Main.isMac()) {
@@ -520,7 +594,7 @@ class FileMetaData {
             try {
                 process = Runtime.getRuntime().exec(new String[]{
                     "mdls", f.toString()
-                }, null,f.getParentFile());
+                }, null, f.getParentFile());
 
                 in = new DataInputStream(process.getInputStream());
                 String line = null;
@@ -539,12 +613,12 @@ class FileMetaData {
                     }
                 }
 
-            } catch(Exception e) {
+            } catch (Exception e) {
                 // Oh well...
             } finally {
                 try {
                     in.close();
-                } catch(Exception e2) {
+                } catch (Exception e2) {
                     // Oh well... part 2
                 }
             }
@@ -557,7 +631,7 @@ class FileMetaData {
      *@param names - list of attribute names.
      *@return multi-line string.
      */
-    public String get(String... names) {
+    public String get(final String... names) {
         String result = "";
         for (String name : names) {
             String s = get(name);
@@ -574,7 +648,7 @@ class FileMetaData {
      *@param name - attribute name.
      *@return string value of the attribute.
      */
-    public String get(String name) {
+    public String get(final String name) {
         String result = data.get(name);
         if (result == null) {
             result = "";
@@ -583,6 +657,9 @@ class FileMetaData {
     }
 }
 
+/**
+ * Drag and drop controller for the idea map.
+ */
 class DragAndDropController implements DropTargetListener {
     /**
      * Internationalization strings.
@@ -590,35 +667,68 @@ class DragAndDropController implements DropTargetListener {
     private static ResourceBundle resBundle = ResourceBundle.getBundle(
             "dg/hipster/resource/strings");
 
+    /**
+     * Idea map that stuff is being dropped onto.
+     */
     private IdeaMap ideaMap;
 
+    /**
+     * Constructor of a controller for a given
+     * idea map.
+     * @param anIdeaMap idea map that we are watching for
+     * DnD events on.
+     */
     public DragAndDropController(final IdeaMap anIdeaMap) {
         this.ideaMap = anIdeaMap;
     }
+    /**
+     * Drag peration enters the idea map.
+     * @param dtde event describing the drag.
+     */
     public void dragEnter(final DropTargetDragEvent dtde) {
     }
+    /**
+     * Drag operation has left the idea map.
+     * @param dtde event describing the exit.
+     */
     public void dragExit(final DropTargetEvent dtde) {
     }
+    /**
+     * Called each time the drag operation
+     * continues over the idea map.
+     * @param event event describing the lates drag operation.
+     */
     public void dragOver(final DropTargetDragEvent event) {
     }
+    /**
+     * Called if the user changes the nature of
+     * the drag operation, for example by pressing
+     * a modifier key.
+     * @param dtde event describing the change in the nature
+     * of the drag operation.
+     */
     public void dropActionChanged(final DropTargetDragEvent dtde) {
     }
+    /**
+     * Something has been dropped on the idea map.
+     * @param event event describing the drop operation.
+     */
     public void drop(final DropTargetDropEvent event) {
         try {
             Transferable transferable = event.getTransferable();
             IdeaView ideaView = ideaMap.getViewAt(
                     ideaMap.getMapPoint(event.getLocation()));
             if (transferable.isDataFlavorSupported(
-                    DataFlavor.javaFileListFlavor)){
+                    DataFlavor.javaFileListFlavor)) {
                 event.acceptDrop(DnDConstants.ACTION_COPY);
                 final Object os = transferable.getTransferData(
                         DataFlavor.javaFileListFlavor);
-                if(!(os instanceof java.util.Collection)) {
+                if (!(os instanceof java.util.Collection)) {
                     event.rejectDrop();
                     return;
                 }
                 boolean err = false;
-                File f = (File)((Collection)os).iterator().next();
+                File f = (File) ((Collection) os).iterator().next();
                 boolean isOpml = f.getName().toUpperCase().endsWith(".OPML");
                 if (isOpml) {
                     ReaderFactory factory = ReaderFactory.getInstance();
@@ -652,7 +762,7 @@ class DragAndDropController implements DropTargetListener {
                 }
                 event.getDropTargetContext().dropComplete(true);
             } else if (transferable.isDataFlavorSupported(
-                    DataFlavor.stringFlavor)){
+                    DataFlavor.stringFlavor)) {
                 event.acceptDrop(DnDConstants.ACTION_COPY);
                 String s = transferable.getTransferData(
                         DataFlavor.stringFlavor).toString();
@@ -661,8 +771,8 @@ class DragAndDropController implements DropTargetListener {
                     int linebreakIndex = s.lastIndexOf('\n');
                     String insertText = null;
                     Idea idea = new Idea(s);
-                    if(linebreakIndex != -1) {
-                        insertText = s.substring(0,linebreakIndex);
+                    if (linebreakIndex != -1) {
+                        insertText = s.substring(0, linebreakIndex);
                         idea.setText(s.substring(linebreakIndex + 1));
                     } else {
                         insertText = s;
