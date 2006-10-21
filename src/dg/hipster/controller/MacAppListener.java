@@ -74,7 +74,7 @@ public final class MacAppListener implements ApplicationListener {
         try {
             IdeaDocument document = ReaderFactory.getInstance().read(f);
             Main.getMainframe().setDocument(document);
-        } catch(ReaderException re) {
+        } catch (ReaderException re) {
             re.printStackTrace();
         }
         event.setHandled(true);

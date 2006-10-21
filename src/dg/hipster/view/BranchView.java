@@ -136,7 +136,7 @@ public class BranchView extends IdeaView {
         Point2D p = new Point2D.Double(Math.sin(a) * len,
                 Math.cos(a) * len);
         Point s = this.getView(c, p);
-        for (BranchView subView : this.getSubViews()) {
+        for (BranchView subView : this.getSubBranches()) {
             subView.initFromTo(s, a);
         }
         this.setFromPoint(c);

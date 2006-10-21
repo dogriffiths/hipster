@@ -46,7 +46,7 @@ import java.util.Vector;
 import javax.swing.Timer;
 
 /**
- *
+ * Animator that automatically lays out an idea map.
  * @author dgriffiths
  */
 
@@ -109,30 +109,67 @@ final class MapMover implements ActionListener {
      * else such as the mouse is controlling it).
      */
     private BranchView fixedBranch;
+    /**
+     * Proportion of velocity lost each click as a result of air RESISTANCE.
+     */
+    static final double RESISTANCE = 0.1;
+    /**
+     * Minimum desirable angle between branches (events may cause angles
+     * to be less than this - for example, in the case of the case of many
+     * branches).
+     */
+    static final double MIN_BRANCH_ANGLE = Math.PI / 20;
 
-    public MapMover(IdeaMap newIdeaMap) {
+    /**
+     * Constructor of the animator for a given idea map.
+     * @param newIdeaMap idea map to animate.
+     */
+    public MapMover(final IdeaMap newIdeaMap) {
         this.ideaMap = newIdeaMap;
     }
 
+    /**
+     * Start the adjustment of the map. This will
+     * continue asynchronously.
+     */
     public void startAdjust() {
         timeChanged = System.currentTimeMillis();
         this.ticker.start();
     }
 
+    /**
+     * Stop the adjustment of the idea map.
+     */
     public void stopAdjust() {
         this.ticker.stop();
         this.maxSpeed = 0.0;
         ideaMap.repaint();
     }
 
+    /**
+     * Whether the idea map is currently being
+     * animated.
+     * @return true if being animated, false otherwise.
+     */
     public boolean isRunning() {
         return ticker.isRunning();
     }
 
-    public void setFixedBranch(BranchView fixed) {
+    /**
+     * Sets a single branch to not be adjusted by
+     * this map mover. Useful if the branch is being
+     * manually adjusted at the time.
+     * @param fixed branch to ignore with the animation.
+     */
+    public void setFixedBranch(final BranchView fixed) {
         this.fixedBranch = fixed;
     }
 
+    /**
+     * Called by the timer to update the animation.
+     * @param evt event describing the latest tick
+     * of the timer.
+     */
     public void actionPerformed(final ActionEvent evt) {
         if (timeChanged == 0) {
             timeChanged = System.currentTimeMillis();
@@ -148,6 +185,9 @@ final class MapMover implements ActionListener {
         adjust();
     }
 
+    /**
+     * Adjust the idea map slightly.
+     */
     private void adjust() {
         IdeaView rootView = ideaMap.getRootView();
         particles = new Vector<Vertex>();
@@ -160,13 +200,22 @@ final class MapMover implements ActionListener {
         ideaMap.repaint();
     }
 
-    private double getNewVelocity(final Vertex force, final IdeaView view,
+    /**
+     * Given the force on a given branch, calculate
+     * its new angular velocity.
+     *
+     * @param force force being applied to the branch.
+     * @param branch branch being considered.
+     * @param p start point of the branch.
+     * @return new velocity of the branch.
+     */
+    private double getNewVelocity(final Vertex force, final BranchView branch,
             final Position p) {
-        Vertex p2 = getParticle(view, new Position(ORIGIN, p.angle));
+        Vertex p2 = getParticle(branch, new Position(ORIGIN, p.angle));
         double sideForce = (p2.y * force.x) + (-p2.x * force.y);
-        double v = view.getIdea().getV();
+        double v = branch.getIdea().getV();
         v += sideForce / mass;
-        v *= 0.90;
+        v *= (1.0 - RESISTANCE);
         if (v > maxSpeed) {
             v = maxSpeed;
         }
@@ -176,119 +225,164 @@ final class MapMover implements ActionListener {
         return v;
     }
 
+    /**
+     * Adjust the angles of the branches to make
+     * sure that they don't go out of order, or
+     * turn past the parent branch.
+     *
+     * @param parentView parent branch.
+     */
     private void adjustAngles(final IdeaView parentView) {
-        final List<BranchView> views = parentView.getSubViews();
-        for (int i = 0; i < views.size(); i++) {
-            IdeaView previousView = null;
-            IdeaView nextView = null;
-            IdeaView view = views.get(i);
+        final List<BranchView> branches = parentView.getSubBranches();
+        for (int i = 0; i < branches.size(); i++) {
+            BranchView previousBranch = null;
+            BranchView nextBranch = null;
+            BranchView branch = branches.get(i);
             if (i > 0) {
-                previousView = views.get(i - 1);
+                previousBranch = branches.get(i - 1);
             }
-            if (i < views.size() - 1) {
-                nextView = views.get(i + 1);
+            if (i < branches.size() - 1) {
+                nextBranch = branches.get(i + 1);
             }
-            double newAngle = getNewAngle(parentView, previousView, view,
-                    nextView);
-            if (view != fixedBranch) {
-                view.getIdea().setAngle(newAngle);
+            double newAngle = getNewAngle(parentView, previousBranch, branch,
+                    nextBranch);
+            if (branch != fixedBranch) {
+                branch.getIdea().setAngle(newAngle);
             }
-            adjustAngles(view);
+            adjustAngles(branch);
         }
     }
 
+    /**
+     * Get the new angle of a branch, given the branches
+     * before and after it. This method may also adjust
+     * the next and previous branches. This method mostly
+     * makes sure the branch doesn't change position with
+     * those around it.
+     * @param parentView parent of the branch.
+     * @param previousBranch branch that should be immediately
+     * anti-clockwise to this one.
+     * @param branch branch we are considering.
+     * @param nextBranch branch that should be immediately
+     * clockwise of the branch.
+     * @return new angle the branch should be set to.
+     */
     private double getNewAngle(final IdeaView parentView,
-            final IdeaView previousView, final IdeaView view,
-            final IdeaView nextView) {
-        final List<BranchView> views = parentView.getSubViews();
-        final double v = view.getIdea().getV();
-        double minDiffAngle = Math.PI / 2 / views.size();
+            final BranchView previousBranch, final BranchView branch,
+            final BranchView nextBranch) {
+        final List<BranchView> branches = parentView.getSubBranches();
+        final double v = branch.getIdea().getV();
+        double minDiffAngle = Math.PI / 2 / branches.size();
 
-        double oldAngle = view.getIdea().getAngle();
-        double newAngle = oldAngle  + (view.getIdea().getV()
-        / view.getIdea().getLength());
-        if (previousView != null) {
-            double previousAngle = previousView.getIdea().getAngle();
+        double oldAngle = branch.getIdea().getAngle();
+        double newAngle = oldAngle  + (branch.getIdea().getV()
+        / branch.getIdea().getLength());
+        if (previousBranch != null) {
+            double previousAngle = previousBranch.getIdea().getAngle();
             if (previousAngle > newAngle - minDiffAngle) {
-                previousView.getIdea().setAngle(newAngle - minDiffAngle);
+                previousBranch.getIdea().setAngle(newAngle - minDiffAngle);
                 newAngle = previousAngle + minDiffAngle;
-                double previousV = previousView.getIdea().getV();
+                double previousV = previousBranch.getIdea().getV();
                 double diffV = v - previousV;
                 if (diffV > 0) {
-                    view.getIdea().setV(diffV);
-                    previousView.getIdea().setV(-diffV);
+                    branch.getIdea().setV(diffV);
+                    previousBranch.getIdea().setV(-diffV);
                 } else {
-                    view.getIdea().setV(-diffV);
-                    previousView.getIdea().setV(diffV);
+                    branch.getIdea().setV(-diffV);
+                    previousBranch.getIdea().setV(diffV);
                 }
             }
         } else {
             double previousAngle = -Math.PI;
-            double md = Math.PI / 20;
-            if (previousAngle > newAngle - md) {
-                newAngle = previousAngle + md;
+            if (previousAngle > newAngle - MIN_BRANCH_ANGLE) {
+                newAngle = previousAngle + MIN_BRANCH_ANGLE;
                 double previousV = 0.0;
                 double diffV = v - previousV;
                 if (diffV > 0) {
-                    view.getIdea().setV(diffV);
+                    branch.getIdea().setV(diffV);
                 } else {
-                    view.getIdea().setV(-diffV);
+                    branch.getIdea().setV(-diffV);
                 }
             }
         }
-        if (nextView != null) {
-            double nextAngle = nextView.getIdea().getAngle();
+        if (nextBranch != null) {
+            double nextAngle = nextBranch.getIdea().getAngle();
             if (nextAngle < newAngle + minDiffAngle) {
-                nextView.getIdea().setAngle(newAngle + minDiffAngle);
+                nextBranch.getIdea().setAngle(newAngle + minDiffAngle);
                 newAngle = nextAngle - minDiffAngle;
-                double nextV = nextView.getIdea().getV();
+                double nextV = nextBranch.getIdea().getV();
                 double diffV = 0.0;
                 if (diffV > 0) {
-                    view.getIdea().setV(-diffV);
-                    nextView.getIdea().setV(diffV);
+                    branch.getIdea().setV(-diffV);
+                    nextBranch.getIdea().setV(diffV);
                 } else {
-                    view.getIdea().setV(diffV);
-                    nextView.getIdea().setV(-diffV);
+                    branch.getIdea().setV(diffV);
+                    nextBranch.getIdea().setV(-diffV);
                 }
             }
         } else {
             double nextAngle = Math.PI;
-            double md = Math.PI / 20;
-            if (nextAngle < newAngle + md) {
-                newAngle = nextAngle - md;
+            if (nextAngle < newAngle + MIN_BRANCH_ANGLE) {
+                newAngle = nextAngle - MIN_BRANCH_ANGLE;
                 double nextV = 0.0;
                 double diffV = 0.0;
                 if (diffV > 0) {
-                    view.getIdea().setV(-diffV);
+                    branch.getIdea().setV(-diffV);
                 } else {
-                    view.getIdea().setV(diffV);
+                    branch.getIdea().setV(diffV);
                 }
             }
         }
         return newAngle;
     }
 
-
-
-
-    private Vertex endForce(final IdeaView parentView, final Position p) {
-        final List<BranchView> views = parentView.getSubViews();
-        if (views.size() == 0) {
+    /**
+     * The force applied onto the end of the given
+     * view by the sub-branches pushing against it.
+     * @param view view being considered.
+     * @param p location of the start point of the
+     * sub-branches.
+     * @return force applied to the end point of the view
+     * as a 2D vector.
+     */
+    private Vertex endForce(final IdeaView view, final Position p) {
+        final List<BranchView> branches = view.getSubBranches();
+        if (branches.size() == 0) {
             return new Vertex(0.0, 0.0);
         }
-        Vertex totForce = new Vertex(0.0, 0.0);
-        for (IdeaView view: views) {
-            Vertex particle = getParticle(view, p);
-            Vertex force = repulsion(particle, view, p);
-            totForce = totForce.add(force);
-            view.getIdea().setV(getNewVelocity(force, view, p));
+        Vertex totalForce = new Vertex(0.0, 0.0);
+        for (BranchView branch : branches) {
+            Vertex particle = getParticle(branch, p);
+            Vertex force = repulsion(particle, branch, p);
+            totalForce = totalForce.add(force);
+            branch.getIdea().setV(getNewVelocity(force, branch, p));
         }
-        return totForce;
+        return totalForce;
     }
 
+    /**
+     * Repulsion force applied to the end-point of
+     * the given view by the end-points of all the
+     * other branches. This is the key to how the animation
+     * works. Each branch has a particle at the end of
+     * non-zero mass. Each of these particles repel each
+     * other using an inverse-square force, kind of like
+     * reverse gravity. The desire of each particle
+     * to be as far away from the others as possible
+     * causes the branches they are sitting on to move.
+     * @param point position of the particle on the end of
+     * the view.
+     * @param view view holding the particle.
+     * @param p location and angle of the view.
+     * @return resultant force on the particle.
+     */
     private Vertex repulsion(final Vertex point, final IdeaView view,
             final Position p) {
         Vertex force = new Vertex(0, 0);
+        /*
+         * Loop through all the other particles and add up the repulsive
+         * forces.
+         */
         for (Vertex other : particles) {
             Vertex dir = point.subtract(other);
             double dSquare = point.distanceSq(other);
@@ -299,6 +393,11 @@ final class MapMover implements ActionListener {
                 force.trim(-1.0, 1.0);
             }
         }
+        /*
+         * In addition to the repulsion force of all other particles,
+         * we also need to add on the force of the sub-branches pushing
+         * back on this one.
+         */
         force = force.add(endForce(view, new Position(point,
                 view.getIdea().getAngle() + p.angle)));
         return force;
@@ -306,15 +405,16 @@ final class MapMover implements ActionListener {
 
 
     /**
-     *
-     * @param parentView
-     * @param start
+     * Create a list of particles at the ends of
+     * all of the branches.
+     * @param parentView view to start at.
+     * @param start start point of the given view.
      */
     private void createParticles(final IdeaView parentView,
             final Position start) {
-        List<BranchView> views = parentView.getSubViews();
+        List<BranchView> branches = parentView.getSubBranches();
         particles.add(ORIGIN);
-        for (IdeaView view : views) {
+        for (IdeaView view : branches) {
             Vertex location = getParticle(view, start);
             particles.add(location);
             Position nextStart = new Position(location,
@@ -323,6 +423,13 @@ final class MapMover implements ActionListener {
         }
     }
 
+    /**
+     * Get the particle associated with the
+     * given view.
+     * @param view
+     * @param p
+     * @return
+     */
     private Vertex getParticle(final IdeaView view, final Position p) {
         double angle = view.getIdea().getAngle() + p.angle;
         double length = view.getIdea().getLength();

@@ -61,7 +61,7 @@ public class CentreView extends IdeaView {
 
     public void paint(Graphics g, IdeaMap map) {
         initFromTo();
-//        for (BranchView branch : this.getSubViews()) {
+//        for (BranchView branch : this.getSubBranches()) {
             this.paintLinks(g);
 //        }
         paintBranches(g, new Point(0, 0), this, getIdea().getAngle(), 0, map);
@@ -90,7 +90,7 @@ public class CentreView extends IdeaView {
     }
 
     private void initFromTo() {
-        for (BranchView subView : getSubViews()) {
+        for (BranchView subView : getSubBranches()) {
             double a = subView.getIdea().getAngle();
             Point start = new Point(
                     (int) (Math.sin(a) * this.ROOT_RADIUS_X),

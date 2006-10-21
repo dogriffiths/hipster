@@ -446,7 +446,7 @@ public final class IdeaMap extends JComponent implements MapComponent {
             return;
         }
         IdeaView parentView = (IdeaView) parent;
-        int pos = parentView.getSubViews().indexOf(selected);
+        int pos = parentView.getSubBranches().indexOf(selected);
         Idea newIdea = new Idea("New " + (newCount++));
         parentView.getIdea().add(pos + 1, newIdea);
         this.setSelected(newIdea);
@@ -602,7 +602,7 @@ public final class IdeaMap extends JComponent implements MapComponent {
         if (parentView.getIdea().equals(idea)) {
             return parentView;
         }
-        for (IdeaView subView: parentView.getSubViews()) {
+        for (IdeaView subView: parentView.getSubBranches()) {
             IdeaView ideaView = findIdeaViewFor(subView, idea);
             if (ideaView != null) {
                 return ideaView;

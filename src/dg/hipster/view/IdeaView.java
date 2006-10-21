@@ -156,15 +156,15 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
             return null;
         }
         IdeaView parentView = (IdeaView) parent;
-        int pos = parentView.getSubViews().indexOf(this);
-        int subCount = parentView.getSubViews().size();
+        int pos = parentView.getSubBranches().indexOf(this);
+        int subCount = parentView.getSubBranches().size();
         int diff = difference % subCount;
         int siblingPos = pos + diff;
         if ((diff == 0) || (siblingPos < 0) || (siblingPos > (subCount - 1))) {
             return null;
         }
         siblingPos = (siblingPos + subCount) % subCount;
-        return parentView.getSubViews().get(siblingPos);
+        return parentView.getSubBranches().get(siblingPos);
     }
     
     private synchronized void add(BranchView subView) {
@@ -182,7 +182,7 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
         subViews.remove(subView);
     }
     
-    public synchronized Vector<BranchView> getSubViews() {
+    public synchronized Vector<BranchView> getSubBranches() {
         return (Vector<BranchView>)subViews.clone();
     }
     
@@ -276,7 +276,7 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
     void paintBranches(final Graphics g, final Point c2,
             final IdeaView aView, final double initAngle,
             final int depth, final IdeaMap map) {
-        List<BranchView> views = aView.getSubViews();
+        List<BranchView> views = aView.getSubBranches();
         synchronized(views) {
             for (BranchView view: views) {
                 view.paint(g, depth, map);
@@ -339,7 +339,7 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
                 linkView.paintLink(g);
             }
         }
-        for (BranchView branch : this.getSubViews()) {
+        for (BranchView branch : this.getSubBranches()) {
             branch.paintLinks(g);
         }
     }

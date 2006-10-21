@@ -524,7 +524,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
      */
     private Map<Point2D, IdeaView> endPoints(final IdeaView ideaView) {
         Map<Point2D, IdeaView> results = new HashMap<Point2D, IdeaView>();
-        List<BranchView> subViews = ideaView.getSubViews();
+        List<BranchView> subViews = ideaView.getSubBranches();
         // Add all the sub-views
         results.put(ideaView.getEndPoint(), ideaView);
         for (IdeaView subView : subViews) {
