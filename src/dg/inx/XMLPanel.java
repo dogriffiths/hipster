@@ -226,8 +226,10 @@ public class XMLPanel extends JPanel {
         SpinnerModel sm = new SpinnerDateModel();
         dt.setModel(sm);
         JSpinner.DateEditor editor = (JSpinner.DateEditor)dt.getEditor();
-        editor.getTextField().setForeground(Color.WHITE);
-        editor.getTextField().setBackground(new Color(55, 55, 55));
+        JTextField txt = editor.getTextField();
+        txt.setForeground(Color.WHITE);
+        txt.setBackground(new Color(55, 55, 55));
+        txt.setCaretColor(Color.WHITE);
         gbl.setConstraints(dt, con);
         if (source.startsWith("#")) {
             c.bind(dt, source.substring(1));

@@ -224,7 +224,7 @@ public final class IdeaMap extends JComponent implements MapComponent {
             }
             text.setText(selected.getIdea().getText());
         } else {
-            propertiesPanel.setVisible(false);
+            setPropertiesVisible(false);
             text.setText("");
         }
     }
@@ -675,7 +675,7 @@ public final class IdeaMap extends JComponent implements MapComponent {
      * @param show true if visible, false otherwise.
      */
     public void setPropertiesVisible(boolean show) {
-        if (this.getSelectedView() != null) {
+        if (!show || (this.getSelectedView() != null)) {
             propertiesPanel.setVisible(show);
         }
         propertiesVisible = show;

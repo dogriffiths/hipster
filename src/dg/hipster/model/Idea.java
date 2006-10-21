@@ -201,6 +201,60 @@ public class Idea extends AbstractModel implements IdeaListener {
         }
     }
     
+    public String getUrl() {
+        return url;
+    }
+    
+    public void setUrl(String newUrl) {
+        String oldUrl = this.url;
+        if ((this.url == null) || (!this.url.equals(newUrl))) {
+            this.url = newUrl;
+            this.firePropertyChange("url", oldUrl, newUrl);
+        }
+    }
+    
+    public String getDescription() {
+        return description;
+    }
+    
+    public void setDescription(String newDescription) {
+        String oldDescription = this.description;
+        if ((this.description == null)
+        || (!this.description.equals(newDescription))) {
+            this.description = newDescription;
+            this.firePropertyChange("description", oldDescription,
+                    newDescription);
+        }
+    }
+    
+    public Date getEndDate() {
+        return endDate;
+    }
+    
+    public void setEndDate(Date newEndDate) {
+        Date oldEndDate = this.endDate;
+        if ((this.endDate == null)
+        || (!this.endDate.equals(newEndDate))) {
+            this.endDate = newEndDate;
+            this.firePropertyChange("endDate", oldEndDate,
+                    newEndDate);
+        }
+    }
+    
+    public Date getStartDate() {
+        return startDate;
+    }
+    
+    public void setStartDate(Date newStartDate) {
+        Date oldStartDate = this.startDate;
+        if ((this.startDate == null)
+        || (!this.startDate.equals(newStartDate))) {
+            this.startDate = newStartDate;
+            this.firePropertyChange("startDate", oldStartDate,
+                    newStartDate);
+        }
+    }
+    
     /**
      * Get a list of the sub-ideas for this idea.
      *@return list of idea objects
@@ -361,38 +415,6 @@ public class Idea extends AbstractModel implements IdeaListener {
             idea.add(subIdea.clone());
         }
         return idea;
-    }
-    
-    public String getUrl() {
-        return url;
-    }
-    
-    public void setUrl(String url) {
-        this.url = url;
-    }
-    
-    public String getDescription() {
-        return description;
-    }
-    
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Date getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(Date endDate) {
-        this.endDate = endDate;
-    }
-
-    public Date getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(Date startDate) {
-        this.startDate = startDate;
     }
 }
 
