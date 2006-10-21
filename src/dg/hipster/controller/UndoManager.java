@@ -40,6 +40,7 @@ import dg.hipster.model.IdeaEvent;
 import dg.hipster.model.IdeaListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Date;
 import java.util.Stack;
 
 /**
@@ -78,7 +79,7 @@ public class UndoManager implements IdeaListener, PropertyChangeListener {
      * @param ideaEvent event recording the change that
      * has occurred to the idea.
      */
-    public void ideaChanged(IdeaEvent ideaEvent) {
+    public void ideaChanged(final IdeaEvent ideaEvent) {
         switch(ideaEvent.getID()) {
             case IdeaEvent.ADDED:
                 Idea newIdea = ideaEvent.getIdea();
@@ -101,7 +102,7 @@ public class UndoManager implements IdeaListener, PropertyChangeListener {
      * Called when a property changes on an idea.
      * @param propertyChangeEvent event describing the change.
      */
-    public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
+    public void propertyChange(final PropertyChangeEvent propertyChangeEvent) {
         storeEvent(propertyChangeEvent);
         redoEvents.clear();
     }
@@ -132,7 +133,7 @@ public class UndoManager implements IdeaListener, PropertyChangeListener {
      * Root idea being watched.
      * @param newIdea Root idea being watched.
      */
-    public void setIdea(Idea newIdea) {
+    public void setIdea(final Idea newIdea) {
         Idea oldIdea = this.idea;
         this.idea = newIdea;
         if (oldIdea != null) {
@@ -151,10 +152,9 @@ public class UndoManager implements IdeaListener, PropertyChangeListener {
      * because it has been deleted.
      * @param anIdea idea to stop listening to.
      */
-    private void stopListeningTo(Idea anIdea) {
+    private void stopListeningTo(final Idea anIdea) {
         if (anIdea != null) {
-            anIdea.removePropertyChangeListener("text", this);
-            anIdea.removePropertyChangeListener("notes", this);
+            anIdea.removePropertyChangeListener(this);
             for (Idea subIdea : anIdea.getSubIdeas()) {
                 stopListeningTo(subIdea);
             }
@@ -168,8 +168,7 @@ public class UndoManager implements IdeaListener, PropertyChangeListener {
      */
     private void startListeningTo(Idea anIdea) {
         if (anIdea != null) {
-            anIdea.addPropertyChangeListener("text", this);
-            anIdea.addPropertyChangeListener("notes", this);
+            anIdea.addPropertyChangeListener(this);
             for (Idea subIdea : anIdea.getSubIdeas()) {
                 startListeningTo(subIdea);
             }
@@ -222,7 +221,7 @@ public class UndoManager implements IdeaListener, PropertyChangeListener {
      * Undo the specified idea-event.
      * @param ideaEvent idea-event to undo.
      */
-    private void undo(IdeaEvent ideaEvent) {
+    private void undo(final IdeaEvent ideaEvent) {
         switch(ideaEvent.getID()) {
             case IdeaEvent.ADDED:
                 Idea parent0 = (Idea)ideaEvent.getSource();
@@ -242,7 +241,7 @@ public class UndoManager implements IdeaListener, PropertyChangeListener {
      * Redo the specified idea-event.
      * @param ideaEvent idea-event to undo.
      */
-    private void redo(IdeaEvent ideaEvent) {
+    private void redo(final IdeaEvent ideaEvent) {
         switch(ideaEvent.getID()) {
             case IdeaEvent.REMOVED:
                 Idea parent0 = (Idea)ideaEvent.getSource();
@@ -262,13 +261,21 @@ public class UndoManager implements IdeaListener, PropertyChangeListener {
      * Undo the specified property-change-event.
      * @param propertyChangeEvent event to undo.
      */
-    private void undo(PropertyChangeEvent propertyChangeEvent) {
+    private void undo(final PropertyChangeEvent propertyChangeEvent) {
         String propertyName = propertyChangeEvent.getPropertyName();
         Idea idea = (Idea)propertyChangeEvent.getSource();
         if (propertyName.equals("text")) {
             idea.setText((String)propertyChangeEvent.getOldValue());
         } else if (propertyName.equals("notes")) {
             idea.setNotes((String)propertyChangeEvent.getOldValue());
+        } else if (propertyName.equals("description")) {
+            idea.setDescription((String)propertyChangeEvent.getOldValue());
+        } else if (propertyName.equals("url")) {
+            idea.setUrl((String)propertyChangeEvent.getOldValue());
+        } else if (propertyName.equals("startDate")) {
+            idea.setStartDate((Date)propertyChangeEvent.getOldValue());
+        } else if (propertyName.equals("endDate")) {
+            idea.setEndDate((Date)propertyChangeEvent.getOldValue());
         }
     }
 
@@ -276,13 +283,21 @@ public class UndoManager implements IdeaListener, PropertyChangeListener {
      * Redo the specified property-change-event.
      * @param propertyChangeEvent event to undo.
      */
-    private void redo(PropertyChangeEvent propertyChangeEvent) {
+    private void redo(final PropertyChangeEvent propertyChangeEvent) {
         String propertyName = propertyChangeEvent.getPropertyName();
         Idea idea = (Idea)propertyChangeEvent.getSource();
         if (propertyName.equals("text")) {
             idea.setText((String)propertyChangeEvent.getNewValue());
         } else if (propertyName.equals("notes")) {
             idea.setNotes((String)propertyChangeEvent.getNewValue());
+        } else if (propertyName.equals("description")) {
+            idea.setDescription((String)propertyChangeEvent.getNewValue());
+        } else if (propertyName.equals("url")) {
+            idea.setUrl((String)propertyChangeEvent.getNewValue());
+        } else if (propertyName.equals("startDate")) {
+            idea.setStartDate((Date)propertyChangeEvent.getNewValue());
+        } else if (propertyName.equals("endDate")) {
+            idea.setEndDate((Date)propertyChangeEvent.getNewValue());
         }
     }
 }

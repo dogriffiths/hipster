@@ -426,9 +426,9 @@ final class MapMover implements ActionListener {
     /**
      * Get the particle associated with the
      * given view.
-     * @param view
-     * @param p
-     * @return
+     * @param view 
+     * @param p 
+     * @return 
      */
     private Vertex getParticle(final IdeaView view, final Position p) {
         double angle = view.getIdea().getAngle() + p.angle;
