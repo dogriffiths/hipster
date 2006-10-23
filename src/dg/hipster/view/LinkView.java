@@ -53,12 +53,12 @@ import java.awt.geom.Point2D;
 public class LinkView extends IdeaView {
     private static int NUM_POINTS = 11;
     private Point2D[] linePoints;
-    
+
     /** Creates a new instance of LinkView */
     public LinkView(IdeaLink aLink) {
         super(aLink);
     }
-    
+
     public boolean hits(Point2D p) {
         initPoints();
         for (int i = 0; i < linePoints.length - 1; i++) {
@@ -70,16 +70,16 @@ public class LinkView extends IdeaView {
         }
         return false;
     }
-    
+
     public IdeaLink getLink() {
         return (IdeaLink)super.getIdea();
     }
-    
+
     public void setLink(IdeaLink link) {
         super.setIdea(link);
     }
-    
-    
+
+
     public void paintLink(final Graphics g) {
         initPoints();
         IdeaLink link = getLink();
@@ -109,7 +109,7 @@ public class LinkView extends IdeaView {
                 (int)midPoint.getY() - circleRadius,
                 circleRadius * 2, circleRadius * 2);
     }
-    
+
     private void initPoints() {
         IdeaLink link = getLink();
         BranchView fromBranch = (BranchView) getRootView().getViewFor(
@@ -126,31 +126,31 @@ public class LinkView extends IdeaView {
         if ((start1 != null) && (end1 != null)
         && (start0 != null) && (end0 != null)) {
             Point[] p = new Point[4];
-            
+
             Point s0 = intPoint(start0);
             Point s1 = intPoint(start1);
             Point e0 = intPoint(end0);
             Point e1 = intPoint(end1);
-            
+
             Point v0 = minus(s0, e0);
             Point v1 = minus(s1, e1);
             Point n0 = normal(v0);
             Point n1 = normal(v1);
-            
+
             p[0] = mid(s0, e0);
             p[3] = mid(s1, e1);
-            
+
             double distBetweenMids = length(minus(p[0], p[3]));
             double n0Length = length(n0);
             n0 = scale(n0, distBetweenMids / n0Length / 3);
             double n1Length = length(n1);
             n1 = scale(n1, distBetweenMids / n1Length / 3);
-            
+
             p[1] = plus(p[0], n0);
             if (dot(minus(s0, p[1]), n0) * dot(minus(s0, s1), n0) < 0) {
                 p[1] = minus(p[0], n0);
             }
-            
+
             p[2] = plus(p[3], n1);
             if (dot(minus(s1, p[2]), n1) * dot(minus(s1, s0), n1) < 0) {
                 p[2] = minus(p[3], n1);
@@ -158,7 +158,7 @@ public class LinkView extends IdeaView {
             createBezier(p);
         }
     }
-    
+
     private void createBezier(final Point[] coordlist) {
         linePoints = new Point2D.Double[NUM_POINTS];
         linePoints[0] = new Point2D.Double(coordlist[0].x, coordlist[0].y);
@@ -189,35 +189,35 @@ public class LinkView extends IdeaView {
             t += k;
         }
     }
-    
+
     private static Point normal(Point p) {
         return new Point(-p.y, p.x);
     }
-    
+
     private static int dot(Point p0, Point p1) {
         return p0.x * p1.x + p0.y * p1.y;
     }
-    
+
     private static Point plus(Point p0, Point p1) {
         return new Point(p0.x + p1.x, p0.y + p1.y);
     }
-    
+
     private static Point minus(Point p0, Point p1) {
         return new Point(p0.x - p1.x, p0.y - p1.y);
     }
-    
+
     private static Point intPoint(Point2D p) {
         return new Point((int) p.getX(), (int) p.getY());
     }
-    
+
     private static Point mid(Point p0, Point p1) {
         return new Point((p0.x + p1.x) / 2, (p0.y + p1.y) / 2);
     }
-    
+
     private static int length(Point p0) {
         return (int)Math.hypot(p0.x, p0.y);
     }
-    
+
     private static Point scale(Point p, double scale) {
         return new Point((int)(p.x * scale), (int)(p.y * scale));
     }

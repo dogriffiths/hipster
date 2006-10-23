@@ -59,16 +59,16 @@ public class BranchView extends IdeaView {
      * Default width of the stroke used to render branches.
      */
     public static final float DEFAULT_STROKE_WIDTH = 20.0f;
-    
+
     /** Creates a new instance of BranchView */
     public BranchView() {
         this(null);
     }
-    
+
     public BranchView(Idea anIdea) {
         super(anIdea);
     }
-    
+
     void paint(final Graphics g, final int depth, final IdeaMap map) {
         double a = getRealAngle();
         Point c = new Point((int)fromPoint.getX(), (int)fromPoint.getY());
@@ -106,29 +106,29 @@ public class BranchView extends IdeaView {
         drawString((Graphics2D)g, this.getIdea().getText(), midp, 4,
                 textAngle, this.isEditing(), map);
     }
-    
+
     boolean hits(Point2D p) {
         Point2D fromPoint = this.getFromPoint();
         Point2D toPoint = this.getToPoint();
         return Utilities.hitsLine(p, fromPoint, toPoint, thickness);
     }
-    
+
     void setFromPoint(Point2D f) {
         this.fromPoint = f;
     }
-    
+
     public Point2D getFromPoint() {
         return this.fromPoint;
     }
-    
+
     void setToPoint(Point2D t) {
         this.toPoint = t;
     }
-    
+
     public Point2D getToPoint() {
         return this.toPoint;
     }
-    
+
     void initFromTo(final Point c, final double initAngle) {
         double a = this.getIdea().getAngle() + initAngle;
         this.setRealAngle(a);
@@ -142,7 +142,7 @@ public class BranchView extends IdeaView {
         this.setFromPoint(c);
         this.setToPoint(s);
     }
-    
+
     public Point2D getMidPoint() {
         return new Point2D.Double(
                 (fromPoint.getX() + toPoint.getX()) / 2,

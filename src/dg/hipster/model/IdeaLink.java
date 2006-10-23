@@ -16,7 +16,7 @@ package dg.hipster.model;
 public class IdeaLink extends Idea {
     private Idea from;
     private Idea to;
-    
+
     /** Creates a new instance of IdeaLink */
     public IdeaLink(Idea fromIdea, Idea toIdea) {
         super();
@@ -39,7 +39,7 @@ public class IdeaLink extends Idea {
     public void setTo(Idea to) {
         this.to = to;
     }
-    
+
     public String toString() {
         return from + " -> " + to;
     }

@@ -35,6 +35,7 @@
 
 package dg.hipster.model;
 
+import dg.hipster.controller.UndoManager;
 import dg.inx.AbstractModel;
 import java.io.File;
 import java.util.ResourceBundle;
@@ -49,17 +50,23 @@ public class IdeaDocument extends AbstractModel implements IdeaListener {
      */
     protected static ResourceBundle resBundle = ResourceBundle.getBundle(
             "dg/hipster/resource/strings");
+    /**
+     * Undo controller.
+     */
+    private UndoManager undoManager = new UndoManager();
 
     private Idea idea;
     private File currentFile;
     private boolean dirty;
     private String title;
     private boolean needsAdjustment;
+    private Idea selected;
 
     public IdeaDocument() {
         this.setCurrentFile(null);
         this.setIdea(new Idea(this.getTitle()));
         this.setDirty(false);
+        this.setSelected(this.getIdea());
     }
 
     public void setIdea(Idea newIdea) {
@@ -71,6 +78,7 @@ public class IdeaDocument extends AbstractModel implements IdeaListener {
         if (this.idea != null) {
             newIdea.addIdeaListener(this);
         }
+        undoManager.setIdea(newIdea);
         firePropertyChange("idea", oldIdea, this.idea);
     }
 
@@ -127,5 +135,96 @@ public class IdeaDocument extends AbstractModel implements IdeaListener {
 
     public boolean isNeedsAdjustment() {
         return this.needsAdjustment;
+    }
+
+    public Idea getSelected() {
+        return selected;
+    }
+
+    public void setSelected(Idea newSelected) {
+        Idea oldSelected = newSelected;
+        if (this.selected != null) {
+            this.selected.setSelected(false);
+        }
+        this.selected = newSelected;
+        if (this.selected != null) {
+            this.selected.setSelected(true);
+        }
+        firePropertyChange("selected", oldSelected, this.selected);
+    }
+
+    /**
+     * Delete the currently selected idea (and consequently
+     * its child ideas).
+     */
+    public void deleteSelected() {
+        if (selected == null) {
+            return;
+        }
+        Idea parent = this.idea.getParentFor(selected);
+        if (parent == null) {
+            return;
+        }
+        if (selected instanceof IdeaLink) {
+            parent.removeLink((IdeaLink)selected);
+            this.setSelected(parent);
+            return;
+        }
+        Idea nextToSelect = null;
+        Idea nextSibling = getNextSibling(selected);
+        Idea previousSibling = getPreviousSibling(selected);
+        if (nextSibling != null) {
+            nextToSelect = nextSibling;
+        } else if (previousSibling != null) {
+            nextToSelect = previousSibling;
+        } else {
+            nextToSelect = parent;
+        }
+        parent.remove(selected);
+        this.setSelected(nextToSelect);
+    }
+
+    public Idea getPreviousSibling(Idea i) {
+        return getSibling(i, -1);
+    }
+
+    public Idea getNextSibling(Idea i) {
+        return getSibling(i, +1);
+    }
+
+    public Idea getSibling(Idea i, int difference) {
+        Idea parent = idea.getParentFor(i);
+        if (parent == null) {
+            return null;
+        }
+        int pos = parent.getSubIdeas().indexOf(i);
+        int subCount = parent.getSubIdeas().size();
+        int diff = difference % subCount;
+        int siblingPos = pos + diff;
+        if ((diff == 0) || (siblingPos < 0) || (siblingPos > (subCount - 1))) {
+            return null;
+        }
+        siblingPos = (siblingPos + subCount) % subCount;
+        return parent.getSubIdeas().get(siblingPos);
+    }
+
+    /**
+     * Undo the last change.
+     */
+    public void undo() {
+        if (undoManager != null) {
+            undoManager.undo();
+            this.setSelected(null);
+        }
+    }
+
+    /**
+     * Redo the last change undone.
+     */
+    public void redo() {
+        if (undoManager != null) {
+            undoManager.redo();
+            this.setSelected(null);
+        }
     }
 }

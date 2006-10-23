@@ -63,27 +63,27 @@ import org.xml.sax.SAXException;
  */
 public class XMLPanel extends JPanel {
     private Controller c;
-    
+
     public XMLPanel(AbstractModel model, String viewXML) {
         this.setBackground(null);
         this.setForeground(null);
         c = new Controller(model);
-        
+
         GridBagLayout gbl = new GridBagLayout();
         GridBagConstraints con = new GridBagConstraints();
-        
+
         setLayout(gbl);
-        
+
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         InputStream in = null;
         try {
             in = XMLPanel.class.getResourceAsStream(viewXML);
             Document document = factory.newDocumentBuilder().parse(in);
-            
+
             // docElement should point at the <commPort> element
             Element docElement = (Element) document.getElementsByTagName(
                     "panel").item(0);
-            
+
             // Loop through each <statstic> element within <statistics> element
             NodeList rowList = docElement.getElementsByTagName("row");
             for (int i = 0; i < rowList.getLength(); i++) {
@@ -175,7 +175,7 @@ public class XMLPanel extends JPanel {
                     }
                 }
             }
-            
+
         } catch(IOException ioe) {
             ioe.printStackTrace();
         } catch(ParserConfigurationException pce) {
@@ -191,11 +191,11 @@ public class XMLPanel extends JPanel {
             }
         }
     }
-    
+
     public Controller getController() {
         return this.c;
     }
-    
+
     private JLabel makeLabel(String text, GridBagLayout gbl,
             GridBagConstraints con) {
         JLabel label = new JLabel(text);
@@ -204,7 +204,7 @@ public class XMLPanel extends JPanel {
         gbl.setConstraints(label, con);
         return label;
     }
-    
+
     private static JTextField makeText(Controller c, String source,
             GridBagLayout gbl, GridBagConstraints con) {
         JTextField txt = new JTextField();
@@ -219,7 +219,7 @@ public class XMLPanel extends JPanel {
         }
         return txt;
     }
-    
+
     private static JSpinner makeDate(Controller c, String source,
             GridBagLayout gbl, GridBagConstraints con) {
         JSpinner dt = new JSpinner();
@@ -238,7 +238,7 @@ public class XMLPanel extends JPanel {
         }
         return dt;
     }
-    
+
     private static JTextArea makeTextArea(Controller c, String source,
             GridBagLayout gbl, GridBagConstraints con, int rows, int cols) {
         JTextArea txt = new JTextArea();
@@ -258,7 +258,7 @@ public class XMLPanel extends JPanel {
         txt.setAutoscrolls(true);
         return txt;
     }
-    
+
     private static JCheckBox makeCheckBox(Controller c, String source,
             GridBagLayout gbl, GridBagConstraints con, String label) {
         JCheckBox chk = new JCheckBox();

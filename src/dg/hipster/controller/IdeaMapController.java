@@ -43,9 +43,11 @@ import dg.hipster.model.Idea;
 import dg.hipster.model.IdeaDocument;
 import dg.hipster.model.IdeaLink;
 import dg.hipster.view.BranchView;
+import dg.hipster.view.FloatingPanel;
 import dg.hipster.view.IdeaMap;
 import dg.hipster.view.IdeaView;
 import dg.hipster.view.MapComponent;
+import dg.inx.XMLPanel;
 import java.awt.Point;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
@@ -67,6 +69,8 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.Point2D;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.DataInputStream;
 import java.io.File;
 import java.util.Collection;
@@ -83,7 +87,7 @@ import javax.swing.JOptionPane;
  * @author davidg
  */
 public final class IdeaMapController implements KeyListener, FocusListener,
-        MouseListener, MouseMotionListener {
+        MouseListener, MouseMotionListener, PropertyChangeListener {
     /**
      * Internationalization strings.
      */
@@ -127,7 +131,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
                 new MouseWheelListener() {
             public void mouseWheelMoved(final MouseWheelEvent e) {
                 int rotation = e.getWheelRotation();
-                ideaMap.zoom(Math.pow(ZOOM_PER_CLICK, rotation));
+                ideaMap.getViewport().zoom(Math.pow(ZOOM_PER_CLICK, rotation));
             }
         });
         this.ideaMap.getTextField().addActionListener(new ActionListener() {
@@ -148,6 +152,31 @@ public final class IdeaMapController implements KeyListener, FocusListener,
         DropTargetListener dtl = new DragAndDropController(this.ideaMap);
         DropTarget dt = new DropTarget(ideaMap, dtl);
         dt.setActive(true);
+    }
+
+    public void propertyChange(PropertyChangeEvent evt) {
+        if ("selected".equals(evt.getPropertyName())) {
+            Idea selectedIdea = (Idea)evt.getNewValue();
+            IdeaView selectedView = ideaMap.findIdeaViewFor(ideaMap.getRootView(), selectedIdea);
+            if (selectedView != null) {
+                FloatingPanel propertiesPanel = ideaMap.getPropertiesPanel();
+                propertiesPanel.getContentPane().removeAll();
+                propertiesPanel.getContentPane().add(new XMLPanel(
+                        selectedView.getIdea(),
+                        "/dg/hipster/view/ideaProperties.xml"));
+                propertiesPanel.auto();
+                ideaMap.setPropertiesVisible(ideaMap.getPropertiesVisible());
+                if (ideaMap.getPropertiesVisible()) {
+                    propertiesPanel.setVisible(false);
+                    propertiesPanel.setVisible(true);
+                }
+                ideaMap.getTextField().setText(selectedIdea.getText());
+            } else {
+                ideaMap.setPropertiesVisible(false);
+                ideaMap.getTextField().setText("");
+            }
+
+        }
     }
 
     /**
@@ -177,10 +206,11 @@ public final class IdeaMapController implements KeyListener, FocusListener,
      * @param evt event describing the mouse click.
      */
     public void mouseClicked(final MouseEvent evt) {
-        Point2D p = this.ideaMap.getMapPoint(evt.getPoint());
+        Point2D p = this.ideaMap.getViewport().getMapPoint(
+                this.ideaMap.getSize(), evt.getPoint());
         IdeaView hit = this.ideaMap.getViewAt(p);
         if (hit == null) {
-            ideaMap.setSelected(null);
+            ideaMap.getDocument().setSelected(null);
         } else {
             String url = hit.getIdea().getUrl();
             if ((url.length() > 0) && (!url.startsWith("#"))
@@ -202,7 +232,8 @@ public final class IdeaMapController implements KeyListener, FocusListener,
     public void mousePressed(final MouseEvent evt) {
         this.ideaMap.unEdit();
         downPoint = evt.getPoint();
-        Point2D p = this.ideaMap.getMapPoint(evt.getPoint());
+        Point2D p = this.ideaMap.getViewport().getMapPoint(
+                this.ideaMap.getSize(), evt.getPoint());
         if (this.ideaMap != null) {
             boolean shouldEdit = (evt.getClickCount() == 2);
             selectIdeaViewAt(p, shouldEdit);
@@ -218,7 +249,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
     private void selectIdeaViewAt(final Point2D p, final boolean shouldEdit) {
         IdeaView hit = this.ideaMap.getViewAt(p);
         if (hit != null) {
-            this.ideaMap.setSelected(hit.getIdea());
+            this.ideaMap.getDocument().setSelected(hit.getIdea());
             if (hit instanceof BranchView) {
                 draggedBranch = (BranchView) hit;
                 mapMover.setFixedBranch(draggedBranch);
@@ -237,7 +268,8 @@ public final class IdeaMapController implements KeyListener, FocusListener,
      */
     public void mouseReleased(final MouseEvent evt) {
         if ((evt.getModifiersEx() & MouseEvent.SHIFT_DOWN_MASK) != 0) {
-            Point2D p = this.ideaMap.getMapPoint(evt.getPoint());
+            Point2D p = this.ideaMap.getViewport().getMapPoint(
+                    this.ideaMap.getSize(), evt.getPoint());
             createLinkTo(p);
         }
         draggedBranch = null;
@@ -298,11 +330,11 @@ public final class IdeaMapController implements KeyListener, FocusListener,
         }
         int xDiff = p.x - downPoint.x;
         int yDiff = p.y - downPoint.y;
-        Point offset = ideaMap.getOffset();
+        Point offset = ideaMap.getViewport().getOffset();
         if (offset == null) {
             offset = new Point(0, 0);
         }
-        ideaMap.setOffset(new Point(offset.x + xDiff,
+        ideaMap.getViewport().setOffset(new Point(offset.x + xDiff,
                 offset.y + yDiff));
         downPoint = p;
     }
@@ -365,7 +397,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
                 break;
             case KeyEvent.VK_BACK_SPACE:
             case KeyEvent.VK_DELETE:
-                this.ideaMap.deleteSelected();
+                this.ideaMap.getDocument().deleteSelected();
                 break;
             case KeyEvent.VK_ESCAPE:
                 this.ideaMap.unEdit();
@@ -408,7 +440,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
             }
         }
         if (nextView != null) {
-            this.ideaMap.setSelected(nextView.getIdea());
+            this.ideaMap.getDocument().setSelected(nextView.getIdea());
         }
     }
 
@@ -435,7 +467,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
             }
         }
         if (nextView != null) {
-            this.ideaMap.setSelected(nextView.getIdea());
+            this.ideaMap.getDocument().setSelected(nextView.getIdea());
         }
     }
 
@@ -456,7 +488,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
         if (previous == null) {
             return;
         }
-        this.ideaMap.setSelected(previous.getIdea());
+        this.ideaMap.getDocument().setSelected(previous.getIdea());
     }
 
     /**
@@ -482,7 +514,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
             }
         }
         if (nextView != null) {
-            this.ideaMap.setSelected(nextView.getIdea());
+            this.ideaMap.getDocument().setSelected(nextView.getIdea());
         }
     }
 
@@ -509,7 +541,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
             }
         }
         if (nextView != null) {
-            this.ideaMap.setSelected(nextView.getIdea());
+            this.ideaMap.getDocument().setSelected(nextView.getIdea());
         }
     }
 
@@ -561,7 +593,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
         if (this.ideaMap != null) {
             IdeaView hit = this.ideaMap.getViewAt(p);
             if ((hit != null) && (hit instanceof BranchView)) {
-                Idea selectedIdea = this.ideaMap.getSelected();
+                Idea selectedIdea = this.ideaMap.getDocument().getSelected();
                 if ((selectedIdea != null)
                 && (this.ideaMap.getSelectedView() instanceof BranchView)) {
                     Idea hitIdea = hit.getIdea();
@@ -717,7 +749,8 @@ class DragAndDropController implements DropTargetListener {
         try {
             Transferable transferable = event.getTransferable();
             IdeaView ideaView = ideaMap.getViewAt(
-                    ideaMap.getMapPoint(event.getLocation()));
+                    ideaMap.getViewport().getMapPoint(
+                    ideaMap.getSize(), event.getLocation()));
             if (transferable.isDataFlavorSupported(
                     DataFlavor.javaFileListFlavor)) {
                 event.acceptDrop(DnDConstants.ACTION_COPY);

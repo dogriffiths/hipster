@@ -63,7 +63,7 @@ public final class OPMLReader extends DefaultHandler implements IdeaReader {
     private Map<Integer, Idea> ideaIndex = new HashMap<Integer, Idea>();
     private List<IdeaLink> links = new ArrayList<IdeaLink>();
     private List<Integer> linkTos = new ArrayList<Integer>();
-    
+
     public void startElement(String namespaceURI,
             String sName, // simple name (localName)
             String qName, // qualified name
@@ -168,7 +168,7 @@ public final class OPMLReader extends DefaultHandler implements IdeaReader {
             throw new ReaderException("Unable to read OPML", e);
         }
     }
-    
+
     private void addLinks() {
         for (int i = 0; i < links.size(); i++) {
             IdeaLink link = links.get(i);
@@ -178,7 +178,7 @@ public final class OPMLReader extends DefaultHandler implements IdeaReader {
             link.getFrom().addLink(link);
         }
     }
-    
+
     public IdeaDocument getDocument() {
         IdeaDocument document = new IdeaDocument();
         document.setIdea(idea);

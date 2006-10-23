@@ -378,6 +378,34 @@ public class IdeaTest extends TestCase {
                 "CHANGED", i.ideaEvent.getActionCommand());
     }
     
+    public void testGetParentFor() {
+        Idea idea0 = new Idea("idea0");
+        Idea idea1 = new Idea("Idea1");
+        Idea idea2 = new Idea("idea2");
+        Idea idea3 = new Idea("idea3");
+        Idea idea4 = new Idea("idea4");
+        idea0.add(idea1);
+        idea1.add(idea2);
+        idea1.add(idea3);
+        idea0.add(idea4);
+        IdeaLink link0 = new IdeaLink(idea2, idea4);
+        idea2.addLink(link0);
+        assertEquals("null should have no parent", null, idea0.getParentFor(
+                null));
+        assertEquals("idea0 should have no parent", null, idea0.getParentFor(
+                idea0));
+        assertEquals("idea1 shouldn't find parent for idea0", null, idea1.getParentFor(
+                idea0));
+        assertEquals("idea0 should find parent for idea2", idea1, idea0.getParentFor(
+                idea2));
+        assertEquals("idea1 should find parent for idea2", idea1, idea1.getParentFor(
+                idea2));
+        assertEquals("idea0 should find parent for link0", idea2, idea0.getParentFor(
+                link0));
+        assertEquals("idea1 should find parent for link0", idea2, idea1.getParentFor(
+                link0));
+    }
+    
 //    /**
 //     * Test of getLinks method, of class dg.hipster.model.Idea.
 //     */
