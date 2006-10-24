@@ -160,7 +160,10 @@ public class LinkView extends IdeaView {
     }
 
     private void createBezier(final Point[] coordlist) {
-        linePoints = new Point2D.Double[NUM_POINTS];
+        int n = NUM_POINTS;
+        int distance = length(minus(coordlist[0], coordlist[3]));
+        n = distance / 5;
+        linePoints = new Point2D.Double[n];
         linePoints[0] = new Point2D.Double(coordlist[0].x, coordlist[0].y);
         double k = 1.0 / (linePoints.length - 1);
         double t = k;

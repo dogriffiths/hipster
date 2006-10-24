@@ -35,6 +35,7 @@
 
 package dg.hipster.model;
 
+import dg.hipster.Utilities;
 import dg.inx.AbstractModel;
 import java.util.Date;
 import java.util.List;
@@ -99,14 +100,14 @@ public class Idea extends AbstractModel implements IdeaListener {
      * Whether this idea is currently selected.
      */
     private boolean selected;
-
+    
     /**
      * No args constructor.
      */
     public Idea() {
-
+        
     }
-
+    
     /**
      * Constructor for an idea with the given text.
      * @param text zhort text description of the idea
@@ -114,11 +115,11 @@ public class Idea extends AbstractModel implements IdeaListener {
     public Idea(String text) {
         setText(text);
     }
-
+    
     //
     // PROPERTIES
     //
-
+    
     /**
      * Get the short text description of this idea.
      * @return short text string, using for idea maps
@@ -126,7 +127,7 @@ public class Idea extends AbstractModel implements IdeaListener {
     public String getText() {
         return text;
     }
-
+    
     /**
      * Specify the short newText description of this idea.
      *
@@ -140,7 +141,7 @@ public class Idea extends AbstractModel implements IdeaListener {
             notify(new IdeaEvent(this, IdeaEvent.CHANGED, "CHANGED"));
         }
     }
-
+    
     /**
      * The length of this idea.
      *@return length in points.
@@ -148,7 +149,7 @@ public class Idea extends AbstractModel implements IdeaListener {
     public double getLength() {
         return length;
     }
-
+    
     /**
      * The length of this idea.
      * @param newLength length of the idea's representation.
@@ -160,7 +161,7 @@ public class Idea extends AbstractModel implements IdeaListener {
             this.firePropertyChange("length", oldLength, newLength);
         }
     }
-
+    
     /**
      * The angle of this idea relative to its parent.
      *@return angle in radians.
@@ -168,7 +169,7 @@ public class Idea extends AbstractModel implements IdeaListener {
     public double getAngle() {
         return angle;
     }
-
+    
     /**
      * The angle of this idea relative to its parent.
      * @param newAngle angle in radians.
@@ -180,7 +181,7 @@ public class Idea extends AbstractModel implements IdeaListener {
             this.firePropertyChange("angle", oldAngle, newAngle);
         }
     }
-
+    
     /**
      * The velocity of this idea's end-point during animation.
      *@return the velocity.
@@ -188,7 +189,7 @@ public class Idea extends AbstractModel implements IdeaListener {
     public double getV() {
         return v;
     }
-
+    
     /**
      * The velocity of this idea's end-point during animation.
      * @param newV the velocity.
@@ -200,7 +201,7 @@ public class Idea extends AbstractModel implements IdeaListener {
             this.firePropertyChange("v", oldV, newV);
         }
     }
-
+    
     /**
      * Longer notes fields.
      * @return Long text string for use in the notes
@@ -209,7 +210,7 @@ public class Idea extends AbstractModel implements IdeaListener {
     public String getNotes() {
         return notes;
     }
-
+    
     /**
      * Longer notes fields.
      * @param newNotes Long text string for use in the notes
@@ -223,7 +224,7 @@ public class Idea extends AbstractModel implements IdeaListener {
             notify(new IdeaEvent(this, IdeaEvent.CHANGED, "CHANGED"));
         }
     }
-
+    
     /**
      * URL associated with this idea.
      * @return URL of more info.
@@ -231,7 +232,7 @@ public class Idea extends AbstractModel implements IdeaListener {
     public String getUrl() {
         return url;
     }
-
+    
     /**
      * URL connected with this idea.
      * @param newUrl associated URL.
@@ -243,7 +244,7 @@ public class Idea extends AbstractModel implements IdeaListener {
             this.firePropertyChange("url", oldUrl, newUrl);
         }
     }
-
+    
     /**
      * Longer text field. Might be used in exports in
      * preference to the text field.
@@ -252,7 +253,7 @@ public class Idea extends AbstractModel implements IdeaListener {
     public String getDescription() {
         return description;
     }
-
+    
     /**
      * Longer text field. Might be used in exports in
      * preference to the text field.
@@ -267,7 +268,7 @@ public class Idea extends AbstractModel implements IdeaListener {
                     newDescription);
         }
     }
-
+    
     /**
      * End date for the period this idea is valid.
      * @return idea's end date.
@@ -275,7 +276,7 @@ public class Idea extends AbstractModel implements IdeaListener {
     public Date getEndDate() {
         return endDate;
     }
-
+    
     /**
      * End date for the period this idea is valid.
      * @param newEndDate idea's end date.
@@ -289,7 +290,7 @@ public class Idea extends AbstractModel implements IdeaListener {
                     newEndDate);
         }
     }
-
+    
     /**
      * Start date for the period this idea is valid.
      * @return idea's start date.
@@ -297,7 +298,7 @@ public class Idea extends AbstractModel implements IdeaListener {
     public Date getStartDate() {
         return startDate;
     }
-
+    
     /**
      * Start date for the period this idea is valid.
      * @param newStartDate idea's start date.
@@ -311,11 +312,11 @@ public class Idea extends AbstractModel implements IdeaListener {
                     newStartDate);
         }
     }
-
+    
     public boolean isSelected() {
         return selected;
     }
-
+    
     public void setSelected(boolean newSelected) {
         boolean oldSelected = this.selected;
         this.selected = newSelected;
@@ -323,7 +324,7 @@ public class Idea extends AbstractModel implements IdeaListener {
             this.firePropertyChange("selected", oldSelected, newSelected);
         }
     }
-
+    
     /**
      * Get a list of the sub-ideas for this idea.
      *@return list of idea objects
@@ -331,7 +332,7 @@ public class Idea extends AbstractModel implements IdeaListener {
     public List<Idea> getSubIdeas() {
         return (List<Idea>)subIdeas.clone();
     }
-
+    
     /**
      * Get the list of links that this idea is connected to.
      * @return list of links to related ideas.
@@ -339,11 +340,11 @@ public class Idea extends AbstractModel implements IdeaListener {
     public List<IdeaLink> getLinks() {
         return (List<IdeaLink>)links.clone();
     }
-
+    
     //
     // Collection methods.
     //
-
+    
     /**
      * Add a sub-idea to this idea.
      * @param subIdea sub-idea to add
@@ -354,7 +355,7 @@ public class Idea extends AbstractModel implements IdeaListener {
         notify(new IdeaEvent(this, IdeaEvent.ADDED, "ADDED",
                 subIdea, subIdeas.size() - 1));
     }
-
+    
     /**
      * Add a sub-idea to this idea at the given position.
      * @param pos position in the list of sub-ideas to insert
@@ -366,7 +367,7 @@ public class Idea extends AbstractModel implements IdeaListener {
         notify(new IdeaEvent(this, IdeaEvent.ADDED, "ADDED",
                 subIdea, pos));
     }
-
+    
     /**
      * Remove the given sub-idea from this idea. No
      * exception is raised if the idea given is
@@ -380,7 +381,7 @@ public class Idea extends AbstractModel implements IdeaListener {
         notify(new IdeaEvent(this, IdeaEvent.REMOVED, "REMOVED",
                 subIdea, pos));
     }
-
+    
     /**
      * Add a one-way link to another idea.
      *@param other idea to link to.
@@ -393,7 +394,7 @@ public class Idea extends AbstractModel implements IdeaListener {
                     other));
         }
     }
-
+    
     /**
      * Remove a link to another idea.
      *@param other idea to link to.
@@ -408,11 +409,11 @@ public class Idea extends AbstractModel implements IdeaListener {
                     other));
         }
     }
-
+    
     //
     // Idea-listener methods.
     //
-
+    
     /**
      * Add an idea listener to this idea. The idea listener
      * will be informed when anything changes about this
@@ -424,7 +425,7 @@ public class Idea extends AbstractModel implements IdeaListener {
             listeners.add(ideaListener);
         }
     }
-
+    
     /**
      * The given idea-listener will no longer be
      * notified of changes to this idea. No exception
@@ -435,7 +436,7 @@ public class Idea extends AbstractModel implements IdeaListener {
     public void removeIdeaListener(IdeaListener ideaListener) {
         listeners.remove(ideaListener);
     }
-
+    
     /**
      * Notify all listeners that something has changed. The parameters
      * provide more detail about the change.
@@ -448,15 +449,15 @@ public class Idea extends AbstractModel implements IdeaListener {
             listener.ideaChanged(ideaEvent);
         }
     }
-
+    
     public void ideaChanged(IdeaEvent ideaEvent) {
         notify(ideaEvent);
     }
-
+    
     //
     // Other methods.
     //
-
+    
     /**
      * String version of this idea. It will be the short text
      * description, followed by a recursive list of the
@@ -466,7 +467,7 @@ public class Idea extends AbstractModel implements IdeaListener {
     public String toString() {
         return this.text + subIdeas.toString();
     }
-
+    
     /**
      * Create a clone of this idea.
      */
@@ -486,6 +487,12 @@ public class Idea extends AbstractModel implements IdeaListener {
         return idea;
     }
     
+    /**
+     * Find the parent for the given idea, starting at this idea.
+     *@param idea - idea we are looking for.
+     *@return parent of the given idea, if it is in the tree of ideas
+     * growing from this one.
+     */
     public Idea getParentFor(Idea idea) {
         if (this == idea) {
             return null;
