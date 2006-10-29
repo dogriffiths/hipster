@@ -156,7 +156,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
 
     public void propertyChange(final PropertyChangeEvent evt) {
         if ("selected".equals(evt.getPropertyName())) {
-            Idea selectedIdea = (Idea)evt.getNewValue();
+            Idea selectedIdea = (Idea) evt.getNewValue();
             IdeaView selectedView = ideaMap.findIdeaViewFor(
                     ideaMap.getRootView(), selectedIdea);
             if (selectedView != null) {
