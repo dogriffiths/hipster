@@ -242,7 +242,7 @@
         <delete dir="application/hIPster.app"/>
     </target>
 
-    <target name="exe" depends="exeMac,exeWin,exeNix"/>
+    <target name="exe" depends="exeMac,exeWin,exeWinMac,exeNix"/>
 
     <target name="exeInit" depends="jar">
     </target>
@@ -253,6 +253,10 @@
     
     <target name="exeWin" depends="exeInit" if="isWindows">
         <ant antfile="platforms/windows/build.xml" target="exeWin"/>
+    </target>
+    
+    <target name="exeWinMac" depends="exeInit" if="isMacOSX">
+        <ant antfile="platforms/windows/build.xml" target="exeWinMac"/>
     </target>
     
     <target name="exeNix" depends="exeInit">

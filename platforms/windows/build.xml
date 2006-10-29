@@ -59,4 +59,28 @@
         
         <delete dir="dist/winarc"/>
     </target>
+
+    <target name="exeWinMac" if="isMacOSX">
+        <taskdef name="launch4j" classname="net.sf.launch4j.ant.Launch4jTask"
+        classpath="platforms/windows/launch4j-mac.jar:platforms/windows/xstream.jar" />
+        <launch4j configFile="platforms/windows/launch4jexe.xml" />
+        <copy todir="dist/winarc" file="application/hIPster.exe"/>
+        <copy todir="dist/winarc/manual/English">
+            <fileset dir="etc/help/English">
+                <exclude name="**/.svn"/>
+            </fileset>
+        </copy>
+        <copy todir="dist/winarc/manual/English">
+            <fileset dir="etc/help/common">
+                <exclude name="**/.svn"/>
+            </fileset>
+        </copy>
+        
+        <delete file="dist/hipster-win.zip"/>
+
+        <zip destfile="dist/hipster-win.zip" basedir="dist/winarc"
+        excludes="**/.svn"/>
+        
+        <delete dir="dist/winarc"/>
+    </target>
 </project>
