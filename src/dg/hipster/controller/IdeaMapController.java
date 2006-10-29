@@ -154,10 +154,11 @@ public final class IdeaMapController implements KeyListener, FocusListener,
         dt.setActive(true);
     }
 
-    public void propertyChange(PropertyChangeEvent evt) {
+    public void propertyChange(final PropertyChangeEvent evt) {
         if ("selected".equals(evt.getPropertyName())) {
             Idea selectedIdea = (Idea)evt.getNewValue();
-            IdeaView selectedView = ideaMap.findIdeaViewFor(ideaMap.getRootView(), selectedIdea);
+            IdeaView selectedView = ideaMap.findIdeaViewFor(
+                    ideaMap.getRootView(), selectedIdea);
             if (selectedView != null) {
                 FloatingPanel propertiesPanel = ideaMap.getPropertiesPanel();
                 propertiesPanel.getContentPane().removeAll();
