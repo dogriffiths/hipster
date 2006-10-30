@@ -103,7 +103,7 @@ public class Controller {
             } catch(Exception e) {
                 modelGetter = getMethod(model, getIsser(modelProperty));
             }
-            Object value = modelGetter.invoke(model, null);
+            Object value = modelGetter.invoke(model, (Object[]) null);
             Object[] values = {value};
             if (value != null) {
                 viewSetter.invoke(view, values);
@@ -125,7 +125,7 @@ public class Controller {
             } catch(Exception e) {
                 modelGetter = getMethod(model, getIsser(modelProperty));
             }
-            Object value = modelGetter.invoke(model, null);
+            Object value = modelGetter.invoke(model, (Object[]) null);
             Object[] values = {value};
             if (value != null) {
                 viewSetter.invoke(view, values);
@@ -147,7 +147,7 @@ public class Controller {
             } catch(Exception e) {
                 modelGetter = getMethod(model, getIsser(modelProperty));
             }
-            Object value = modelGetter.invoke(model, null);
+            Object value = modelGetter.invoke(model, (Object[]) null);
             Object[] values = {value};
             if (value != null) {
                 viewSetter.invoke(view, values);
@@ -169,7 +169,7 @@ public class Controller {
             } catch(Exception e) {
                 modelGetter = getMethod(model, getIsser(modelProperty));
             }
-            Object value = modelGetter.invoke(model, null);
+            Object value = modelGetter.invoke(model, (Object[]) null);
             Object[] values = {value};
             if (value != null) {
                 viewSetter.invoke(view, values);
@@ -191,7 +191,7 @@ public class Controller {
             } catch(Exception e) {
                 modelGetter = getMethod(model, getIsser(modelProperty));
             }
-            Object value = modelGetter.invoke(model, null);
+            Object value = modelGetter.invoke(model, (Object[]) null);
             Object[] values = {value};
             if (value != null) {
                 viewSetter.invoke(view, values);
@@ -213,7 +213,7 @@ public class Controller {
             } catch(Exception e) {
                 modelGetter = getMethod(model, getIsser(modelProperty));
             }
-            Object value = modelGetter.invoke(model, null);
+            Object value = modelGetter.invoke(model, (Object[]) null);
             Object[] values = {value};
             if (value != null) {
                 viewSetter.invoke(view, values);
@@ -236,7 +236,7 @@ public class Controller {
             } catch(Exception e) {
                 modelGetter = getMethod(model, getIsser(modelProperty));
             }
-            Object value = modelGetter.invoke(model, null);
+            Object value = modelGetter.invoke(model, (Object[]) null);
             Object[] values = {value};
             if (value != null) {
                 viewSetter.invoke(view, values);
