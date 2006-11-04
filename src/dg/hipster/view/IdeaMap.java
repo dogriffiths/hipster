@@ -299,7 +299,6 @@ public final class IdeaMap extends JComponent implements MapComponent {
     
     /**
      * Put the selected idea into edit mode.
-     * @param selected view to select and edit.
      */
     public void edit() {
         IdeaView selected = this.getSelectedView();
@@ -316,7 +315,6 @@ public final class IdeaMap extends JComponent implements MapComponent {
     
     /**
      * Switch the given idea view out of edit mode.
-     * @param ideaView idea-view to unedit.
      */
     public void unEdit() {
         requestFocusInWindow();

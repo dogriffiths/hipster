@@ -325,7 +325,7 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
      * Search this view and it's child-views and return any that have
      * an aLink matching the one given.
      *
-     * @param anIdea aLink we are looking for.
+     * @param aLink link we are looking for.
      * @return view matching the aLink, or null if none.
      */
     public LinkView getLinkViewFor(IdeaLink aLink) {
