@@ -43,11 +43,9 @@ import dg.hipster.model.Idea;
 import dg.hipster.model.IdeaDocument;
 import dg.hipster.model.IdeaLink;
 import dg.hipster.view.BranchView;
-import dg.hipster.view.FloatingPanel;
 import dg.hipster.view.IdeaMap;
 import dg.hipster.view.IdeaView;
 import dg.hipster.view.MapComponent;
-import dg.inx.XMLPanel;
 import java.awt.Point;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
@@ -114,7 +112,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
      * Factor to zoom by with each mouse-wheel click.
      */
     static final double ZOOM_PER_CLICK = 0.8;
-
+    
     /**
      * Creates a new instance of IdeaMapController.
      *@param newIdeaMap Idea map to control.
@@ -144,7 +142,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
                 unEditCurrent();
             }
             public void focusGained(final FocusEvent fe) {
-
+                
             }
         });
         this.ideaMap.requestFocusInWindow();
@@ -153,12 +151,12 @@ public final class IdeaMapController implements KeyListener, FocusListener,
         DropTarget dt = new DropTarget(ideaMap, dtl);
         dt.setActive(true);
     }
-
+    
     public void propertyChange(final PropertyChangeEvent evt) {
         if ("selected".equals(evt.getPropertyName())) {
             Idea selectedIdea = (Idea) evt.getNewValue();
             ideaMap.selectIdea(selectedIdea);
-
+            
         }
         if (!ideaMap.getTextField().isEnabled()) {
             IdeaDocument doc = ideaMap.getDocument();
@@ -170,28 +168,28 @@ public final class IdeaMapController implements KeyListener, FocusListener,
             }
         }
     }
-
+    
     /**
      * Stop the automatic adjustment process.
      */
     public void stopAdjust() {
         mapMover.stopAdjust();
     }
-
+    
     /**
      * Start the automatic adjustment process.
      */
     public void startAdjust() {
         mapMover.startAdjust();
     }
-
+    
     /**
      * Switch the current idea view out of editing mode.
      */
     private void unEditCurrent() {
         this.ideaMap.unEdit();
     }
-
+    
     /**
      * Called when a mouse is pressed and released on
      * the idea map.
@@ -215,8 +213,8 @@ public final class IdeaMapController implements KeyListener, FocusListener,
             }
         }
     }
-
-
+    
+    
     /**
      * Called when a mouse is pressed on the idea map.
      * @param evt event describing the mouse press.
@@ -231,7 +229,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
             selectIdeaViewAt(p, shouldEdit);
         }
     }
-
+    
     /**
      * Select the ideaView (if any) that is at the given point.
      * @param p point to consider.
@@ -253,7 +251,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
             }
         }
     }
-
+    
     /**
      * Called when a mouse is released over the idea map.
      * @param evt event describing the mouse release.
@@ -268,31 +266,31 @@ public final class IdeaMapController implements KeyListener, FocusListener,
         mapMover.setFixedBranch(null);
         this.ideaMap.clearRubberBand();
     }
-
+    
     /**
      * Called when a mouse exits the idea map.
      * @param evt event describing the mouse exit.
      */
     public void mouseExited(final MouseEvent evt) {
-
+        
     }
-
+    
     /**
      * Called when a mouse enters the idea map.
      * @param evt event describing the mouse entry.
      */
     public void mouseEntered(final MouseEvent evt) {
-
+        
     }
-
+    
     /**
      * Called when a mouse moves over the idea map.
      * @param evt event describing the mouse movement.
      */
     public void mouseMoved(final MouseEvent evt) {
-
+        
     }
-
+    
     /**
      * Called when a mouse is dragged over the idea map.
      * @param evt event describing the mouse drag.
@@ -309,7 +307,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
             this.ideaMap.drawLinkRubberBand(evt.getPoint());
         }
     }
-
+    
     /**
      * Drag the map so that the point that the mouse was
      * first pressed at is moved to the given point.
@@ -330,21 +328,21 @@ public final class IdeaMapController implements KeyListener, FocusListener,
                 offset.y + yDiff));
         downPoint = p;
     }
-
+    
     /**
      * Called the idea map gains the focus.
      * @param evt event describing the capture of the focus.
      */
     public void focusGained(final FocusEvent evt) {
     }
-
+    
     /**
      * Calledwhen the idea map loses the focus.
      * @param evt event describing the loss of focus.
      */
     public void focusLost(final FocusEvent evt) {
     }
-
+    
     /**
      * Called the a key is released when the idea map
      * has the focus.
@@ -352,7 +350,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
      */
     public void keyReleased(final KeyEvent evt) {
     }
-
+    
     /**
      * Called whe a key is typed when the idea map
      * has the focus.
@@ -360,7 +358,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
      */
     public void keyTyped(final KeyEvent evt) {
     }
-
+    
     /**
      * Called whe a key is pressed down when the idea map
      * has the focus.
@@ -408,7 +406,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
                 // Do nothing
         }
     }
-
+    
     /**
      * Select the idea that appears below the current
      * one in the idea map.
@@ -435,7 +433,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
             this.ideaMap.getDocument().setSelected(nextView.getIdea());
         }
     }
-
+    
     /**
      * Select the idea that appears above the current
      * one in the idea map.
@@ -462,7 +460,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
             this.ideaMap.getDocument().setSelected(nextView.getIdea());
         }
     }
-
+    
     /**
      * Select the sibling given by the different (clockwise
      * is positive). Calling this method with +1 will select
@@ -482,7 +480,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
         }
         this.ideaMap.getDocument().setSelected(previous.getIdea());
     }
-
+    
     /**
      * Select the idea immediately to the right of the current
      * one in the idea map.
@@ -509,7 +507,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
             this.ideaMap.getDocument().setSelected(nextView.getIdea());
         }
     }
-
+    
     /**
      * Select the idea immediately to the left of the
      * current one in the idea map.
@@ -536,7 +534,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
             this.ideaMap.getDocument().setSelected(nextView.getIdea());
         }
     }
-
+    
     /**
      * Get a map of endpoints of the ideas that are
      * immediately connected to the given one. This is
@@ -575,7 +573,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
         }
         return results;
     }
-
+    
     /**
      * Create a link from the currently selected idea
      * to the view at the given point.
@@ -604,7 +602,7 @@ class FileMetaData {
      * Map used to store meta-data attributes and values.
      */
     private Map<String, String> data;
-
+    
     /**
      * Constructor for meta-data of a given file.
      * @param f file we are interested in.
@@ -619,7 +617,7 @@ class FileMetaData {
                 process = Runtime.getRuntime().exec(new String[]{
                     "mdls", f.toString()
                 }, null, f.getParentFile());
-
+                
                 in = new DataInputStream(process.getInputStream());
                 String line = null;
                 while ((line = in.readLine()) != null) {
@@ -636,7 +634,7 @@ class FileMetaData {
                         }
                     }
                 }
-
+                
             } catch (Exception e) {
                 // Oh well...
             } finally {
@@ -648,7 +646,7 @@ class FileMetaData {
             }
         }
     }
-
+    
     /**
      * Return the value of the requested parameters, separated by
      * newlines.
@@ -665,7 +663,7 @@ class FileMetaData {
         }
         return result;
     }
-
+    
     /**
      * Get a single meta-data attribute, with names matching
      * those on the Mac platform.
@@ -690,12 +688,12 @@ class DragAndDropController implements DropTargetListener {
      */
     private static ResourceBundle resBundle = ResourceBundle.getBundle(
             "dg/hipster/resource/strings");
-
+    
     /**
      * Idea map that stuff is being dropped onto.
      */
     private IdeaMap ideaMap;
-
+    
     /**
      * Constructor of a controller for a given
      * idea map.

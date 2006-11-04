@@ -47,7 +47,7 @@ import java.util.Stack;
  * Class for undoing operations on ideas.
  * @author davidg
  */
-public class UndoManager implements IdeaListener, PropertyChangeListener {
+public final class UndoManager implements IdeaListener, PropertyChangeListener {
     /**
      * Root idea of the document being undone.
      */
