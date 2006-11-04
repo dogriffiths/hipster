@@ -150,8 +150,6 @@ public final class IdeaMap extends JComponent implements MapComponent {
                 repaint();
             }
         });
-        setDocument(new IdeaDocument());
-        selectIdea(this.getSelectedView().getIdea());
     }
     
     /**
@@ -181,6 +179,7 @@ public final class IdeaMap extends JComponent implements MapComponent {
             this.document.setSelected(newIdea);
             text.setText(newIdea.getText());
             text.setEnabled(false);
+            selectIdea(newIdea);
         }
         this.getViewport().resetView();
     }
