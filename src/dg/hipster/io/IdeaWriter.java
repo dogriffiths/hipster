@@ -16,5 +16,5 @@ import dg.hipster.model.IdeaDocument;
  * @author davidg
  */
 public interface IdeaWriter {
-    public void write(IdeaDocument ideaDocument) throws Exception;
+    void write(IdeaDocument ideaDocument) throws Exception;
 }
