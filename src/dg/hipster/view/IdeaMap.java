@@ -322,7 +322,7 @@ public final class IdeaMap extends JComponent implements MapComponent {
     public void unEdit() {
         requestFocusInWindow();
         IdeaView ideaView = getSelectedView();
-        if (ideaView != null) {
+        if ((ideaView != null) && (ideaView.isEditing())) {
             ideaView.getIdea().setText(text.getText());
             ideaView.setEditing(false);
         }
