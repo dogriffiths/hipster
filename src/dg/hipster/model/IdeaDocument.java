@@ -142,7 +142,7 @@ public class IdeaDocument extends AbstractModel implements IdeaListener {
     }
 
     public void setSelected(Idea newSelected) {
-        Idea oldSelected = newSelected;
+        Idea oldSelected = this.selected;
         if (this.selected != null) {
             this.selected.setSelected(false);
         }

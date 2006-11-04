@@ -7,6 +7,8 @@
 
 package dg.hipster.model;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import junit.framework.*;
 import java.io.File;
 import java.util.ResourceBundle;
@@ -97,13 +99,23 @@ public class IdeaDocumentTest extends TestCase {
      * Test of getSelected method, of class dg.hipster.model.IdeaDocument.
      */
     public void testGetSelected() {
+        Idea centre = instance.getIdea();
         assertEquals("Should have selected centre by default",
                 instance.getIdea(), instance.getSelected());
         Idea idea2 = new Idea("Sub idea");
         instance.getIdea().add(idea2);
+        PropertyChangeListenerImpl2 myList = new PropertyChangeListenerImpl2();
+        assertEquals("Initially old selected should be null", null, myList.oldSelected);
+        assertEquals("Initially new selected should be null", null, myList.newSelected);
+        instance.addPropertyChangeListener(myList);
         instance.setSelected(idea2);
+        assertEquals("Old selected should still be null", centre, myList.oldSelected);
+        assertEquals("New selected should now be idea2", idea2, myList.newSelected);
         assertEquals("Didn't pick up new selection",
                 idea2, instance.getSelected());
+        instance.setSelected(centre);
+        assertEquals("Old selected should now be idea2", idea2, myList.oldSelected);
+        assertEquals("New selected should now be centre", centre, myList.newSelected);
     }
     
     /**
@@ -179,4 +191,15 @@ public class IdeaDocumentTest extends TestCase {
         assertEquals("Idea should be back to 0 child again", 0, instance.getIdea().getSubIdeas().size());
     }
     
+}
+
+class PropertyChangeListenerImpl2 implements PropertyChangeListener {
+    Idea oldSelected;
+    Idea newSelected;
+    public void propertyChange(final PropertyChangeEvent evt) {
+        if (evt.getPropertyName().equals("selected")) {
+            oldSelected = (Idea)evt.getOldValue();
+            newSelected = (Idea)evt.getNewValue();
+        }
+    }
 }
