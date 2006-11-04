@@ -160,6 +160,15 @@ public final class IdeaMapController implements KeyListener, FocusListener,
             ideaMap.selectIdea(selectedIdea);
 
         }
+        if (!ideaMap.getTextField().isEnabled()) {
+            IdeaDocument doc = ideaMap.getDocument();
+            if (doc != null) {
+                Idea selected = doc.getSelected();
+                if (selected != null) {
+                    ideaMap.getTextField().setText(selected.getText());
+                }
+            }
+        }
     }
 
     /**
