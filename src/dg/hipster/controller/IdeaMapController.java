@@ -157,25 +157,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
     public void propertyChange(final PropertyChangeEvent evt) {
         if ("selected".equals(evt.getPropertyName())) {
             Idea selectedIdea = (Idea) evt.getNewValue();
-            IdeaView selectedView = ideaMap.findIdeaViewFor(
-                    ideaMap.getRootView(), selectedIdea);
-            if (selectedView != null) {
-                FloatingPanel propertiesPanel = ideaMap.getPropertiesPanel();
-                propertiesPanel.getContentPane().removeAll();
-                propertiesPanel.getContentPane().add(new XMLPanel(
-                        selectedView.getIdea(),
-                        "/dg/hipster/view/ideaProperties.xml"));
-                propertiesPanel.auto();
-                ideaMap.setPropertiesVisible(ideaMap.getPropertiesVisible());
-                if (ideaMap.getPropertiesVisible()) {
-                    propertiesPanel.setVisible(false);
-                    propertiesPanel.setVisible(true);
-                }
-                ideaMap.getTextField().setText(selectedIdea.getText());
-            } else {
-                ideaMap.setPropertiesVisible(false);
-                ideaMap.getTextField().setText("");
-            }
+            ideaMap.selectIdea(selectedIdea);
 
         }
     }
