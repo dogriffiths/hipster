@@ -61,7 +61,6 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
     Vector<BranchView> subViews = new Vector<BranchView>();
     Vector<LinkView> linkViews = new Vector<LinkView>();
     private Idea idea;
-//    private boolean selected;
     private boolean editing;
     MapComponent parent;
     private double realAngle;
@@ -73,16 +72,6 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
     public IdeaView(Idea anIdea) {
         setIdea(anIdea);
     }
-//
-//    public double getMinSubAngle() {
-//        double minAngle = Math.PI;
-//        for (IdeaView subView: subViews) {
-//            if (subView.getIdea().getAngle() < minAngle) {
-//                minAngle = subView.getIdea().getAngle();
-//            }
-//        }
-//        return minAngle;
-//    }
 
     public double getMaxSubAngle() {
         double maxAngle = -Math.PI;
@@ -223,7 +212,6 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
     }
 
     public void setSelected(boolean isSelected) {
-//        this.selected = isSelected;
         this.getIdea().setSelected(isSelected);
         if (!isSelected) {
             setEditing(false);
@@ -238,7 +226,6 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
     }
 
     public boolean isSelected() {
-//        return this.selected;
         if (this.getIdea() == null) {
             return false;
         }
