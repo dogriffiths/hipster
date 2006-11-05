@@ -186,11 +186,11 @@ public final class UndoManager implements IdeaListener, PropertyChangeListener {
         }
         Object lastEvent = events.pop();
         redoEvents.push(lastEvent);
-        Stack currentRedo = (Stack)redoEvents.clone();
+        Stack currentRedo = (Stack) redoEvents.clone();
         if (lastEvent instanceof IdeaEvent) {
-            undo((IdeaEvent)lastEvent);
+            undo((IdeaEvent) lastEvent);
         } else if (lastEvent instanceof PropertyChangeEvent) {
-            undo((PropertyChangeEvent)lastEvent);
+            undo((PropertyChangeEvent) lastEvent);
         }
         // Now remove the event that would have resulted from the undo
         events.pop();
@@ -206,12 +206,12 @@ public final class UndoManager implements IdeaListener, PropertyChangeListener {
             return;
         }
         Object lastEvent = redoEvents.pop();
-        Stack currentRedo = (Stack)redoEvents.clone();
+        Stack currentRedo = (Stack) redoEvents.clone();
         events.push(lastEvent);
         if (lastEvent instanceof IdeaEvent) {
-            redo((IdeaEvent)lastEvent);
+            redo((IdeaEvent) lastEvent);
         } else if (lastEvent instanceof PropertyChangeEvent) {
-            redo((PropertyChangeEvent)lastEvent);
+            redo((PropertyChangeEvent) lastEvent);
         }
         // Now remove the event that would have resulted from the redo
         events.pop();
@@ -226,12 +226,12 @@ public final class UndoManager implements IdeaListener, PropertyChangeListener {
     private void undo(final IdeaEvent ideaEvent) {
         switch(ideaEvent.getID()) {
             case IdeaEvent.ADDED:
-                Idea parent0 = (Idea)ideaEvent.getSource();
+                Idea parent0 = (Idea) ideaEvent.getSource();
                 parent0.remove(ideaEvent.getIdea());
                 break;
             case IdeaEvent.REMOVED:
-                Idea parent1 = (Idea)ideaEvent.getSource();
-                parent1.add((Integer)ideaEvent.getParam(),
+                Idea parent1 = (Idea) ideaEvent.getSource();
+                parent1.add((Integer) ideaEvent.getParam(),
                         ideaEvent.getIdea());
                 break;
             default:
@@ -246,12 +246,12 @@ public final class UndoManager implements IdeaListener, PropertyChangeListener {
     private void redo(final IdeaEvent ideaEvent) {
         switch(ideaEvent.getID()) {
             case IdeaEvent.REMOVED:
-                Idea parent0 = (Idea)ideaEvent.getSource();
+                Idea parent0 = (Idea) ideaEvent.getSource();
                 parent0.remove(ideaEvent.getIdea());
                 break;
             case IdeaEvent.ADDED:
-                Idea parent1 = (Idea)ideaEvent.getSource();
-                parent1.add((Integer)ideaEvent.getParam(),
+                Idea parent1 = (Idea) ideaEvent.getSource();
+                parent1.add((Integer) ideaEvent.getParam(),
                         ideaEvent.getIdea());
                 break;
             default:
@@ -265,19 +265,19 @@ public final class UndoManager implements IdeaListener, PropertyChangeListener {
      */
     private void undo(final PropertyChangeEvent propertyChangeEvent) {
         String propertyName = propertyChangeEvent.getPropertyName();
-        Idea idea = (Idea)propertyChangeEvent.getSource();
+        Idea idea = (Idea) propertyChangeEvent.getSource();
         if (propertyName.equals("text")) {
-            idea.setText((String)propertyChangeEvent.getOldValue());
+            idea.setText((String) propertyChangeEvent.getOldValue());
         } else if (propertyName.equals("notes")) {
-            idea.setNotes((String)propertyChangeEvent.getOldValue());
+            idea.setNotes((String) propertyChangeEvent.getOldValue());
         } else if (propertyName.equals("description")) {
-            idea.setDescription((String)propertyChangeEvent.getOldValue());
+            idea.setDescription((String) propertyChangeEvent.getOldValue());
         } else if (propertyName.equals("url")) {
-            idea.setUrl((String)propertyChangeEvent.getOldValue());
+            idea.setUrl((String) propertyChangeEvent.getOldValue());
         } else if (propertyName.equals("startDate")) {
-            idea.setStartDate((Date)propertyChangeEvent.getOldValue());
+            idea.setStartDate((Date) propertyChangeEvent.getOldValue());
         } else if (propertyName.equals("endDate")) {
-            idea.setEndDate((Date)propertyChangeEvent.getOldValue());
+            idea.setEndDate((Date) propertyChangeEvent.getOldValue());
         }
     }
 
@@ -287,19 +287,19 @@ public final class UndoManager implements IdeaListener, PropertyChangeListener {
      */
     private void redo(final PropertyChangeEvent propertyChangeEvent) {
         String propertyName = propertyChangeEvent.getPropertyName();
-        Idea idea = (Idea)propertyChangeEvent.getSource();
+        Idea idea = (Idea) propertyChangeEvent.getSource();
         if (propertyName.equals("text")) {
-            idea.setText((String)propertyChangeEvent.getNewValue());
+            idea.setText((String) propertyChangeEvent.getNewValue());
         } else if (propertyName.equals("notes")) {
-            idea.setNotes((String)propertyChangeEvent.getNewValue());
+            idea.setNotes((String) propertyChangeEvent.getNewValue());
         } else if (propertyName.equals("description")) {
-            idea.setDescription((String)propertyChangeEvent.getNewValue());
+            idea.setDescription((String) propertyChangeEvent.getNewValue());
         } else if (propertyName.equals("url")) {
-            idea.setUrl((String)propertyChangeEvent.getNewValue());
+            idea.setUrl((String) propertyChangeEvent.getNewValue());
         } else if (propertyName.equals("startDate")) {
-            idea.setStartDate((Date)propertyChangeEvent.getNewValue());
+            idea.setStartDate((Date) propertyChangeEvent.getNewValue());
         } else if (propertyName.equals("endDate")) {
-            idea.setEndDate((Date)propertyChangeEvent.getNewValue());
+            idea.setEndDate((Date) propertyChangeEvent.getNewValue());
         }
     }
 }

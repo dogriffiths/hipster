@@ -71,8 +71,8 @@ public class BranchView extends IdeaView {
 
     void paint(final Graphics g, final int depth, final IdeaMap map) {
         double a = getRealAngle();
-        Point c = new Point((int)fromPoint.getX(), (int)fromPoint.getY());
-        Point s = new Point((int)toPoint.getX(), (int)toPoint.getY());
+        Point c = new Point((int) fromPoint.getX(), (int) fromPoint.getY());
+        Point s = new Point((int) toPoint.getX(), (int) toPoint.getY());
         paintBranches(g, s, this, a, depth + 1, map);
         Color colour = COLOURS[depth % COLOURS.length];
         if (this.isSelected()) {

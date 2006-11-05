@@ -86,7 +86,7 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
 
     public double getMaxSubAngle() {
         double maxAngle = -Math.PI;
-        for (IdeaView subView: subViews) {
+        for (IdeaView subView : subViews) {
             if (subView.getIdea().getAngle() > maxAngle) {
                 maxAngle = subView.getIdea().getAngle();
             }
@@ -197,7 +197,7 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
             this.getIdea().setLength(10 * newIdea.getText().length() + 20);
             int subNum = newIdea.getSubIdeas().size();
             int i = 0;
-            for (Idea subIdea: newIdea.getSubIdeas()) {
+            for (Idea subIdea : newIdea.getSubIdeas()) {
                 BranchView subView = new BranchView(subIdea);
                 double divAngle = 2 * Math.PI / subNum;
                 double mult = i * divAngle;
@@ -260,7 +260,7 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
             hit = this;
         }
 
-        for (BranchView subView: subViews) {
+        for (BranchView subView : subViews) {
             IdeaView hit2 = subView.getViewAt(p);
             if (hit2 != null) {
                 hit = hit2;
@@ -283,7 +283,7 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
             final int depth, final IdeaMap map) {
         List<BranchView> views = aView.getSubBranches();
         synchronized(views) {
-            for (BranchView view: views) {
+            for (BranchView view : views) {
                 view.paint(g, depth, map);
             }
         }
@@ -312,7 +312,7 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
         if ((this.idea != null) && (this.idea.equals(anIdea))) {
             return this;
         }
-        for (IdeaView subView: this.subViews) {
+        for (IdeaView subView : this.subViews) {
             IdeaView view = subView.getViewFor(anIdea);
             if (view != null) {
                 return view;
@@ -329,7 +329,7 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
      * @return view matching the aLink, or null if none.
      */
     public LinkView getLinkViewFor(IdeaLink aLink) {
-        for (LinkView linkView: this.linkViews) {
+        for (LinkView linkView : this.linkViews) {
             if ((linkView.getLink() != null) && (linkView.getLink().equals(aLink))) {
                 return linkView;
             }
@@ -338,7 +338,7 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
     }
 
     void paintLinks(final Graphics g) {
-        for (IdeaLink link: this.getIdea().getLinks()) {
+        for (IdeaLink link : this.getIdea().getLinks()) {
             LinkView linkView = this.getLinkViewFor(link);
             if (linkView != null) {
                 linkView.paintLink(g);

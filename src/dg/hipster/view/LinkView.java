@@ -72,7 +72,7 @@ public class LinkView extends IdeaView {
     }
 
     public IdeaLink getLink() {
-        return (IdeaLink)super.getIdea();
+        return (IdeaLink) super.getIdea();
     }
 
     public void setLink(IdeaLink link) {
@@ -89,7 +89,7 @@ public class LinkView extends IdeaView {
         float strokeWidth = BranchView.DEFAULT_STROKE_WIDTH / 2;
         Stroke stroke = new BasicStroke(strokeWidth,
                 BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL);
-        BranchView parent = (BranchView)this.getParent();
+        BranchView parent = (BranchView) this.getParent();
         if (this.isSelected()) {
             g.setColor(Color.BLACK);
         } else if ((parent != null) && parent.isSelected()) {
@@ -103,10 +103,10 @@ public class LinkView extends IdeaView {
                     linePoints[i + 1]));
         }
         ((Graphics2D)g).setStroke(oldStroke);
-        int circleRadius = (int)(BranchView.DEFAULT_STROKE_WIDTH * 3 / 4);
+        int circleRadius = (int) (BranchView.DEFAULT_STROKE_WIDTH * 3 / 4);
         Point2D midPoint = fromBranch.getMidPoint();
-        g.fillOval((int)midPoint.getX() - circleRadius,
-                (int)midPoint.getY() - circleRadius,
+        g.fillOval((int) midPoint.getX() - circleRadius,
+                (int) midPoint.getY() - circleRadius,
                 circleRadius * 2, circleRadius * 2);
     }
 
@@ -218,10 +218,10 @@ public class LinkView extends IdeaView {
     }
 
     private static int length(Point p0) {
-        return (int)Math.hypot(p0.x, p0.y);
+        return (int) Math.hypot(p0.x, p0.y);
     }
 
     private static Point scale(Point p, double scale) {
-        return new Point((int)(p.x * scale), (int)(p.y * scale));
+        return new Point((int) (p.x * scale), (int) (p.y * scale));
     }
 }
