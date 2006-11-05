@@ -167,12 +167,15 @@ public final class IdeaMap extends JComponent implements MapComponent {
         if (this.document != null) {
             this.document.removePropertyChangeListener(this.controller);
         }
+        Idea oldIdea = null;
+        if (this.document != null) {
+            oldIdea = this.document.getIdea();
+        }
         this.document = newDocument;
         if (this.document != null) {
             this.document.addPropertyChangeListener(this.controller);
         }
         Idea newIdea = this.document.getIdea();
-        Idea oldIdea = getIdea();
         if ((newIdea != null) && (!newIdea.equals(oldIdea))) {
             this.rootView = new CentreView(newIdea);
             this.rootView.setParent(this);
@@ -216,17 +219,6 @@ public final class IdeaMap extends JComponent implements MapComponent {
      */
     public IdeaView getSelectedView() {
         return findIdeaViewFor(rootView, getDocument().getSelected());
-    }
-
-    /**
-     * The idea represented at the centre of this map.
-     * @return central idea.
-     */
-    public Idea getIdea() {
-        if (this.rootView != null) {
-            return this.rootView.getIdea();
-        }
-        return null;
     }
 
     /**
@@ -459,6 +451,9 @@ public final class IdeaMap extends JComponent implements MapComponent {
      * if none are found.
      */
     public IdeaView findIdeaViewFor(IdeaView parentView, Idea idea) {
+        if (parentView == null) {
+            return null;
+        }
         if (idea == null) {
             return null;
         }
