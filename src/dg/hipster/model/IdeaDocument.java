@@ -80,6 +80,7 @@ public class IdeaDocument extends AbstractModel implements IdeaListener {
         }
         undoManager.setIdea(newIdea);
         firePropertyChange("idea", oldIdea, this.idea);
+        setSelected(newIdea);
     }
 
     public Idea getIdea() {

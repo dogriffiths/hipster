@@ -179,7 +179,6 @@ public final class IdeaMap extends JComponent implements MapComponent {
         if ((newIdea != null) && (!newIdea.equals(oldIdea))) {
             this.rootView = new CentreView(newIdea);
             this.rootView.setParent(this);
-            this.document.setSelected(newIdea);
             text.setText(newIdea.getText());
             text.setEnabled(false);
             selectIdea(newIdea);
@@ -192,13 +191,11 @@ public final class IdeaMap extends JComponent implements MapComponent {
     }
 
     public void selectIdea(final Idea selectedIdea) {
-        IdeaView selectedView = this.findIdeaViewFor(
-                this.getRootView(), selectedIdea);
-        if (selectedView != null) {
+        if (selectedIdea != null) {
             FloatingPanel propertiesPanel = this.getPropertiesPanel();
             propertiesPanel.getContentPane().removeAll();
             propertiesPanel.getContentPane().add(new XMLPanel(
-                    selectedView.getIdea(),
+                    selectedIdea,
                     "/dg/hipster/view/ideaProperties.xml"));
             propertiesPanel.auto();
             this.setPropertiesVisible(this.getPropertiesVisible());
