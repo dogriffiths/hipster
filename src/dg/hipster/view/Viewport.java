@@ -26,7 +26,7 @@ public class Viewport extends AbstractModel {
      * time the {@link #zoomIn()} and {@link #zoomOut()} methods are called.
      */
     public final static double SCALE_FACTOR = 1.5;
-    
+
     /**
      * Amount this map is scaled.
      */
@@ -35,7 +35,7 @@ public class Viewport extends AbstractModel {
      * Amount to offset the map by.
      */
     private Point offset;
-    
+
     public Viewport() {
         setOffset(new Point(0, 0));
         setZoom(1.0);
@@ -68,7 +68,7 @@ public class Viewport extends AbstractModel {
         this.offset = offset;
         firePropertyChange("offset", oldOffset, this.offset);
     }
-    
+
     public void transform(Graphics g) {
         if (offset != null) {
             g.translate(offset.x, offset.y);
@@ -136,7 +136,7 @@ public class Viewport extends AbstractModel {
         y += (size.height / 2);
         return new Point((int) x, (int) y);
     }
-    
+
     /**
      * Scale this map up by the given factor.
      * @param factor scaling factor - 1.0 for normal view.
