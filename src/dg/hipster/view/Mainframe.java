@@ -171,9 +171,7 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
      * Set up the data.
      */
     private void buildModel() {
-        IdeaDocument doc = new IdeaDocument();
-        doc.setIdea(new Idea("Untitled"));
-        setDocument(doc);
+        setDocument(new IdeaDocument());
     }
 
     public void setDocument(final IdeaDocument document) {

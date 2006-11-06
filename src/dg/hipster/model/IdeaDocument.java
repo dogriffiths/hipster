@@ -64,6 +64,7 @@ public class IdeaDocument extends AbstractModel implements IdeaListener {
 
     public IdeaDocument() {
         this.setCurrentFile(null);
+        setTitle("Untitled");
         this.setIdea(new Idea(this.getTitle()));
         this.setDirty(false);
         this.setSelected(this.getIdea());
