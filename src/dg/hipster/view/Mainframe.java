@@ -143,12 +143,6 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
                 ActionEvent.SHIFT_MASK
                 + Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         JMenu editMenu = menuBar.getMenu("edit");
-        if ((new File("/Applications/OmniOutliner Professional.app/")
-        ).exists()) {
-            menuBar.createItem("omniOutliner", fileMenu, "openOmniOutliner",
-                    KeyStroke.getKeyStroke(KeyEvent.VK_L, 
-                    Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        }
         if (!Main.isMac()) {
             fileMenu.addSeparator();
             menuBar.createItem("exit", fileMenu, "fileExit");
@@ -158,6 +152,12 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
                     KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0));
             menuBar.createItem("about", helpMenu, "helpAbout");
         } else {
+            if ((new File("/Applications/OmniOutliner Professional.app/")
+            ).exists()) {
+                menuBar.createItem("omniOutliner", fileMenu, "openOmniOutliner",
+                        KeyStroke.getKeyStroke(KeyEvent.VK_L,
+                        Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+            }
             JMenu helpMenu = menuBar.getMenu("help");
             menuBar.createItem("manual", helpMenu, "helpManual",
                     KeyStroke.getKeyStroke(
