@@ -249,6 +249,7 @@ public final class IdeaMapController implements KeyListener, FocusListener,
             || (hit.getIdea().getUrl().length() == 0))) {
                 this.ideaMap.edit();
             }
+            ideaMap.repaint();
         }
     }
     
@@ -375,15 +376,19 @@ public final class IdeaMapController implements KeyListener, FocusListener,
                 break;
             case KeyEvent.VK_UP:
                 selectUp();
+                ideaMap.repaint();
                 break;
             case KeyEvent.VK_DOWN:
                 selectDown();
+                ideaMap.repaint();
                 break;
             case KeyEvent.VK_LEFT:
                 selectLeft();
+                ideaMap.repaint();
                 break;
             case KeyEvent.VK_RIGHT:
                 selectRight();
+                ideaMap.repaint();
                 break;
             case KeyEvent.VK_BACK_SPACE:
             case KeyEvent.VK_DELETE:
