@@ -64,6 +64,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
+import java.net.URLEncoder;
 import java.util.Collection;
 import java.util.ResourceBundle;
 import javax.swing.JFrame;
@@ -391,6 +392,22 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
     public void homePage() {
         try {
             BrowserLauncher.openURL("http://code.google.com/p/hipster/");
+        } catch(MalformedURLException mfue) {
+            mfue.printStackTrace();
+        } catch(IOException ioe) {
+            ioe.printStackTrace();
+        }
+    }
+    
+    public void openWikipedia() {
+        try {
+            Idea selected = this.getDocument().getSelected();
+            if (selected != null) {
+                String text = selected.getText();
+                String wikiURL = "http://en.wikipedia.org/wiki/"
+                        + text.replaceAll(" ", "%20");
+                BrowserLauncher.openURL(wikiURL);
+            }
         } catch(MalformedURLException mfue) {
             mfue.printStackTrace();
         } catch(IOException ioe) {

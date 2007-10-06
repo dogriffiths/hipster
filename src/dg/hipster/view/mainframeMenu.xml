@@ -23,6 +23,8 @@
         <item textName="copy" action="copyIdea" key="C"/>
         <item textName="paste" action="pasteIdea" key="V"/>
         <item textName="-"/>
+        <item textName="openWikipedia" action="openWikipedia" key="K"/>
+        <item textName="-"/>
         <item textName="insertChild" action="insertChild"/>
         <item textName="insertSibling" action="insertSibling"/>
     </menu>
