@@ -105,6 +105,7 @@ public final class UndoManager implements IdeaListener, PropertyChangeListener {
     public void propertyChange(final PropertyChangeEvent propertyChangeEvent) {
         if ((!"selected".equals(propertyChangeEvent.getPropertyName()))
         && (!"angle".equals(propertyChangeEvent.getPropertyName()))
+        && (!"v".equals(propertyChangeEvent.getPropertyName()))
         && (!"length".equals(propertyChangeEvent.getPropertyName()))) {
             storeEvent(propertyChangeEvent);
             redoEvents.clear();
