@@ -141,4 +141,24 @@ public class UndoManagerTest extends TestCase {
         undoManager.undo();
         assertEquals("Didn't reset text", "subSubIdea0", subSubIdea0.getText());
     }
+    
+    /**
+     * Test undo works if a sub-tree of is cut and paste elsewhere.
+     */
+    public void testUndoTransfer() {
+        Idea idea = new Idea("root");
+        undoManager.setIdea(idea);
+        Idea subIdea0 = new Idea("subIdea0");
+        idea.add(subIdea0);
+        Idea subIdea1 = new Idea("subIdea1");
+        Idea subSubIdea0 = new Idea("subSubIdea0");
+        subIdea0.add(subSubIdea0);
+        idea.add(subIdea1);
+        subIdea0.remove(subSubIdea0);
+        subIdea1.add(subSubIdea0);
+        undoManager.undo();
+        assertEquals("subIdea1 still has the sub idea attached", 0,
+                subIdea1.getSubIdeas().size());
+        undoManager.undo();
+    }
 }

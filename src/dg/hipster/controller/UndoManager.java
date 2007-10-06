@@ -62,7 +62,7 @@ public final class UndoManager implements IdeaListener, PropertyChangeListener {
      * order.
      */
     private Stack redoEvents;
-
+    
     /**
      * Creates a new instance of UndoManager.
      */
@@ -70,7 +70,7 @@ public final class UndoManager implements IdeaListener, PropertyChangeListener {
         events = new Stack();
         redoEvents = new Stack();
     }
-
+    
     /**
      * Called when ideas are amended. We are only
      * interested in ADDED and REMOVED events, because
@@ -97,18 +97,20 @@ public final class UndoManager implements IdeaListener, PropertyChangeListener {
                 // Do nothing
         }
     }
-
+    
     /**
      * Called when a property changes on an idea.
      * @param propertyChangeEvent event describing the change.
      */
     public void propertyChange(final PropertyChangeEvent propertyChangeEvent) {
-        if (!"selected".equals(propertyChangeEvent.getPropertyName())) {
+        if ((!"selected".equals(propertyChangeEvent.getPropertyName()))
+        && (!"angle".equals(propertyChangeEvent.getPropertyName()))
+        && (!"length".equals(propertyChangeEvent.getPropertyName()))) {
             storeEvent(propertyChangeEvent);
             redoEvents.clear();
         }
     }
-
+    
     /**
      * Place an event upon a stack - unless it is
      * already there. The reason for the check is
@@ -122,7 +124,7 @@ public final class UndoManager implements IdeaListener, PropertyChangeListener {
             events.push(event);
         }
     }
-
+    
     /**
      * Root idea being watched.
      * @return idea being watched.
@@ -130,7 +132,7 @@ public final class UndoManager implements IdeaListener, PropertyChangeListener {
     public Idea getIdea() {
         return idea;
     }
-
+    
     /**
      * Root idea being watched.
      * @param newIdea Root idea being watched.
@@ -147,7 +149,7 @@ public final class UndoManager implements IdeaListener, PropertyChangeListener {
             startListeningTo(newIdea);
         }
     }
-
+    
     /**
      * Stop listening to the property changes
      * of an idea - usually
@@ -162,7 +164,7 @@ public final class UndoManager implements IdeaListener, PropertyChangeListener {
             }
         }
     }
-
+    
     /**
      * Start listening to the property changes of
      * an idea.
@@ -176,7 +178,7 @@ public final class UndoManager implements IdeaListener, PropertyChangeListener {
             }
         }
     }
-
+    
     /**
      * Undo the last event recorded.
      */
@@ -197,7 +199,7 @@ public final class UndoManager implements IdeaListener, PropertyChangeListener {
         // Reset the redo events back, because they will have been cleared.
         redoEvents = currentRedo;
     }
-
+    
     /**
      * Redo the last event recorded.
      */
@@ -218,7 +220,7 @@ public final class UndoManager implements IdeaListener, PropertyChangeListener {
         // Reset the redo events back, because they will have been cleared.
         redoEvents = currentRedo;
     }
-
+    
     /**
      * Undo the specified idea-event.
      * @param ideaEvent idea-event to undo.
@@ -238,7 +240,7 @@ public final class UndoManager implements IdeaListener, PropertyChangeListener {
                 throw new RuntimeException("Cannot undo: " + ideaEvent);
         }
     }
-
+    
     /**
      * Redo the specified idea-event.
      * @param ideaEvent idea-event to undo.
@@ -258,7 +260,7 @@ public final class UndoManager implements IdeaListener, PropertyChangeListener {
                 throw new RuntimeException("Cannot redo: " + ideaEvent);
         }
     }
-
+    
     /**
      * Undo the specified property-change-event.
      * @param propertyChangeEvent event to undo.
@@ -280,7 +282,7 @@ public final class UndoManager implements IdeaListener, PropertyChangeListener {
             idea.setEndDate((Date) propertyChangeEvent.getOldValue());
         }
     }
-
+    
     /**
      * Redo the specified property-change-event.
      * @param propertyChangeEvent event to undo.
