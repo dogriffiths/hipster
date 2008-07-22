@@ -55,18 +55,23 @@ public final class WriterFactory {
         return instance;
     }
 
-    public void write(File f, IdeaDocument document) throws ReaderException {
+    public void write(File f, IdeaDocument document, boolean export) throws ReaderException {
         try {
             IdeaWriter writer = null;
             if (f.getName().toLowerCase().endsWith(".opml")) {
                 writer = new OPMLWriter(new OutputStreamWriter(
                         new FileOutputStream(f), "UTF-8"));
+            } else if (f.getName().toLowerCase().endsWith(".txt")) {
+                writer = new WikiWriter(new OutputStreamWriter(
+                        new FileOutputStream(f), "UTF-8"));
             }
             if (writer != null) {
                 try {
                     writer.write(document);
-                    document.setCurrentFile(f);
-                    document.setDirty(false);
+                    if (!export) {
+                        document.setCurrentFile(f);
+                        document.setDirty(false);
+                    }
                 } catch(Exception e) {
                     e.printStackTrace();
                 }

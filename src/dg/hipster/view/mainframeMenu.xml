@@ -14,6 +14,7 @@
         <item textName="-"/>
         <item textName="open" action="openDocument" key="O"/>
         <item textName="save" action="saveDocument" key="S"/>
+        <item textName="exportWiki" action="exportWiki" key="E"/>
     </menu>
     <menu textName="edit">
         <item textName="undo" action="undo" key="Z"/>

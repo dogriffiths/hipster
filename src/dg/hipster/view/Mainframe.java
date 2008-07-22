@@ -319,7 +319,35 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
         
         if (file != null) {
             Idea idea = document.getIdea();
-            WriterFactory.getInstance().write(file, document);
+            WriterFactory.getInstance().write(file, document, false);
+        }
+    }
+    
+    public void exportWiki()
+    throws IOException, ReaderException {
+        File file = null;
+        if (file == null) {
+            String filename = this.getDocument().getTitle();
+            if (!filename.toUpperCase().endsWith(".TXT")) {
+                filename += ".txt";
+            }
+            int pos = filename.lastIndexOf(File.separatorChar);
+            FileDialog chooser = new FileDialog(this,
+                    resBundle.getString("export.wiki.file"),
+                    FileDialog.SAVE);
+            chooser.setFile(filename.substring(pos + 1));
+            
+            chooser.setVisible(true);
+            
+            if (chooser.getFile() != null) {
+                file = new File(chooser.getDirectory() + chooser.getFile());
+            }
+        }
+        
+        
+        if (file != null) {
+            Idea idea = this.getDocument().getIdea();
+            WriterFactory.getInstance().write(file, this.getDocument(), true);
         }
     }
     
