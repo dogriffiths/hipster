@@ -39,7 +39,7 @@
     <target name="exeWin" if="isWindows">
         <taskdef name="launch4j" classname="net.sf.launch4j.ant.Launch4jTask"
         classpath="platforms/windows/launch4j.jar:platforms/windows/xstream.jar" />
-        <launch4j configFile="platforms/windows/launch4jexe.xml" />
+        <launch4j configFile="./platforms/windows/launch4jexe.xml" />
         <copy todir="dist/winarc" file="application/hIPster.exe"/>
         <copy todir="dist/winarc/manual/English">
             <fileset dir="etc/help/English">
@@ -63,7 +63,7 @@
     <target name="exeWinMac" if="isMacOSX">
         <taskdef name="launch4j" classname="net.sf.launch4j.ant.Launch4jTask"
         classpath="platforms/windows/launch4j-mac.jar:platforms/windows/xstream.jar" />
-        <launch4j configFile="platforms/windows/launch4jexe.xml" />
+        <launch4j configFile="./platforms/windows/launch4jexe.xml" />
         <copy todir="dist/winarc" file="application/hIPster.exe"/>
         <copy todir="dist/winarc/manual/English">
             <fileset dir="etc/help/English">

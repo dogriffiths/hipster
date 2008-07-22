@@ -48,7 +48,7 @@
         </exec>
  
         <exec executable="cc">
-            <arg line="-O -g -isysroot /Developer/SDKs/MacOSX10.4u.sdk"/>
+            <arg line="-O -g -isysroot /Developer/SDKs/MacOSX10.5.sdk"/>
             <arg line="-arch i386"/>
             <arg line="-arch ppc"/>
             <arg line="-dynamiclib"/>
