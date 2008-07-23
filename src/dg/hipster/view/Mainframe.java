@@ -43,6 +43,7 @@ import dg.hipster.io.ReaderFactory;
 import dg.hipster.io.WriterFactory;
 import dg.hipster.model.Idea;
 import dg.hipster.model.IdeaDocument;
+import dg.hipster.model.IdeaLink;
 import dg.hipster.model.Settings;
 import dg.inx.XMLMenuBar;
 import java.awt.BorderLayout;
@@ -52,6 +53,7 @@ import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
@@ -66,6 +68,8 @@ import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URLEncoder;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.ResourceBundle;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -485,16 +489,70 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
         this.ideaMap.setPropertiesVisible(!this.ideaMap.getPropertiesVisible());
     }
     
+    private String wikiIdea(int indent, Idea idea) {
+        String title = (blank(idea.getDescription()) ? idea.getText() : idea.getDescription());
+        String url = idea.getUrl();
+        String result = "";
+        if ((url != null) && (url.length() != 0)) {
+            title = "[" + url + " " + title + "]";
+        }
+        String heading = "";
+        if ((indent < 3) && (title.length() < 40)) {
+            heading = "====================".substring(0, indent + 2);
+            result += heading + title + heading + "\n\n";
+        } else {
+            heading = "***********".substring(0, Math.max(indent - 2, 1));
+            result += heading + title + "\n";
+        }
+        if (!blank(idea.getNotes())) {
+            result += idea.getNotes() + "\n\n";
+        }
+        for (Idea subIdea: idea.getSubIdeas()) {
+            result += wikiIdea(indent + 1, subIdea);
+        }
+        if (idea.getLinks().size() > 0) {
+            result += "See also:" + "\n\n";
+        }
+        for (IdeaLink link: idea.getLinks()) {
+            result += "* [#" + ideaIndex.get(link.getTo()) + " " + link.getTo().getText() + "]\n";
+        }
+        return result;
+    }
+    
+    private static boolean blank(String s) {
+        return (s == null) || (s.length() == 0);
+    }
+
+    private void indexWithSubs(Idea idea) {
+        ideaIndex.put(idea, count++);
+        for (Idea subIdea : idea.getSubIdeas()) {
+            indexWithSubs(subIdea);
+        }
+    }
+    
+    private Map<Idea, Integer> ideaIndex;
+    int count;
+
+    private void index(Idea idea) {
+        ideaIndex = new HashMap<Idea, Integer>();
+        count = 0;
+        indexWithSubs(idea);
+    }
+    
     public void copyIdea() {
         DataFlavor ideaFlavour = new DataFlavor(Idea.class, "Idea");
+        Idea idea = getDocument().getSelected();
+        index(idea);
         getToolkit().getSystemClipboard().setContents(
-                new IdeaSelection(getDocument().getSelected().clone()), this);
+                new IdeaSelection(idea.clone(), wikiIdea(0, idea)), this);
     }
     
     public void cutIdea() {
         DataFlavor ideaFlavour = new DataFlavor(Idea.class, "Idea");
+        Idea idea = getDocument().getSelected();
+        index(idea);
         getToolkit().getSystemClipboard().setContents(
-                new IdeaSelection(getDocument().getSelected().clone()), this);
+                new IdeaSelection(idea.clone(), wikiIdea(0, idea)), this);
         getDocument().deleteSelected();
     }
     
@@ -600,20 +658,26 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
 
 class IdeaSelection implements Transferable {
     private Idea idea;
+    private String string;
     
-    public IdeaSelection(Idea anIdea) {
+    public IdeaSelection(Idea anIdea, String string) {
         this.idea = anIdea;
+        this.string = string;
     }
     
     public DataFlavor[] getTransferDataFlavors() {
-        return new DataFlavor[] {new DataFlavor(Idea.class, "Idea")};
+        return new DataFlavor[] {new DataFlavor(Idea.class, "Idea"), DataFlavor.stringFlavor};
     }
     
     public boolean isDataFlavorSupported(DataFlavor dataFlavor) {
-        return (dataFlavor.getDefaultRepresentationClass().equals(Idea.class));
+        return (dataFlavor.getDefaultRepresentationClass().equals(Idea.class)
+        || dataFlavor.getDefaultRepresentationClass().equals(String.class));
     }
     
-    public Idea getTransferData(DataFlavor dataFlavor) {
+    public Object getTransferData(DataFlavor dataFlavor) {
+        if (dataFlavor.equals(DataFlavor.stringFlavor)) {
+            return string;
+        }
         return idea;
     }
 }
