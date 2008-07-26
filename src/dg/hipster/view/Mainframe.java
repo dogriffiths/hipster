@@ -497,7 +497,7 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
             title = "[" + url + " " + title + "]";
         }
         String heading = "";
-        if ((indent < 3) && (title.length() < 40)) {
+        if ((indent < 3) && (title.length() < 60)) {
             heading = "====================".substring(0, indent + 2);
             result += heading + title + heading + "\n\n";
         } else {
