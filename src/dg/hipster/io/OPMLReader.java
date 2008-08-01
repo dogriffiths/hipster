@@ -99,6 +99,7 @@ public final class OPMLReader extends DefaultHandler implements IdeaReader {
                         if (description == null) {
                             description = "";
                         }
+                        i.setDescription(description);
                         String startDateString = attrs.getValue("startDate");
                         if (startDateString != null) {
                             i.setStartDate(OPMLWriter.DATE_FORMAT.parse(

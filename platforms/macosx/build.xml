@@ -49,11 +49,11 @@
  
         <exec executable="cc">
             <arg line="-O -g -isysroot /Developer/SDKs/MacOSX10.[4-9].sdk/"/>
-            <arg line="-arch i386"/>
             <arg line="-arch ppc"/>
-            <arg line="-dynamiclib"/>
+            <arg line="-arch i386"/>
             <arg line="-framework JavaVM"/>
             <arg line="-framework Cocoa"/>
+            <arg line="-dynamiclib"/>
             <arg line="-o build/libHelpBookJNI.jnilib"/>
             <arg value="build/HelpBookJNI.o"/>   
         </exec>
