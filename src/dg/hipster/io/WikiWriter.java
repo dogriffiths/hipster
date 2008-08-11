@@ -98,7 +98,7 @@ public final class WikiWriter implements IdeaWriter {
             out.write("See also:" + "\n\n");
         }
         for (IdeaLink link: idea.getLinks()) {
-            out.write("* [#" + ideaIndex.get(link.getTo()) + " " + link.getTo().getText() + "]\n");
+            out.write("* [[#" + link.getTo().getText() + "]]\n");
         }
     }
     

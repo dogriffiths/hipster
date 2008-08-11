@@ -514,7 +514,7 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
             result += "See also:" + "\n\n";
         }
         for (IdeaLink link: idea.getLinks()) {
-            result += "* [#" + ideaIndex.get(link.getTo()) + " " + link.getTo().getText() + "]\n";
+            result += "* [[#" + link.getTo().getText() + "]]\n";
         }
         return result;
     }
