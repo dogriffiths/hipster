@@ -41,6 +41,8 @@ import dg.hipster.Utilities;
 import dg.hipster.io.ReaderException;
 import dg.hipster.io.ReaderFactory;
 import dg.hipster.io.WriterFactory;
+import dg.hipster.io.WikiWriter;
+import static dg.hipster.io.WikiWriter.wikiIdea;
 import dg.hipster.model.Idea;
 import dg.hipster.model.IdeaDocument;
 import dg.hipster.model.IdeaLink;
@@ -487,36 +489,6 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
      */
     public void togglePropertiesPanel() {
         this.ideaMap.setPropertiesVisible(!this.ideaMap.getPropertiesVisible());
-    }
-    
-    private String wikiIdea(int indent, Idea idea) {
-        String title = (blank(idea.getDescription()) ? idea.getText() : idea.getDescription());
-        String url = idea.getUrl();
-        String result = "";
-        if ((url != null) && (url.length() != 0)) {
-            title = "[" + url + " " + title + "]";
-        }
-        String heading = "";
-        if ((indent < 3) && (title.length() < 60)) {
-            heading = "====================".substring(0, indent + 2);
-            result += heading + title + heading + "\n\n";
-        } else {
-            heading = "***********".substring(0, Math.max(indent - 2, 1));
-            result += heading + title + "\n";
-        }
-        if (!blank(idea.getNotes())) {
-            result += idea.getNotes() + "\n\n";
-        }
-        for (Idea subIdea: idea.getSubIdeas()) {
-            result += wikiIdea(indent + 1, subIdea);
-        }
-        if (idea.getLinks().size() > 0) {
-            result += "See also:" + "\n\n";
-        }
-        for (IdeaLink link: idea.getLinks()) {
-            result += "* [[#" + link.getTo().getText() + "]]\n";
-        }
-        return result;
     }
     
     private static boolean blank(String s) {
