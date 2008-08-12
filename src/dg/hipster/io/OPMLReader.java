@@ -175,8 +175,8 @@ public final class OPMLReader extends DefaultHandler implements IdeaReader {
             IdeaLink link = links.get(i);
             int linkIndex = linkTos.get(i);
             Idea linkTo = ideaIndex.get(linkIndex);
-            link.setTo(linkTo);
-            link.getFrom().addLink(link);
+            IdeaLink newLink = new IdeaLink(link.getFrom(), linkTo);
+            newLink.getFrom().addLink(newLink);
         }
     }
 

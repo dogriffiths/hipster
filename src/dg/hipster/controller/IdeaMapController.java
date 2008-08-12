@@ -69,8 +69,9 @@ import java.awt.event.MouseWheelListener;
 import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.DataInputStream;
 import java.io.File;
+import java.io.InputStreamReader;
+import java.io.BufferedReader;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -617,13 +618,13 @@ class FileMetaData {
         data.put("kMDItemTitle", f.getName());
         if (Main.isMac()) {
             Process process = null;
-            DataInputStream in = null;
+            BufferedReader in = null;
             try {
                 process = Runtime.getRuntime().exec(new String[]{
                     "mdls", f.toString()
                 }, null, f.getParentFile());
                 
-                in = new DataInputStream(process.getInputStream());
+                in = new BufferedReader(new InputStreamReader(process.getInputStream()));
                 String line = null;
                 while ((line = in.readLine()) != null) {
                     int pos0 = line.indexOf('=');

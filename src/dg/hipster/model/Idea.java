@@ -376,6 +376,7 @@ public class Idea extends AbstractModel implements IdeaListener {
      */
     public synchronized void remove(Idea subIdea) {
         int pos = subIdeas.indexOf(subIdea);
+        subIdea.removeLinks();
         subIdeas.remove(subIdea);
         subIdea.removeIdeaListener(this);
         notify(new IdeaEvent(this, IdeaEvent.REMOVED, "REMOVED",
@@ -407,6 +408,16 @@ public class Idea extends AbstractModel implements IdeaListener {
             links.remove(other);
             notify(new IdeaEvent(this, IdeaEvent.REMOVED_LINK, "REMOVED_LINK",
                     other));
+        }
+    }
+
+    /**
+     * Remove all links from the idea
+     */
+    public void removeLinks() {
+        for (int i = links.size() - 1; i >= 0; i--) {
+            IdeaLink link = links.get(i);
+            removeLink(link);
         }
     }
 

@@ -262,7 +262,7 @@ public class XMLPanel extends JPanel {
     private static JCheckBox makeCheckBox(Controller c, String source,
             GridBagLayout gbl, GridBagConstraints con, String label) {
         JCheckBox chk = new JCheckBox();
-        chk.setLabel(label);
+        chk.setText(label);
         gbl.setConstraints(chk, con);
         if (source.startsWith("#")) {
             c.bind(chk, source.substring(1));

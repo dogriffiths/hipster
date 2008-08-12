@@ -109,20 +109,16 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
                 }
             }
         } else if (id == IdeaEvent.ADDED_LINK) {
-            Idea ideaParent = (Idea)fe.getSource();
             LinkView linkView = new LinkView((IdeaLink)fe.getIdea());
             linkView.parent = this;
             linkViews.add(linkView);
         } else if (id == IdeaEvent.REMOVED_LINK) {
-            Idea ideaParent = (Idea)fe.getSource();
-            if (this.idea.equals(ideaParent)) {
-                IdeaLink link = (IdeaLink)fe.getIdea();
-                for (int i = 0; i < linkViews.size(); i++) {
-                    IdeaLink idea = (IdeaLink) linkViews.get(i).getIdea();
-                    if (link.equals(idea)) {
-                        linkViews.remove(i);
-                        break;
-                    }
+            IdeaLink link = (IdeaLink) fe.getIdea();
+            for (int i = 0; i < linkViews.size(); i++) {
+                IdeaLink idea = (IdeaLink) linkViews.get(i).getIdea();
+                if (link.equals(idea)) {
+                    linkViews.remove(i);
+                    break;
                 }
             }
         } else {

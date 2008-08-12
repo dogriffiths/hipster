@@ -75,11 +75,6 @@ public class LinkView extends IdeaView {
         return (IdeaLink) super.getIdea();
     }
 
-    public void setLink(IdeaLink link) {
-        super.setIdea(link);
-    }
-
-
     public void paintLink(final Graphics g) {
         initPoints();
         IdeaLink link = getLink();
