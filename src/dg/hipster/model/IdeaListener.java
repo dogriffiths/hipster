@@ -42,5 +42,5 @@ import java.awt.event.ActionEvent;
  * @author davidg
  */
 public interface IdeaListener {
-    public void ideaChanged(IdeaEvent ideaEvent);
+    void ideaChanged(IdeaEvent ideaEvent);
 }

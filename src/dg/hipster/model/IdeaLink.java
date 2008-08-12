@@ -23,6 +23,16 @@ public class IdeaLink extends Idea {
         super();
         this.from = fromIdea;
         this.to = toIdea;
+        if (this.to != null) {
+            this.to.addIdeaListener(this);
+        }
+    }
+
+    public void ideaChanged(IdeaEvent ideaEvent) {
+        if ((ideaEvent.getIdea().equals(this.to)) && (ideaEvent.getActionCommand().equals("REMOVED"))) {
+            this.from.removeLink(this);
+        }
+        super.ideaChanged(ideaEvent);
     }
 
     public Idea getFrom() {

@@ -379,6 +379,8 @@ public class Idea extends AbstractModel implements IdeaListener {
         subIdea.removeLinks();
         subIdeas.remove(subIdea);
         subIdea.removeIdeaListener(this);
+        subIdea.notify(new IdeaEvent(subIdea, IdeaEvent.REMOVED, "REMOVED",
+                subIdea, pos));
         notify(new IdeaEvent(this, IdeaEvent.REMOVED, "REMOVED",
                 subIdea, pos));
     }
