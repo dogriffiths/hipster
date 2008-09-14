@@ -35,7 +35,19 @@
       -->
 <project name="hipster" default="default" basedir=".">
     <description>Builds, tests, and runs the project hipster.</description>
-
+	<condition property="sdk.dir" value="/Developer/SDKs/MacOSX10.5.sdk/">
+		<and>
+			<os family="mac"/>
+			<matches pattern="^10\.5.*" string="${os.version}"/>
+		</and>
+	</condition>
+	<condition property="sdk.dir" value="/Developer/SDKs/MacOSX10.4u.sdk/">
+		<and>
+			<os family="mac"/>
+			<matches pattern="^10\.4.*" string="${os.version}"/>
+		</and>
+	</condition>
+	
     <target name="jni"  description="Create HelpBook JNI Library" if="isMacOSX">
         <mkdir dir="build"/>
         <exec executable="cc">
@@ -48,7 +60,7 @@
         </exec>
  
         <exec executable="cc">
-            <arg line="-O -g -isysroot /Developer/SDKs/MacOSX10.[4-9].sdk/"/>
+            <arg line="-O -g -isysroot ${sdk.dir}"/>
             <arg line="-arch ppc"/>
             <arg line="-arch i386"/>
             <arg line="-framework JavaVM"/>
