@@ -35,6 +35,12 @@
       -->
 <project name="hipster" default="default" basedir=".">
     <description>Builds, tests, and runs the project hipster.</description>
+	<condition property="sdk.dir" value="/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.10.sdk/">
+		<and>
+			<os family="mac"/>
+			<matches pattern="^10\.10.*" string="${os.version}"/>
+		</and>
+	</condition>
 	<condition property="sdk.dir" value="/Developer/SDKs/MacOSX10.5.sdk/">
 		<and>
 			<os family="mac"/>
