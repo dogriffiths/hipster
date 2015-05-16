@@ -49,7 +49,7 @@ As well as this there are many other features which you can find through explori
 
 # Binaries
 
-Here are a few binary distributions of *hipster*.
+Here are some binary distributions of *hipster*.
 
 - [*nix zip archive](https://dl.dropboxusercontent.com/u/6007591/hipster/hipster-nix.zip "hipster-nix.zip")
 - [Mac application](https://dl.dropboxusercontent.com/u/6007591/hipster/hipster.dmg "hipster.dmg")
