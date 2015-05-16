@@ -51,6 +51,6 @@ As well as this there are many other features which you can find through explori
 
 Here are some binary distributions of *hipster*.
 
-- [*nix zip archive](https://dogriffiths.github.io/hipster/images/hipster-nix.zip "hipster-nix.zip")
-- [Mac application](https://dogriffiths.github.io/hipster/images/hipster.dmg "hipster.dmg")
-- [Java version](https://dogriffiths.github.io/hipster/images/hipster.jar "hipster.jar")
+- [*nix zip archive](https://dogriffiths.github.io/hipster/distros/hipster-nix.zip "hipster-nix.zip")
+- [Mac application](https://dogriffiths.github.io/hipster/distros/hipster.dmg "hipster.dmg")
+- [Java version](https://dogriffiths.github.io/hipster/distros/hipster.jar "hipster.jar")
