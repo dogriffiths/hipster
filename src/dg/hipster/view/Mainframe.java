@@ -129,6 +129,7 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
         this.getContentPane().add(ideaMap, BorderLayout.CENTER);
         this.setJMenuBar(createMenu());
         this.setIconImage(createIcon());
+        enableOSXFullscreen(this);
     }
     
     private Image createIcon() {
@@ -138,6 +139,18 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
             throw new RuntimeException("Unable to find picture " + imageName);
         }
         return Toolkit.getDefaultToolkit().getImage(url);
+    }
+
+    public static void enableOSXFullscreen(java.awt.Window window) {
+        try {
+            Class util = Class.forName("com.apple.eawt.FullScreenUtilities");
+            Class params[] = new Class[]{java.awt.Window.class, Boolean.TYPE};
+            Method method = util.getMethod("setWindowCanFullScreen", params);
+            method.invoke(util, window, true);
+        } catch (ClassNotFoundException e1) {
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
     
     private JMenuBar createMenu() {
