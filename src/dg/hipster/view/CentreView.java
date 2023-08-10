@@ -38,6 +38,7 @@ package dg.hipster.view;
 import dg.hipster.model.Idea;
 
 import java.awt.*;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 
 /**
@@ -61,6 +62,7 @@ public class CentreView extends IdeaView {
 
     public void paint(Graphics g, IdeaMap map) {
         initFromTo();
+
 //        for (BranchView branch : this.getSubBranches()) {
             this.paintLinks(g);
 //        }
@@ -77,6 +79,8 @@ public class CentreView extends IdeaView {
 //            colour = invert(colour);
 //        }
         g.setColor(colour);
+        Font font  = new Font("Loopiejuice", Font.PLAIN, 22);
+        g.setFont(font);
 
         Stroke stroke = new BasicStroke(5.0f,
                 BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL);
@@ -86,6 +90,7 @@ public class CentreView extends IdeaView {
 
         g.drawOval(-ROOT_RADIUS_X, -ROOT_RADIUS_Y, ROOT_RADIUS_X * 2,
                 ROOT_RADIUS_Y * 2);
+        ((Graphics2D)g).transform(AffineTransform.getTranslateInstance(0.0, 15.0));
         drawString((Graphics2D)g, getIdea().getText(), new Point(0, 0), 4,
                 getIdea().getAngle(), this.isEditing(), map);
     }

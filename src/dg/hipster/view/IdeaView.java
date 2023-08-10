@@ -261,9 +261,15 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
 
     abstract boolean hits(Point2D p);
 
+    public static int MAX_DEPTH = 2;
+    public static boolean PAINT_LINKS = false;
+
     void paintBranches(final Graphics g, final Point c2,
             final IdeaView aView, final double initAngle,
             final int depth, final IdeaMap map) {
+        if (depth > MAX_DEPTH) {
+            return;
+        }
         List<BranchView> views = aView.getSubBranches();
         synchronized(views) {
             for (BranchView view : views) {
@@ -323,9 +329,9 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
     void paintLinks(final Graphics g) {
         for (IdeaLink link : this.getIdea().getLinks()) {
             LinkView linkView = this.getLinkViewFor(link);
-//            if (linkView != null) {
-//                linkView.paintLink(g);
-//            }
+            if (linkView != null && PAINT_LINKS) {
+                linkView.paintLink(g);
+            }
         }
         for (BranchView branch : this.getSubBranches()) {
             branch.paintLinks(g);
@@ -367,7 +373,9 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
 
         int offsetX = (int) (realTextWidth * (double) (alignment % 3) / 2.0);
 //        int offsetY = (int) (-realTextHeight * (double) (alignment / 3) / 2.0);
-        int offsetY = 5;
+//        int offsetY = 5;
+//        int offsetY = 8;
+        int offsetY = 12;
 
         if (!editing) {
 

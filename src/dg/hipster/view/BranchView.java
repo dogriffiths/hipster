@@ -68,7 +68,12 @@ public class BranchView extends IdeaView {
     }
 
     void paint(final Graphics g, final int depth, final IdeaMap map) {
-        Font font  = new Font("Loopiejuice", Font.PLAIN, 22);
+        System.out.println("XXXXXXX depth = " + depth + " max depth = " + MAX_DEPTH);
+        if (depth > MAX_DEPTH) {
+            return;
+        }
+//        Font font  = new Font("Loopiejuice", Font.PLAIN, 22);
+        Font font  = new Font("Loopiejuice", Font.PLAIN, 44);
         g.setFont(font);
         double a = getRealAngle();
         Point c = new Point((int) fromPoint.getX(), (int) fromPoint.getY());
@@ -85,7 +90,8 @@ public class BranchView extends IdeaView {
         if (strokeWidth < (DEFAULT_STROKE_WIDTH / 2)) {
             strokeWidth = DEFAULT_STROKE_WIDTH / 2;
         }
-        strokeWidth = 4.0f;
+//        strokeWidth = 4.0f;
+        strokeWidth = 6.0f;
         Stroke stroke = new BasicStroke(strokeWidth,
                 BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL);
         ((Graphics2D)g).setStroke(stroke);
@@ -96,6 +102,30 @@ public class BranchView extends IdeaView {
 //        g.drawLine(c.x, c.y - 1, s.x, s.y - 1);
         g.setColor(colour);
         g.drawLine(c.x, c.y, s.x, s.y);
+
+        int xdiff = s.x - c.x;
+        int ydiff = s.y - c.y;
+
+        float splits = 64.0f;
+        for (int i = 0; i < splits; i++) {
+            float v = ((float) i / splits);
+            Stroke strokeA = new BasicStroke(strokeWidth * (1.0f + v),
+                    BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL);
+            ((Graphics2D)g).setStroke(strokeA);
+            double w = 0.2 * v;
+            g.drawLine(c.x + (int)(xdiff * w), c.y + (int)(ydiff * w), s.x - (int)(xdiff * w), s.y - (int)(ydiff * w));
+        }
+
+//        Stroke stroke3 = new BasicStroke(strokeWidth * 1.5f,
+//                BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL);
+//        ((Graphics2D)g).setStroke(stroke3);
+//        g.drawLine(c.x + (int)(xdiff * 0.05), c.y + (int)(ydiff * 0.05), s.x - (int)(xdiff * 0.05), s.y - (int)(ydiff * 0.05));
+//
+//        Stroke stroke2 = new BasicStroke(strokeWidth * 2.0f,
+//                BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL);
+//        ((Graphics2D)g).setStroke(stroke2);
+//        g.drawLine(c.x + (int)(xdiff * 0.1), c.y + (int)(ydiff * 0.1), s.x - (int)(xdiff * 0.1), s.y - (int)(ydiff * 0.1));
+
         ((Graphics2D)g).setStroke(oldStroke);
         if (this.isSelected()) {
             g.setColor(Color.WHITE);

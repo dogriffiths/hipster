@@ -25,7 +25,8 @@ public class Viewport extends AbstractModel {
      * Proportion that the image will be scaled in and out each
      * time the {@link #zoomIn()} and {@link #zoomOut()} methods are called.
      */
-    public final static double SCALE_FACTOR = 1.5;
+//    public final static double SCALE_FACTOR = 1.5;
+    public final static double SCALE_FACTOR = 1.1;
 
     /**
      * Amount this map is scaled.

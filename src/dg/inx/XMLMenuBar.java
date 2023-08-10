@@ -170,25 +170,20 @@ public final class XMLMenuBar extends JMenuBar {
     }
 
     public void createItem(String name, JMenu menu, String action, KeyStroke keyStroke) {
-        System.out.println("XXXXXX 0 name = " + name);
         String text = "-";
-        System.out.println("XXXXXX 25");
         if (!"-".equals(name)) {
             text = resBundle.getString("menu." + name);
         } else {
             menu.addSeparator();
             return;
         }
-        System.out.println("XXXXXX 50");
         JMenuItem item = new JMenuItem(text);
         menu.add(item);
         if (keyStroke != null) {
             item.setAccelerator(keyStroke);
         }
-        System.out.println("XXXXXX 75");
         menuItems.put(name, item);
         controller.bindMethod(backingBean, action, item);
-        System.out.println("XXXXXX 100");
     }
 
     public JMenu getMenu(String name) {
