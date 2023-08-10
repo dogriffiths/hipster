@@ -323,9 +323,9 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
     void paintLinks(final Graphics g) {
         for (IdeaLink link : this.getIdea().getLinks()) {
             LinkView linkView = this.getLinkViewFor(link);
-            if (linkView != null) {
-                linkView.paintLink(g);
-            }
+//            if (linkView != null) {
+//                linkView.paintLink(g);
+//            }
         }
         for (BranchView branch : this.getSubBranches()) {
             branch.paintLinks(g);
@@ -366,7 +366,8 @@ public abstract class IdeaView implements IdeaListener, MapComponent {
         double realTextHeight = fm.getHeight() - fm.getDescent();
 
         int offsetX = (int) (realTextWidth * (double) (alignment % 3) / 2.0);
-        int offsetY = (int) (-realTextHeight * (double) (alignment / 3) / 2.0);
+//        int offsetY = (int) (-realTextHeight * (double) (alignment / 3) / 2.0);
+        int offsetY = 5;
 
         if (!editing) {
 

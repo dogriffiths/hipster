@@ -92,7 +92,8 @@ public final class IdeaMap extends JComponent implements MapComponent {
     /**
      * Default background colour.
      */
-    private static final Color DEFAULT_BACKGROUND = new Color(95, 95, 95);
+//    private static final Color DEFAULT_BACKGROUND = new Color(95, 95, 95);
+    private static final Color DEFAULT_BACKGROUND = new Color(255, 255, 255);
     /**
      * Floating properties panel.
      */

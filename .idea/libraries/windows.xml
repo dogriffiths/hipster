@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="windows">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/platforms/windows/launch4j-mac.jar!/" />
+      <root url="jar://$PROJECT_DIR$/platforms/windows/xstream.jar!/" />
+      <root url="jar://$PROJECT_DIR$/platforms/windows/launch4j.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

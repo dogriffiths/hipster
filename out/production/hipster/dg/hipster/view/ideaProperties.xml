@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    Document   : ideaProperties.xml
+    Created on : 04 October 2006, 10:56
+    Author     : dgriffiths
+    Description:
+        Purpose of the document follows.
+-->
+
+<panel>
+  <row>
+    <label value="Text:" margin-bottom="2" margin-right="7" width="1"
+        align="right"/>
+    <text value="#text" margin-bottom="4" width="10"/>
+  </row>
+  <row>
+    <label value="Description:" margin-bottom="2" margin-right="7" width="1"
+        align="right"/>
+    <text value="#description" margin-bottom="4" width="10"/>
+  </row>
+  <row>
+    <label value="Start:" margin-bottom="2" margin-right="7" width="1"
+        align="right"/>
+    <date value="#startDate" margin-bottom="4" width="10"/>
+  </row>
+  <row>
+    <label value="End:" margin-bottom="2" margin-right="7" width="1"
+        align="right"/>
+    <date value="#endDate" margin-bottom="4" width="10"/>
+  </row>
+  <row>
+    <label value="URL:" margin-bottom="2" margin-right="7" width="1"
+        align="right"/>
+    <text value="#url" margin-bottom="4" width="10"/>
+  </row>
+  <row>
+    <label value="Notes:" margin-bottom="2"/>
+  </row>
+  <row>
+    <textArea value="#notes" margin-bottom="2" rows="5" cols="30"/>
+  </row>
+</panel>

@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="macosx">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/platforms/macosx/xercesImpl.jar!/" />
+      <root url="jar://$PROJECT_DIR$/platforms/macosx/jarbundler-1.9.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

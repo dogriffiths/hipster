@@ -37,12 +37,8 @@ package dg.hipster.view;
 
 import dg.hipster.Utilities;
 import dg.hipster.model.Idea;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.Stroke;
+
+import java.awt.*;
 import java.awt.geom.Point2D;
 
 /**
@@ -50,15 +46,17 @@ import java.awt.geom.Point2D;
  * @author davidg
  */
 public class BranchView extends IdeaView {
+//    public static final Color[] COLOURS = {new Color(255, 20, 20), Color.ORANGE,
     public static final Color[] COLOURS = {new Color(255, 20, 20), Color.ORANGE,
-    new Color(20, 200, 20), Color.CYAN};
+    new Color(20, 200, 20), Color.BLUE};
     private double thickness;
     private Point2D fromPoint;
     private Point2D toPoint;
     /**
      * Default width of the stroke used to render branches.
      */
-    public static final float DEFAULT_STROKE_WIDTH = 20.0f;
+//    public static final float DEFAULT_STROKE_WIDTH = 20.0f;
+    public static final float DEFAULT_STROKE_WIDTH = 4.0f;
 
     /** Creates a new instance of BranchView */
     public BranchView() {
@@ -70,6 +68,8 @@ public class BranchView extends IdeaView {
     }
 
     void paint(final Graphics g, final int depth, final IdeaMap map) {
+        Font font  = new Font("Loopiejuice", Font.PLAIN, 22);
+        g.setFont(font);
         double a = getRealAngle();
         Point c = new Point((int) fromPoint.getX(), (int) fromPoint.getY());
         Point s = new Point((int) toPoint.getX(), (int) toPoint.getY());
@@ -85,14 +85,15 @@ public class BranchView extends IdeaView {
         if (strokeWidth < (DEFAULT_STROKE_WIDTH / 2)) {
             strokeWidth = DEFAULT_STROKE_WIDTH / 2;
         }
+        strokeWidth = 4.0f;
         Stroke stroke = new BasicStroke(strokeWidth,
                 BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL);
         ((Graphics2D)g).setStroke(stroke);
         this.thickness = strokeWidth;
-        g.setColor(lower);
-        g.drawLine(c.x, c.y + 1, s.x, s.y + 1);
-        g.setColor(upper);
-        g.drawLine(c.x, c.y - 1, s.x, s.y - 1);
+//        g.setColor(lower);
+//        g.drawLine(c.x, c.y + 1, s.x, s.y + 1);
+//        g.setColor(upper);
+//        g.drawLine(c.x, c.y - 1, s.x, s.y - 1);
         g.setColor(colour);
         g.drawLine(c.x, c.y, s.x, s.y);
         ((Graphics2D)g).setStroke(oldStroke);

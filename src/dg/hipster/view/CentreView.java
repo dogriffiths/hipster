@@ -36,10 +36,8 @@
 package dg.hipster.view;
 
 import dg.hipster.model.Idea;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
+
+import java.awt.*;
 import java.awt.geom.Point2D;
 
 /**
@@ -47,8 +45,10 @@ import java.awt.geom.Point2D;
  * @author davidg
  */
 public class CentreView extends IdeaView {
-    public static int ROOT_RADIUS_X = 70;
-    public static int ROOT_RADIUS_Y = 40;
+//    public static int ROOT_RADIUS_X = 70;
+    public static int ROOT_RADIUS_X = 120;
+//    public static int ROOT_RADIUS_Y = 40;
+    public static int ROOT_RADIUS_Y = 60;
 
     /** Creates a new instance of CentreView */
     public CentreView() {
@@ -69,14 +69,21 @@ public class CentreView extends IdeaView {
         if (this.isSelected()) {
             colour = invert(colour);
         }
-        g.setColor(colour);
-        g.fillOval(-ROOT_RADIUS_X, -ROOT_RADIUS_Y, ROOT_RADIUS_X * 2,
-                ROOT_RADIUS_Y * 2);
+//        g.setColor(colour);
+//        g.fillOval(-ROOT_RADIUS_X, -ROOT_RADIUS_Y, ROOT_RADIUS_X * 2,
+//                ROOT_RADIUS_Y * 2);
         colour = Color.BLACK;
-        if (this.isSelected()) {
-            colour = invert(colour);
-        }
+//        if (this.isSelected()) {
+//            colour = invert(colour);
+//        }
         g.setColor(colour);
+
+        Stroke stroke = new BasicStroke(5.0f,
+                BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL);
+        ((Graphics2D)g).setStroke(stroke);
+
+
+
         g.drawOval(-ROOT_RADIUS_X, -ROOT_RADIUS_Y, ROOT_RADIUS_X * 2,
                 ROOT_RADIUS_Y * 2);
         drawString((Graphics2D)g, getIdea().getText(), new Point(0, 0), 4,

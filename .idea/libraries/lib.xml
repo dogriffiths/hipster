@@ -1,0 +1,22 @@
+<component name="libraryTable">
+  <library name="lib">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/jaxen-1.1-beta-7.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/asm-2.2.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/log4j-1.2.8.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/checkstyle-all-4.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/simian-2.2.12.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/junit.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/ccl.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jaxen-full.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/javancss.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/AppleJavaExtensions.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/javancss2ant.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/cobertura.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jakarta-oro-2.0.8.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/pmd-3.7.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

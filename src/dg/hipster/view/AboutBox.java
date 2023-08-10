@@ -84,7 +84,8 @@ public final class AboutBox extends JFrame implements ActionListener {
         if (titleFont == null) {
             titleFont = new Font("SansSerif", Font.BOLD, 14);
         }
-        bodyFont  = new Font("Lucida Grande", Font.PLAIN, 10);
+//        bodyFont  = new Font("Lucida Grande", Font.PLAIN, 10);
+        bodyFont  = new Font("Loopiejuice", Font.PLAIN, 10);
         if (bodyFont == null) {
             bodyFont = new Font("SansSerif", Font.PLAIN, 10);
         }

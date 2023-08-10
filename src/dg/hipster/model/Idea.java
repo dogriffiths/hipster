@@ -133,8 +133,9 @@ public class Idea extends AbstractModel implements IdeaListener {
      *
      * @param newText string to use
      */
-    public void setText(String newText) {
+    public void setText(String nt1) {
         String oldText = this.text;
+        String newText = "   " + nt1 + "   ";
         if ((this.text == null) || (!this.text.equals(newText))) {
             this.text = newText;
             this.firePropertyChange("text", oldText, newText);
