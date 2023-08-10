@@ -116,16 +116,6 @@ public class BranchView extends IdeaView {
             g.drawLine(c.x + (int)(xdiff * w), c.y + (int)(ydiff * w), s.x - (int)(xdiff * w), s.y - (int)(ydiff * w));
         }
 
-//        Stroke stroke3 = new BasicStroke(strokeWidth * 1.5f,
-//                BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL);
-//        ((Graphics2D)g).setStroke(stroke3);
-//        g.drawLine(c.x + (int)(xdiff * 0.05), c.y + (int)(ydiff * 0.05), s.x - (int)(xdiff * 0.05), s.y - (int)(ydiff * 0.05));
-//
-//        Stroke stroke2 = new BasicStroke(strokeWidth * 2.0f,
-//                BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL);
-//        ((Graphics2D)g).setStroke(stroke2);
-//        g.drawLine(c.x + (int)(xdiff * 0.1), c.y + (int)(ydiff * 0.1), s.x - (int)(xdiff * 0.1), s.y - (int)(ydiff * 0.1));
-
         ((Graphics2D)g).setStroke(oldStroke);
         if (this.isSelected()) {
             g.setColor(Color.WHITE);

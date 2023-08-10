@@ -79,7 +79,7 @@ public class CentreView extends IdeaView {
 //            colour = invert(colour);
 //        }
         g.setColor(colour);
-        Font font  = new Font("Loopiejuice", Font.PLAIN, 22);
+        Font font  = new Font("Loopiejuice", Font.PLAIN, 25);
         g.setFont(font);
 
         Stroke stroke = new BasicStroke(5.0f,
@@ -88,8 +88,29 @@ public class CentreView extends IdeaView {
 
 
 
-        g.drawOval(-ROOT_RADIUS_X, -ROOT_RADIUS_Y, ROOT_RADIUS_X * 2,
-                ROOT_RADIUS_Y * 2);
+//        g.drawOval(-ROOT_RADIUS_X, -ROOT_RADIUS_Y, ROOT_RADIUS_X * 2,
+//                ROOT_RADIUS_Y * 2);
+//        drawArc(int x, int y, int width, int height, int startAngle, int arcAngle)
+
+
+        float splits = 8.0f;
+        float strokeWidth = 4.0f;
+        for (int i = 0; i < splits; i++) {
+            float v = ((float) i / splits);
+            Stroke strokeA = new BasicStroke(strokeWidth * (1.0f + v),
+                    BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL);
+            ((Graphics2D)g).setStroke(strokeA);
+            int w = 50 - (int)(50 * v);
+            g.drawArc(-ROOT_RADIUS_X, -ROOT_RADIUS_Y, ROOT_RADIUS_X * 2,
+//                    ROOT_RADIUS_Y * 2, -180 - w, 350 + 2 * w);
+                    ROOT_RADIUS_Y * 2, -180 - w, 250 + 2 * w);
+//            g.drawLine(c.x + (int)(xdiff * w), c.y + (int)(ydiff * w), s.x - (int)(xdiff * w), s.y - (int)(ydiff * w));
+        }
+
+
+//        g.drawArc(-ROOT_RADIUS_X, -ROOT_RADIUS_Y, ROOT_RADIUS_X * 2,
+//                ROOT_RADIUS_Y * 2, -250, 350);
+        ((Graphics2D)g).scale(1.0, 1.2);
         ((Graphics2D)g).transform(AffineTransform.getTranslateInstance(0.0, 15.0));
         drawString((Graphics2D)g, getIdea().getText(), new Point(0, 0), 4,
                 getIdea().getAngle(), this.isEditing(), map);
