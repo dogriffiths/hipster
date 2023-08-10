@@ -48,10 +48,8 @@ import dg.hipster.model.IdeaDocument;
 import dg.hipster.model.IdeaLink;
 import dg.hipster.model.Settings;
 import dg.inx.XMLMenuBar;
-import java.awt.BorderLayout;
-import java.awt.FileDialog;
-import java.awt.Image;
-import java.awt.Toolkit;
+
+import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.DataFlavor;
@@ -61,6 +59,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
+import java.awt.print.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -87,7 +86,7 @@ import javax.swing.UIManager;
  * @author davidg
  */
 public final class Mainframe extends JFrame implements PropertyChangeListener,
-        FocusListener, ClipboardOwner {
+        FocusListener, ClipboardOwner, Printable {
     /**
      * Internationalization strings.
      */
@@ -159,9 +158,14 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
         JMenu fileMenu = menuBar.getMenu("file");
         menuBar.createItem("saveAs", fileMenu, "saveAsDocument",
                 KeyStroke.getKeyStroke(
-                KeyEvent.VK_S,
-                ActionEvent.SHIFT_MASK
-                + Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+                        KeyEvent.VK_S,
+                        ActionEvent.SHIFT_MASK
+                                + Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        menuBar.createItem("printDocument", fileMenu, "printDocument",
+                KeyStroke.getKeyStroke(
+                        KeyEvent.VK_P,
+                        ActionEvent.SHIFT_MASK
+                                + Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         JMenu editMenu = menuBar.getMenu("edit");
         if (!Main.isMac()) {
             fileMenu.addSeparator();
@@ -312,6 +316,26 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
     
     public void saveDocument() throws IOException, ReaderException {
         saveDocument(this.getDocument(), this.getDocument().getCurrentFile());
+    }
+
+    public void printDocument() {
+        PrinterJob printJob = PrinterJob.getPrinterJob();
+        PageFormat pageFormat = printJob.defaultPage();
+        pageFormat.setOrientation(PageFormat.LANDSCAPE);
+        Paper paper = new Paper();
+        paper.setSize(2000, 2000);
+        pageFormat.setPaper(paper);
+        pageFormat = printJob.validatePage(pageFormat);
+        printJob.setJobName("Test print page");
+        printJob.setPrintable(this, pageFormat);
+
+        if (printJob.printDialog()) {
+            try {
+                printJob.print();
+            } catch (PrinterException ex) {
+                ex.printStackTrace();
+            }
+        }
     }
     
     public void saveDocument(IdeaDocument document, File f)
@@ -638,6 +662,33 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
         if (this.ideaMap.getDocument() != null) {
             this.ideaMap.getDocument().redo();
         }
+    }
+
+    @Override
+    public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) throws PrinterException {
+        Graphics2D g2D = (Graphics2D)(graphics);
+//        // Render some strings
+//        g2D.setFont(new Font("Sans", Font.PLAIN, 8));
+//        g2D.drawString("This is supposed to be a small string", 10, 20);
+//        g2D.setFont(new Font("Helvetica", Font.BOLD, 12));
+//        g2D.drawString("This is supposed to be a bold string in medium size", 100, 50);
+//        g2D.setFont(new Font("Helvetica", Font.PLAIN, 12));
+//        g2D.drawString("This string should look less bold than the one above", 100, 70);
+//        g2D.setFont(new Font("Helvetica", Font.ITALIC, 24));
+//        g2D.drawString("And THIS should be a quite BIG ITALIC string", 50, 100);
+//        try {
+//            BufferedImage bi = ImageIO.read(new File("./testImage.png"));
+//            g2D.drawImage(bi, new AffineTransformOp(new AffineTransform()
+//            {{ scale(0.65, 0.65);}} , AffineTransformOp.TYPE_BICUBIC), 0, 130);
+//        } catch(IOException ioe) {
+//            // Don't render any image
+//        }
+        g2D.scale(0.5, 0.5);
+        ideaMap.print(g2D);
+        if (pageIndex == 0)
+            return Printable.PAGE_EXISTS;
+
+        return Printable.NO_SUCH_PAGE;
     }
 }
 
