@@ -390,8 +390,10 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
 
         // Create an instance of the SVG Generator.
         SVGGraphics2D svgGenerator = new SVGGraphics2D(document1);
+        svgGenerator.setSVGCanvasSize(this.ideaMap.getSize());
 
-        this.ideaMap.paintComponent(svgGenerator);
+//        this.ideaMap.paintComponent(svgGenerator);
+        this.ideaMap.paintMainThing(svgGenerator);
 
         // Finally, stream out SVG to the standard output using
         // UTF-8 encoding.

@@ -243,6 +243,14 @@ public final class IdeaMap extends JComponent implements MapComponent {
         Dimension size = getSize();
         gOrig.setColor(this.getBackground());
         gOrig.fillRect(0, 0, size.width, size.height);
+        paintMainThing(gOrig);
+        if ((rubberBandFrom != null) && (rubberBandTo != null)) {
+            this.drawRubberBand((Graphics2D) gOrig);
+        }
+    }
+
+    public void paintMainThing(Graphics gOrig) {
+        Dimension size = getSize();
         Graphics g = gOrig.create();
         ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_ON);
@@ -253,9 +261,6 @@ public final class IdeaMap extends JComponent implements MapComponent {
             rootView.paint(g, this);
         }
         g.dispose();
-        if ((rubberBandFrom != null) && (rubberBandTo != null)) {
-            this.drawRubberBand((Graphics2D) gOrig);
-        }
     }
 
     /**
