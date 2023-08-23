@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="svg-graphics-0.0.2-shaded">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/svg-graphics-0.0.2-shaded.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

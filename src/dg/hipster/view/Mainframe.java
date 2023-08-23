@@ -41,19 +41,21 @@ import dg.hipster.Utilities;
 import dg.hipster.io.ReaderException;
 import dg.hipster.io.ReaderFactory;
 import dg.hipster.io.WriterFactory;
-import dg.hipster.io.WikiWriter;
+
 import static dg.hipster.io.WikiWriter.wikiIdea;
 import dg.hipster.model.Idea;
 import dg.hipster.model.IdeaDocument;
-import dg.hipster.model.IdeaLink;
 import dg.hipster.model.Settings;
 import dg.inx.XMLMenuBar;
+import org.apache.batik.svggen.SVGGraphics2D;
+import org.apache.batik.svggen.SVGGraphics2DIOException;
+import org.w3c.dom.DOMImplementation;
+import org.w3c.dom.Document;
 
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
@@ -62,12 +64,9 @@ import java.awt.event.KeyEvent;
 import java.awt.print.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.File;
-import java.io.FilenameFilter;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
-import java.net.URLEncoder;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -79,6 +78,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
+import org.apache.batik.dom.GenericDOMImplementation;
 
 /**
  * Main window of the application.
@@ -343,6 +343,14 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
         File file = f;
         if (file == null) {
             String filename = document.getTitle();
+
+            System.out.println("XXXXXXX filename = " + filename);
+            if (filename.toUpperCase().endsWith(".SVG")) {
+                saveToSVG(file);
+                return;
+            }
+
+
             if (!filename.toUpperCase().endsWith(".OPML")) {
                 filename += ".opml";
             }
@@ -361,11 +369,37 @@ public final class Mainframe extends JFrame implements PropertyChangeListener,
         
         
         if (file != null) {
+            String filename = file.getName();
+            System.out.println("XXXXXXX filename = " + filename);
+            if (filename.toUpperCase().endsWith(".SVG")) {
+                saveToSVG(file);
+                return;
+            }
             Idea idea = document.getIdea();
             WriterFactory.getInstance().write(file, document, false);
         }
     }
-    
+
+    private void saveToSVG(File file) throws UnsupportedEncodingException, FileNotFoundException, SVGGraphics2DIOException {
+        DOMImplementation domImpl =
+                GenericDOMImplementation.getDOMImplementation();
+
+        // Create an instance of org.w3c.dom.Document.
+        String svgNS = "http://www.w3.org/2000/svg";
+        Document document1 = domImpl.createDocument(svgNS, "svg", null);
+
+        // Create an instance of the SVG Generator.
+        SVGGraphics2D svgGenerator = new SVGGraphics2D(document1);
+
+        this.ideaMap.paintComponent(svgGenerator);
+
+        // Finally, stream out SVG to the standard output using
+        // UTF-8 encoding.
+        boolean useCSS = true; // we want to use CSS style attributes
+        Writer out = new OutputStreamWriter(new FileOutputStream(file), "UTF-8");
+        svgGenerator.stream(out, useCSS);
+    }
+
     public void exportWiki()
     throws IOException, ReaderException {
         File file = null;

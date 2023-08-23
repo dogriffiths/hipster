@@ -126,6 +126,12 @@ is divided into following sections:
                 <javac srcdir="@{srcdir}" destdir="@{destdir}" debug="@{debug}" deprecation="${javac.deprecation}" source="${javac.source}" target="${javac.target}" includeantruntime="false">
                     <classpath>
                         <path path="@{classpath}"/>
+                        <path path="lib/svg-graphics-0.0.2-shaded.jar"/>
+                        <path path="lib/batik-rasterizer-1.16.jar"/>
+                        <path path="lib/batik-slideshow-1.16.jar"/>
+                        <path path="lib/batik-squiggle-1.16.jar"/>
+                        <path path="lib/batik-svgpp-1.16.jar"/>
+                        <path path="lib/batik-ttf2svg-1.16.jar"/>
                     </classpath>
                     <compilerarg line="${javac.compilerargs}"/>
                     <customize/>

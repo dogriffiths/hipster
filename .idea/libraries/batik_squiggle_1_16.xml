@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="batik-squiggle-1.16">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/batik-squiggle-1.16.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

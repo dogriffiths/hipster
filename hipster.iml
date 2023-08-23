@@ -9,5 +9,11 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="lib" level="project" />
+    <orderEntry type="library" name="batik-ttf2svg-1.16" level="project" />
+    <orderEntry type="library" name="batik-svgpp-1.16" level="project" />
+    <orderEntry type="library" name="batik-squiggle-1.16" level="project" />
+    <orderEntry type="library" name="batik-slideshow-1.16" level="project" />
+    <orderEntry type="library" name="batik-rasterizer-1.16" level="project" />
+    <orderEntry type="library" name="svg-graphics-0.0.2-shaded" level="project" />
   </component>
 </module>
